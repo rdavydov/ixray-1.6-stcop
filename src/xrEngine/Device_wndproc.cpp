@@ -6,13 +6,15 @@ bool CRenderDevice::on_message	(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 		case WM_SYSKEYDOWN : {
 			return true;
 						   }
-		case WM_ACTIVATE : {
+		case WM_ACTIVATE : 
+		{
 #ifdef INGAME_EDITOR
 			if (editor()) {
 				Device.b_is_Active	= TRUE;
 				break;
 			}
 #endif // #ifdef INGAME_EDITOR
+			ShowCursor(wParam == WA_INACTIVE);
 			OnWM_Activate	(wParam, lParam);
 			return			(false);
 		}
