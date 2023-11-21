@@ -48,6 +48,7 @@ void CreateGameWindow() {
 
 		g_AppInfo.WindowHandle = CreateWindowEx(WS_EX_TOPMOST, wndclass, L"S.T.A.L.K.E.R.: Call of Pripyat", Device.m_dwWindowStyle, 0, 0,
 			screen_width, screen_height, 0L, 0, hInstance, 0L);
+		ShowWindow(g_AppInfo.WindowHandle, SW_MINIMIZE);
 	}
 }
 
@@ -117,12 +118,13 @@ int APIENTRY WinMain
 	DestroyWindow(logoWindow);
 	logoWindow = NULL;
 
-	xr_delete(g_pStringTable);
 	// Show main wnd
-	ShowWindow(g_AppInfo.WindowHandle, SW_SHOW);
-
+	ShowWindow(g_AppInfo.WindowHandle, SW_RESTORE);
+	Console->Execute("vid_restart");
+	
 	EngineLoadStage5();
 
+	xr_delete(g_pStringTable);
 	Core._destroy();
 
 #ifdef NO_MULTI_INSTANCES		
