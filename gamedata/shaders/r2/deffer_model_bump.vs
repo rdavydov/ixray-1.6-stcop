@@ -25,6 +25,10 @@ p_bumped	_main	( v_model I )
 	hemi_val	= saturate(hemi_val);
 
 	O.position	= float4	(Pe, 	hemi_val);		//Use L_material.x for old behaviour;
+	
+	float2 tcs = O.hpos.xy / O.hpos.w;
+	tcs.y = -tcs.y;
+	O.position.xy = O.position.z * tcs * pos_decompression_params.xy;
 
 #if defined(USE_R2_STATIC_SUN) && !defined(USE_LM_HEMI)
 	O.tcdh.w	= L_material.y;					// (,,,dir-occlusion)

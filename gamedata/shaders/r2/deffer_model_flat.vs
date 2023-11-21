@@ -22,6 +22,10 @@ p_flat 	_main	( v_model I )
 
 	O.tcdh 		= float4	(I.tc.xyyy);
 	O.position	= float4	(Pe, hemi_val);		//use L_material.x for old behaviour
+	
+	float2 tcs = O.hpos.xy / O.hpos.w;
+	tcs.y = -tcs.y;
+	O.position.xy = O.position.z * tcs * pos_decompression_params.xy;
 
 #if defined(USE_R2_STATIC_SUN) && !defined(USE_LM_HEMI)
 	O.tcdh.w	= L_material.y;							// (,,,dir-occlusion)
