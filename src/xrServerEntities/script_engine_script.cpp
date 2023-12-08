@@ -42,12 +42,6 @@ void ErrorLog(LPCSTR caMessage)
 		}
 #	endif // #ifndef USE_LUA_STUDIO
 #endif // #ifdef USE_DEBUGGER
-
-#ifdef DEBUG
-		bool lua_studio_connected = !!ai().script_engine().debugger();
-		if (!lua_studio_connected)
-#endif //#ifdef DEBUG
-	R_ASSERT2(0, caMessage);
 }
 
 void FlushLogs()
