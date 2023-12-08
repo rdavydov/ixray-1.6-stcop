@@ -688,7 +688,9 @@ void CCC_Register()
 #endif
 
 	// Render device states
+#ifndef MASTER_GOLD
 	CMD3(CCC_Mask, "read_sun_config", &psEnvironmentFlags, ENABLE_READ_SUN_CONFIG);
+#endif
 
 	CMD3(CCC_Mask, "rs_device_active", &psDeviceFlags, rsDeviceActive);
 

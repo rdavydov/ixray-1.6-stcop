@@ -43,8 +43,7 @@ static const float			MAX_NOISE_FREQ	= 0.03f;
 
 const float MAX_DIST_FACTOR = 0.95f;
 
-Flags32 psEnvironmentFlags {
-};
+Flags32 psEnvironmentFlags{ ENABLE_READ_SUN_CONFIG };
 
 //////////////////////////////////////////////////////////////////////////
 // environment
