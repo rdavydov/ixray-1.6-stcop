@@ -81,12 +81,15 @@ add_custom_command(TARGET ${PROJECT_NAME}
 ## DirectX SDK
 if(NOT "${CMAKE_VS_PLATFORM_NAME}" MATCHES "(x64)")
     target_link_libraries(xrRender_R1 PUBLIC ${CMAKE_BINARY_DIR}/packages/Microsoft.DXSDK.D3DX.9.29.952.8/build/native/release/lib/x86/d3dx9.lib)
+	target_link_libraries(xrRender_R1 PUBLIC ${CMAKE_BINARY_DIR}/packages/directxtex_desktop_win10.2023.6.14.1/native/lib/x86/release/DirectXTex.lib)
 else()
     target_link_libraries(xrRender_R1 PUBLIC ${CMAKE_BINARY_DIR}/packages/Microsoft.DXSDK.D3DX.9.29.952.8/build/native/release/lib/x64/d3dx9.lib)
+	target_link_libraries(xrRender_R1 PUBLIC ${CMAKE_BINARY_DIR}/packages/directxtex_desktop_win10.2023.6.14.1/native/lib/x64/release/DirectXTex.lib)
 endif()
 
 target_include_directories(xrRender_R1 PUBLIC "${CMAKE_BINARY_DIR}/packages/Microsoft.DXSDK.D3DX.9.29.952.8/build/native/include/")
 target_include_directories(xrRender_R1 PUBLIC "${CMAKE_BINARY_DIR}/packages/directxmesh_desktop_win10.2023.4.28.1/include/")
+target_include_directories(xrRender_R1 PUBLIC "${CMAKE_BINARY_DIR}/packages/directxtex_desktop_win10.2023.6.14.1/include/")
 
 ## RenderDoc
 target_include_directories(xrRender_R1 PUBLIC "${RENDERDOC_API}")
