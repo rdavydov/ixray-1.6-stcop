@@ -86,23 +86,40 @@ void	R_xforms::apply_invw()
 
 void	R_xforms::unmap			()
 {
-	c_w			= NULL;
 	c_invw		= NULL;
+
+	c_w			= NULL;
 	c_v			= NULL;
 	c_p			= NULL;
 	c_wv		= NULL;
 	c_vp		= NULL;
 	c_wvp		= NULL;
+
+	c_w_old		= NULL;
+	c_v_old		= NULL;
+	c_p_old		= NULL;
+	c_wv_old	= NULL;
+	c_vp_old	= NULL;
+	c_wvp_old	= NULL;
 }
-R_xforms::R_xforms				()
+R_xforms::R_xforms ()
 {
 	unmap			();
-	m_w.identity	();
 	m_invw.identity	();
+
+	m_w.identity	();
 	m_v.identity	();
 	m_p.identity	();
 	m_wv.identity	();
 	m_vp.identity	();
 	m_wvp.identity	();
+
+	m_w_old.identity	();
+	m_v_old.identity	();
+	m_p_old.identity	();
+	m_wv_old.identity	();
+	m_vp_old.identity	();
+	m_wvp_old.identity	();
+
 	m_bInvWValid = true;
 }
