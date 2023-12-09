@@ -144,7 +144,12 @@ void dxFontRender::CreateFontAtlas(u32 width, u32 height, const char* name, void
 	FontData.SysMemPitch = width * 4;
 
 	ID3DTexture2D* Texture = nullptr;
-	R_CHK(RDevice->CreateTexture2D(&descFontAtlas, &FontData, &Texture));
+
+	if (RDevice->CreateTexture2D(&descFontAtlas, &FontData, &Texture) != S_OK) {
+		Msg("! D3D_USAGE_DEFAULT may not working");
+		_RELEASE(Texture); descFontAtlas.Usage = D3D_USAGE_DYNAMIC;
+		R_CHK(RDevice->CreateTexture2D(&descFontAtlas, &FontData, &Texture));
+	}
 #else
 	D3DLOCKED_RECT LockedRect = {};
 	ID3DTexture2D* Texture = nullptr;
