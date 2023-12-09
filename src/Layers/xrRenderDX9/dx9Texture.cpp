@@ -219,6 +219,7 @@ ID3DBaseTexture*	CRender::texture_load(LPCSTR fRName, u32& ret_msize)
 	xr_strcpy(fname,fRName); //. andy if (strext(fname)) *strext(fname)=0;
 	fix_texture_name		(fname);
 	IReader* S				= NULL;
+	if (!FS.exist(fn, "$game_textures$", fname, ".dds") && strstr(fname, "_bump"))	goto _BUMP_from_base;
 	if (FS.exist(fn,"$level$",			fname,	".dds"))							goto _DDS;
 	if (FS.exist(fn,"$game_saves$",		fname,	".dds"))							goto _DDS;
 	if (FS.exist(fn,"$game_textures$",	fname,	".dds"))							goto _DDS;
@@ -308,6 +309,24 @@ _DDS_2D:
 			mip_cnt = T_sysmem->GetLevelCount();
 			ret_msize = calc_texture_size(img_loaded_lod, mip_cnt, img_size);
 			return					T_sysmem;
+		}
+	}
+_BUMP_from_base: 
+	{
+		Msg("! Fallback to default bump map: %s", fname);
+		if (strstr(fname, "_bump#")) {
+			R_ASSERT2(FS.exist(fn, "$game_textures$", "ed\\ed_dummy_bump#", ".dds"), "ed_dummy_bump#");
+			S = FS.r_open(fn);
+			R_ASSERT2(S, fn);
+			img_size = S->length();
+			goto _DDS_2D;
+		}
+		if (strstr(fname, "_bump")) {
+			R_ASSERT2(FS.exist(fn, "$game_textures$", "ed\\ed_dummy_bump", ".dds"), "ed_dummy_bump");
+			S = FS.r_open(fn);
+			R_ASSERT2(S, fn);
+			img_size = S->length();
+			goto _DDS_2D;
 		}
 	}
 }
