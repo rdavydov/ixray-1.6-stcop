@@ -125,13 +125,15 @@ void		CResourceManager::_DeletePass			(const SPass* P)
 //--------------------------------------------------------------------------------------------------------------
 SVS*	CResourceManager::_CreateVS		(LPCSTR _name)
 {
-	string_path			name;
-	xr_strcpy				(name,_name);
-	if (0 == ::Render->m_skinning)	xr_strcat(name,"_0");
-	if (1 == ::Render->m_skinning)	xr_strcat(name,"_1");
-	if (2 == ::Render->m_skinning)	xr_strcat(name,"_2");
-	if (3 == ::Render->m_skinning)	xr_strcat(name,"_3");
-	if (4 == ::Render->m_skinning)	xr_strcat(name,"_4");
+	xr_string res_name = _name;
+
+	if (Render->m_skinning > 0) {
+		res_name += "_" + std::to_string(Render->m_skinning);
+	}
+
+	res_name += RImplementation.getShaderParams();
+	LPCSTR name = res_name.c_str();
+
 	LPSTR N				= LPSTR		(name);
 	map_VS::iterator I	= m_vs.find	(N);
 	if (I!=m_vs.end())	return I->second;
@@ -140,22 +142,13 @@ SVS*	CResourceManager::_CreateVS		(LPCSTR _name)
 		SVS*	_vs					= xr_new<SVS>	();
 		_vs->dwFlags				|= xr_resource_flagged::RF_REGISTERED;
 		m_vs.insert					(std::make_pair(_vs->set_name(name),_vs));
-		//_vs->vs				= NULL;
-		//_vs->signature		= NULL;
+
 		if (0==_stricmp(_name,"null"))	{
 			return _vs;
 		}
 
-		string_path					shName;
-		{
-			const char*	pchr = strchr(_name, '(');
-			ptrdiff_t	size = pchr?pchr-_name:xr_strlen(_name);
-			strncpy(shName, _name, size);
-			shName[size] = 0;
-		}
-
 		string_path					cname;
-		xr_strconcat(cname,::Render->getShaderPath(),/*_name*/shName,".vs");
+		xr_strconcat(cname,::Render->getShaderPath(), _name,".vs");
 		FS.update_path				(cname,	"$game_shaders$", cname);
 		//		LPCSTR						target		= NULL;
 
@@ -229,8 +222,9 @@ void	CResourceManager::_DeleteVS			(const SVS* vs)
 //--------------------------------------------------------------------------------------------------------------
 SPS*	CResourceManager::_CreatePS			(LPCSTR _name)
 {
-	string_path name;
-	xr_strcpy(name, _name);
+	xr_string res_name = _name + RImplementation.getShaderParams();
+	LPCSTR name = res_name.c_str();
+
 	LPSTR N				= LPSTR(name);
 	map_PS::iterator I	= m_ps.find	(N);
 	if (I!=m_ps.end())	return		I->second;
@@ -244,15 +238,9 @@ SPS*	CResourceManager::_CreatePS			(LPCSTR _name)
 			return _ps;
 		}
 
-		string_path					shName;
-		const char*	pchr = strchr(_name, '(');
-		ptrdiff_t	strSize = pchr?pchr-_name:xr_strlen(_name);
-		strncpy(shName, _name, strSize );
-		shName[strSize] = 0;
-
 		// Open file
 		string_path					cname;
-		xr_strconcat(cname,::Render->getShaderPath(),/*_name*/shName,".ps");
+		xr_strconcat(cname,::Render->getShaderPath(),_name,".ps");
 		FS.update_path				(cname,	"$game_shaders$", cname);
 
 		// duplicate and zero-terminate
@@ -317,9 +305,12 @@ void	CResourceManager::_DeletePS			(const SPS* ps)
 }
 
 //--------------------------------------------------------------------------------------------------------------
-SGS*	CResourceManager::_CreateGS			(LPCSTR name)
+SGS*	CResourceManager::_CreateGS			(LPCSTR _name)
 {
-	LPSTR N				= LPSTR(name);
+	xr_string res_name = _name + RImplementation.getShaderParams();
+	LPCSTR name = res_name.c_str();
+
+	LPSTR N = LPSTR(name);
 	map_GS::iterator I	= m_gs.find	(N);
 	if (I!=m_gs.end())	return		I->second;
 	else
@@ -327,14 +318,14 @@ SGS*	CResourceManager::_CreateGS			(LPCSTR name)
 		SGS*	_gs					=	xr_new<SGS>	();
 		_gs->dwFlags				|=	xr_resource_flagged::RF_REGISTERED;
 		m_gs.insert					(std::make_pair(_gs->set_name(name),_gs));
-		if (0==_stricmp(name,"null"))	{
+		if (0==_stricmp(_name,"null"))	{
 			_gs->gs				= NULL;
 			return _gs;
 		}
 
 		// Open file
 		string_path					cname;
-		xr_strconcat(cname,::Render->getShaderPath(),name,".gs");
+		xr_strconcat(cname,::Render->getShaderPath(),_name,".gs");
 		FS.update_path				(cname,	"$game_shaders$", cname);
 
 		// duplicate and zero-terminate
