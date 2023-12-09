@@ -9,8 +9,10 @@
 #include "../xrRender/dxRenderDeviceRender.h"
 #endif
 
-// #include "std_classes.h"
-// #include "xr_avi.h"
+#include <DirectXTex.h>
+#include "../xrRenderDX9/DDSTextureLoader9.h"
+using namespace DirectX;
+
 
 void fix_texture_name(LPSTR fn)
 {
@@ -263,7 +265,8 @@ IC u32 it_height_rev_base(u32 d, u32 s)	{	return	color_rgba	(
 
 ID3DBaseTexture*	CRender::texture_load(LPCSTR fRName, u32& ret_msize)
 {
-	ID3DTexture2D*		pTexture2D		= NULL;
+	TexMetadata				imageInfo		= {};
+	ID3DTexture2D*			pTexture2D		= NULL;
 	IDirect3DCubeTexture9*	pTextureCUBE	= NULL;
 	string_path				fn;
 	u32						dwWidth,dwHeight;
@@ -304,42 +307,27 @@ ID3DBaseTexture*	CRender::texture_load(LPCSTR fRName, u32& ret_msize)
 _DDS:
 	{
 		// Load and get header
-		D3DXIMAGE_INFO			IMG;
-		S						= FS.r_open	(fn);
+		S = FS.r_open(fn);
 #ifdef DEBUG
-		Msg						("* Loaded: %s[%d]b",fn,S->length());
+		Msg("* Loaded: %s[%d]b", fn, S->length());
 #endif // DEBUG
-		img_size				= S->length	();
-		R_ASSERT				(S);
-		result_	= D3DXGetImageInfoFromFileInMemory	(S->pointer(),S->length(),&IMG);
-		if ( FAILED(result_) ) {
-			Msg					("! Can't get image info for texture '%s'",fn);
-			FS.r_close			(S);
-			string_path			temp;
-			R_ASSERT			( FS.exist( temp, "$game_textures$", "ed\\ed_not_existing_texture", ".dds" ) );
-			R_ASSERT			( xr_strcmp(temp,fn) );
-			xr_strcpy			( fn, temp );
-			goto _DDS;
+		img_size = S->length();
+		R_ASSERT(S);
+		R_CHK2(GetMetadataFromDDSMemory(S->pointer(), S->length(), DDS_FLAGS::DDS_FLAGS_NONE, imageInfo), fn);
+		if (imageInfo.IsCubemap() || imageInfo.IsVolumemap()) {
+			goto _DDS_CUBE;
 		}
-
-		if (IMG.ResourceType	== D3DRTYPE_CUBETEXTURE)			goto _DDS_CUBE;
-		else														goto _DDS_2D;
-
+		else {
+			goto _DDS_2D;
+		}
 _DDS_CUBE:
 		{
-			result_	=
-				D3DXCreateCubeTextureFromFileInMemoryEx(
-					RDevice,
-					S->pointer(),S->length(),
-					D3DX_DEFAULT,
-					IMG.MipLevels,0,
-					IMG.Format,
-					(RImplementation.o.no_ram_textures ? D3DPOOL_DEFAULT : D3DPOOL_MANAGED),
-					D3DX_DEFAULT,
-					D3DX_DEFAULT,
-					0,&IMG,0,
-					&pTextureCUBE
-				);
+			HRESULT const result_ = CreateDDSTextureFromMemory(
+				HW.pDevice,
+				static_cast<const uint8_t*>(S->pointer()),
+				S->length(),
+				&pTextureCUBE);
+
 			FS.r_close				(S);
 
 			if ( FAILED(result_) ) {
@@ -352,9 +340,9 @@ _DDS_CUBE:
 			}
 
 			// OK
-			dwWidth					= IMG.Width;
-			dwHeight				= IMG.Height;
-			fmt						= IMG.Format;
+			dwWidth					= imageInfo.width;
+			dwHeight				= imageInfo.height;
+			//fmt						= imageInfo.format;
 			ret_msize				= calc_texture_size(img_loaded_lod, mip_cnt, img_size);
 			mip_cnt					= pTextureCUBE->GetLevelCount();
 			return					pTextureCUBE;
@@ -364,18 +352,13 @@ _DDS_2D:
 			_strlwr					(fn);
 			// Load   SYS-MEM-surface, bound to device restrictions
 			ID3DTexture2D*		T_sysmem;
-			HRESULT const result_	=
-				D3DXCreateTextureFromFileInMemoryEx(
-					RDevice,S->pointer(),S->length(),
-					D3DX_DEFAULT,D3DX_DEFAULT,
-					IMG.MipLevels,0,
-					IMG.Format,
-					D3DPOOL_SYSTEMMEM,
-					D3DX_DEFAULT,
-					D3DX_DEFAULT,
-					0,&IMG,0,
-					&T_sysmem
-				);
+			
+			HRESULT const result_ = CreateDDSTextureFromMemory(
+				HW.pDevice, 
+				static_cast<const uint8_t*>(S->pointer()), 
+				S->length(), 
+				&T_sysmem);
+
 			FS.r_close				(S);
 
 			if ( FAILED(result_) ) {
@@ -388,6 +371,12 @@ _DDS_2D:
 				goto _DDS;
 			}
 
+			img_loaded_lod = get_texture_load_lod(fn);
+			mip_cnt = T_sysmem->GetLevelCount();
+			ret_msize = calc_texture_size(img_loaded_lod, mip_cnt, img_size);
+			return					T_sysmem;
+
+#if 0
 			img_loaded_lod			= get_texture_load_lod(fn);
 			pTexture2D				= TW_LoadTextureFromTexture(T_sysmem,IMG.Format, img_loaded_lod, dwWidth, dwHeight);
 			mip_cnt					= pTexture2D->GetLevelCount();
@@ -397,6 +386,7 @@ _DDS_2D:
 			fmt						= IMG.Format;
 			ret_msize				= calc_texture_size(img_loaded_lod, mip_cnt, img_size);
 			return					pTexture2D;
+#endif
 		}
 	}
 	/*
