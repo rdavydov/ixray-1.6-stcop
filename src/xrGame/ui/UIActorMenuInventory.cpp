@@ -46,6 +46,7 @@ void CUIActorMenu::InitInventoryMode()
 	m_pInventoryOutfitList->Show		(true);
 	m_pInventoryHelmetList->Show		(true);
 	m_pInventoryDetectorList->Show		(true);
+	m_pInventoryMapList->Show(true);
 	m_pInventoryPistolList->Show		(true);
 	m_pInventoryAutomaticList->Show		(true);
 	m_pQuickSlot->Show					(true);
@@ -248,6 +249,7 @@ void CUIActorMenu::OnInventoryAction(PIItem pItem, u16 action_type)
 		m_pInventoryOutfitList,
 		m_pInventoryHelmetList,
 		m_pInventoryDetectorList,
+		m_pInventoryMapList,
 		m_pInventoryBagList,
 		m_pTradeActorBagList,
 		m_pTradeActorList,
@@ -429,6 +431,7 @@ void CUIActorMenu::InitInventoryContents(CUIDragDropListEx* pBagList)
 	InitCellForSlot				(INV_SLOT_3);
 	InitCellForSlot				(OUTFIT_SLOT);
 	InitCellForSlot				(DETECTOR_SLOT);
+	InitCellForSlot(MAP_SLOT);
 	InitCellForSlot				(GRENADE_SLOT);
 	InitCellForSlot				(HELMET_SLOT);
 
@@ -489,10 +492,7 @@ bool CUIActorMenu::TryActiveSlot(CUICellItem* itm)
 		SendEvent_ActivateSlot( slot, m_pActorInvOwner->object_id() );
 		return true;
 	}
-	if ( slot == DETECTOR_SLOT )
-	{
 
-	}
 	return false;
 }
 
@@ -556,7 +556,10 @@ bool CUIActorMenu::ToSlot(CUICellItem* itm, bool force_place, u16 slot_id)
 		if ( !force_place || slot_id == NO_ACTIVE_SLOT ) 
 			return false;
 
-		if ( m_pActorInvOwner->inventory().SlotIsPersistent(slot_id) && slot_id != DETECTOR_SLOT  )
+		if (m_pActorInvOwner->inventory().SlotIsPersistent(slot_id) && slot_id != DETECTOR_SLOT)
+			return false;
+
+		if (m_pActorInvOwner->inventory().SlotIsPersistent(slot_id) && slot_id != MAP_SLOT)
 			return false;
 
 		if ( slot_id == INV_SLOT_2 && m_pActorInvOwner->inventory().CanPutInSlot(iitem, INV_SLOT_3))
@@ -712,6 +715,10 @@ CUIDragDropListEx* CUIActorMenu::GetSlotList(u16 slot_idx)
 
 		case DETECTOR_SLOT:
 			return m_pInventoryDetectorList;
+			break;
+
+		case MAP_SLOT:
+			return m_pInventoryMapList;
 			break;
 
 		case GRENADE_SLOT://fake

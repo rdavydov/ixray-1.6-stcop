@@ -679,6 +679,20 @@ bool CInventory::Action(u16 cmd, u32 flags)
 				}
 			}
 		}break;
+	case kMAP:
+		{
+			b_send_event = true;
+			if (flags & CMD_START)
+			{
+				if (GetActiveSlot() == MAP_SLOT && ActiveItem())
+				{
+					Activate(NO_ACTIVE_SLOT);
+				}
+				else {
+					Activate(MAP_SLOT);
+				}
+			}
+		}break;
 	}
 
 	if(b_send_event && g_pGameLevel && OnClient() && pActor)

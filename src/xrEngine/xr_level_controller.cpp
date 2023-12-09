@@ -36,6 +36,7 @@ ENGINE_API _action  actions[]		= {
 	{ "torch",				kTORCH					,_both},	
 	{ "night_vision",		kNIGHT_VISION			,_both},	
 	{ "show_detector",		kDETECTOR				,_sp},		
+	{ "show_map",		    kMAP				    ,_sp},
 
 	{ "wpn_1",				kWPN_1					,_both},	
 	{ "wpn_2",				kWPN_2					,_both},	

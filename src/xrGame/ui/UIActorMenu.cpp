@@ -306,7 +306,8 @@ EDDListType CUIActorMenu::GetListType(CUIDragDropListEx* l)
 	if(l==m_pInventoryOutfitList)		return iActorSlot;
 	if(l==m_pInventoryHelmetList)		return iActorSlot;
 	if(l==m_pInventoryDetectorList)		return iActorSlot;
-	
+	if (l == m_pInventoryMapList)		return iActorSlot;
+
 	if(l==m_pTradeActorBagList)			return iActorBag;
 	if(l==m_pTradeActorList)			return iActorTrade;
 	if(l==m_pTradePartnerBagList)		return iPartnerTradeBag;
@@ -480,6 +481,7 @@ void CUIActorMenu::clear_highlight_lists()
 	m_HelmetSlotHighlight->Show(false);
 	m_OutfitSlotHighlight->Show(false);
 	m_DetectorSlotHighlight->Show(false);
+	m_MapSlotHighlight->Show(false);
 	for(u8 i=0; i<4; i++)
 		m_QuickSlotsHighlight[i]->Show(false);
 	for(u8 i=0; i<e_af_count; i++)
@@ -817,6 +819,7 @@ void CUIActorMenu::ClearAllLists()
 	m_pInventoryOutfitList->ClearAll			(true);
 	m_pInventoryHelmetList->ClearAll			(true);
 	m_pInventoryDetectorList->ClearAll			(true);
+	m_pInventoryMapList->ClearAll(true);
 	m_pInventoryPistolList->ClearAll			(true);
 	m_pInventoryAutomaticList->ClearAll			(true);
 	m_pQuickSlot->ClearAll						(true);
