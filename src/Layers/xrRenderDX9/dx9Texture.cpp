@@ -162,6 +162,82 @@ IC	void	TW_Iterate_2OP
 	}
 }
 
+ID3DTexture2D* TW_LoadTextureFromTexture
+(
+	ID3DTexture2D* t_from,
+	D3DFORMAT& t_dest_fmt,
+	int						levels_2_skip,
+	u32& w,
+	u32& h
+)
+{
+	// Calculate levels & dimensions
+	ID3DTexture2D* t_dest = NULL;
+	D3DSURFACE_DESC			t_from_desc0;
+	R_CHK(t_from->GetLevelDesc(0, &t_from_desc0));
+	int levels_exist = t_from->GetLevelCount();
+	int top_width = t_from_desc0.Width;
+	int top_height = t_from_desc0.Height;
+	Reduce(top_width, top_height, levels_exist, levels_2_skip);
+
+	// Create HW-surface (only D3DPOOL_DEFAULT)
+	R_CHK(RDevice->CreateTexture(top_width, top_height, levels_exist, 0, t_dest_fmt,
+		D3DPOOL_DEFAULT, // (RImplementation.o.no_ram_textures ? D3DPOOL_DEFAULT : D3DPOOL_MANAGED), 
+		&t_dest, NULL));
+	
+	// Copy surfaces & destroy temporary
+	ID3DTexture2D* T_src = t_from;
+	ID3DTexture2D* T_dst = t_dest;
+
+	int		L_src = T_src->GetLevelCount() - 1;
+	int		L_dst = T_dst->GetLevelCount() - 1;
+	for (; L_dst >= 0; L_src--, L_dst--)
+	{
+		// Get surfaces
+		IDirect3DSurface9* S_src, * S_dst;
+
+		R_CHK(T_src->GetSurfaceLevel(L_src, &S_src));
+		R_CHK(T_dst->GetSurfaceLevel(L_dst, &S_dst));
+
+		// D3DSURFACE_DESC	D_src, D_dst;
+		// T_src->GetLevelDesc(L_src, &D_src);
+		// T_dst->GetLevelDesc(L_dst, &D_dst);
+
+		// D3DLOCKED_RECT R_src, R_dst;
+		// T_src->LockRect(L_src, &R_src, 0, 0);
+		// T_dst->LockRect(L_dst, &R_dst, 0, 0);
+
+		// Copy
+		//for (u32 y = 0; y < desc.Height; y++) {
+		//	for (u32 x = 0; x < desc.Width; x++) {
+		//		DWORD& pSrc0 = *(((DWORD*)((BYTE*)Rsrc0.pBits + (y * Rsrc0.Pitch))) + x);
+		//		DWORD& pSrc1 = *(((DWORD*)((BYTE*)Rsrc1.pBits + (y * Rsrc1.Pitch))) + x);
+		//		DWORD& pDst = *(((DWORD*)((BYTE*)Rdst.pBits + (y * Rdst.Pitch))) + x);
+		//		pDst = pred(pDst, pSrc0, pSrc1);
+		//	}
+		//}
+
+
+		// T_src->UnlockRect(L_src);
+		// T_dst->UnlockRect(L_dst);
+
+		// Copy
+		R_CHK(RDevice->UpdateSurface(S_src, NULL, S_dst, NULL));
+
+		// Copy
+		// R_CHK(D3DXLoadSurfaceFromSurface(S_dst, NULL, NULL, S_src, NULL, NULL, D3DX_FILTER_NONE, 0));
+
+		// Release surfaces
+		_RELEASE(S_src);
+		_RELEASE(S_dst);
+	}
+
+	// OK
+	w = top_width;
+	h = top_height;
+	return					t_dest;
+}
+
 IC u32 it_gloss_rev		(u32 d, u32 s)	{	return	color_rgba	(
 	color_get_A(s),		// gloss
 	color_get_B(d),
@@ -257,7 +333,7 @@ _DDS:
 _DDS_CUBE:
 		{
 			HRESULT const result_ = CreateDDSTextureFromMemory(
-				HW.pDevice,
+				RDevice,
 				static_cast<const uint8_t*>(S->pointer()),
 				S->length(),
 				&pTextureCUBE);
@@ -284,13 +360,16 @@ _DDS_CUBE:
 _DDS_2D:
 		{
 			_strlwr					(fn);
+
 			// Load   SYS-MEM-surface, bound to device restrictions
 			ID3DTexture2D*		T_sysmem;
-			
-			HRESULT const result_ = CreateDDSTextureFromMemory(
-				HW.pDevice, 
+			HRESULT const result_ = CreateDDSTextureFromMemoryEx(
+				RDevice,
 				static_cast<const uint8_t*>(S->pointer()), 
-				S->length(), 
+				S->length(),
+				0,
+				D3DPOOL_SYSTEMMEM,
+				false,
 				&T_sysmem);
 
 			FS.r_close				(S);
@@ -305,10 +384,18 @@ _DDS_2D:
 				goto _DDS;
 			}
 
+			D3DSURFACE_DESC baseSurfaceDesc = { };
+			T_sysmem->GetLevelDesc(0, &baseSurfaceDesc);
+
 			img_loaded_lod = get_texture_load_lod(fn);
-			mip_cnt = T_sysmem->GetLevelCount();
+			pTexture2D = TW_LoadTextureFromTexture(T_sysmem, baseSurfaceDesc.Format, img_loaded_lod, dwWidth, dwHeight);
+			mip_cnt = pTexture2D->GetLevelCount();
+			_RELEASE(T_sysmem);
+
+			// OK
+			fmt = baseSurfaceDesc.Format;
 			ret_msize = calc_texture_size(img_loaded_lod, mip_cnt, img_size);
-			return					T_sysmem;
+			return					pTexture2D;
 		}
 	}
 _BUMP_from_base: 
