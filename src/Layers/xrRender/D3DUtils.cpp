@@ -48,6 +48,17 @@ static Fvector boxvert[boxvertcount];
 #endif
 
 
+void CDrawUtilities::DrawIndexedPrimitive(int pt,
+    u32 pc,
+    const Fvector& pos,
+    const Fvector* vb,
+    const u32& vb_size,
+    const u32* ib,
+    const u32& ib_size,
+    const u32& clr_argb,
+    float scale)
+{}
+
 // identity box
 constexpr u32 identboxcolor = color_rgba(255,255,255,0);
 static const int identboxwirecount = 24;

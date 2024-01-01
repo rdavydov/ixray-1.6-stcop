@@ -1,8 +1,11 @@
 //---------------------------------------------------------------------------
+#pragma once
+#include "../xrEUI/XrUI.h"
+#include "../xrEProps/stdafx.h"
+#include "../xrEProps/Tree/Properties/UIPropertiesForm.h"
+#include "../xrEProps/Tree/Properties/UIPropertiesItem.h"
+#include "Editor/EThumbnail.h"
 
-#ifndef SoundLibH
-#define SoundLibH
-#endif
 class UISoundEditorForm :public XrUI
 {
 public:
@@ -27,7 +30,9 @@ private:
 		flReadOnly = (1 << 1),
 	};
 	Flags32		m_Flags;
-	DEFINE_VECTOR(ESoundThumbnail*, THMVec, THMIt);
+	using THMVec = xr_vector<ESoundThumbnail*>;
+	using THMIt = THMVec::iterator;
+
 	THMVec				m_THM_Used;
 	THMVec				m_THM_Current;
 	ESoundThumbnail* FindUsedTHM(LPCSTR name);

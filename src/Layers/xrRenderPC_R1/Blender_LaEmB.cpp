@@ -47,16 +47,21 @@ void	CBlender_LaEmB::Compile(CBlender_Compile& C)
 	IBlender::Compile		(C);
 
 	BOOL bConstant			= (0!=_stricmp(oT2_const,"$null"));
-	if (C.bEditor)	{
+	if (C.bEditor)	
+	{
 		if (bConstant)	compile_EDc	(C);
 		else			compile_ED	(C);
-	} else {
+	}
+	else
+	{
 		if (2==C.iElement)
 		{
 			if (bConstant)	compile_Lc	(C);
 			else			compile_L	(C);
-		} else {
-			switch (dxRenderDeviceRender::Instance().Caps.raster.dwStages)
+		} 
+		else 
+		{
+			switch (Caps.raster.dwStages)
 			{
 			case 2:		// Geforce1/2/MX
 				if (bConstant)	compile_2c	(C);

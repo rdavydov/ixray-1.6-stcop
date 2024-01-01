@@ -18,5 +18,4 @@ DECLARE_RP(AppStart);
 DECLARE_RP(AppEnd);
 DECLARE_RP(DeviceReset);
 DECLARE_RP(ScreenResolutionChanged);
-
-
+DECLARE_RP(DrawUI);

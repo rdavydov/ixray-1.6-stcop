@@ -6,7 +6,6 @@
 #define XRAPI_API __declspec(dllimport)
 #endif
 
-#ifndef _EDITOR
 class IRender_interface;
 extern XRAPI_API IRender_interface*	Render;
 
@@ -22,21 +21,10 @@ extern XRAPI_API xr_token*	vid_mode_token;
 class IUIRender;
 extern XRAPI_API IUIRender*	UIRender;
 
-
-#ifndef	_EDITOR
 class CGameMtlLibrary;
-extern XRAPI_API CGameMtlLibrary *			PGMLib;
-#endif
+extern XRAPI_API CGameMtlLibrary *PGMLib;
 
 #ifdef DEBUG_DRAW
 	class IDebugRender;
 	extern XRAPI_API IDebugRender*	DRender;
 #endif // DEBUG
-
-#else
-	class	CRender;
-    extern ENGINE_API CRender*	Render;
-
-   class IRenderFactory;
-    extern ENGINE_API IRenderFactory*	RenderFactory;
-#endif

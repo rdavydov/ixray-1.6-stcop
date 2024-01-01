@@ -5,8 +5,8 @@
 #include "editobject.h"
 #include "editmesh.h"
 #include "ui_main.h"
-#include "xrHemisphere.h"
-#include "xrImage_Resampler.h"
+#include "../xrEngine/xrHemisphere.h"
+#include "../xrEngine/xrImage_Resampler.h"
 #include "..\Engine\Image.h"
 /*
 IC void SetCamera(float angle, const Fvector& C, float height, float radius, float dist)
@@ -105,8 +105,9 @@ void CImageManager::CreateLODTexture(const Fbox& bb, U32Vec& tgt_data, u32 tgt_w
     EDevice->m_Camera.SetDepth	(save_far,false);
 }
 */
+using Fvector4Vec = xr_vector<Fvector4>;
+using Fvector4It = Fvector4Vec::iterator;
 
-DEFINE_VECTOR(Fvector4,Fvector4Vec,Fvector4It);
 BOOL GetPointColor(SPickQuery::SResult* R, u32& alpha, u32& color)
 {
     CSurface* surf			= R->e_mesh->GetSurfaceByFaceID(R->tag); VERIFY(surf);
@@ -162,7 +163,9 @@ struct SBuildLight{
     Flight					light;
     float					energy;
 };
-DEFINE_VECTOR				(SBuildLight,BLVec,BLIt);
+using BLVec = xr_vector<SBuildLight>;
+using BLIt = BLVec::iterator;
+
 ICF static void  simple_hemi_callback(float x, float y, float z, float E, LPVOID P)
 {
     BLVec* dst 					= (BLVec*)P;
@@ -430,7 +433,7 @@ void CImageManager::CreateLODTexture(CEditableObject* OBJECT, LPCSTR tex_name, u
 	CreateLODTexture			(OBJECT,lod_pixels,nm_pixels,tgt_w,tgt_h,samples,quality);
 
     string_path					out_name,src_name;
-    CImage* I 					= xr_new<CImage>();
+    CXImage* I 					= xr_new<CXImage>();
     // save lod
     strcpy						(src_name,tex_name);
 
@@ -446,7 +449,7 @@ void CImageManager::CreateLODTexture(CEditableObject* OBJECT, LPCSTR tex_name, u
     SynchronizeTexture			(src_name,age);
 
     // save normal map
-    strconcat					(sizeof(src_name),src_name, tex_name, "_nm");
+    xr_strconcat				(src_name, tex_name, "_nm");
     strcpy						(src_name,EFS.ChangeFileExt(src_name,".thm").c_str());
     FS.file_delete				(_textures_,src_name);
 

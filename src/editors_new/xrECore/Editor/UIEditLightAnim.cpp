@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "UIEditLightAnim.h"
-#include "LightAnimLibrary.h"
+#include "../xrEngine/LightAnimLibrary.h"
+
 #include "ui_main.h"
 #define POINTER_HEIGHT 35
 UIEditLightAnim* UIEditLightAnim::Form = nullptr;
@@ -26,7 +27,7 @@ UIEditLightAnim::UIEditLightAnim()
     m_PointerTexture = nullptr;
     m_PointerValue = 0;
     m_RenderAlpha = false;
-     R_CHK(HW.pDevice->CreateTexture(32, 32, 1, D3DUSAGE_DYNAMIC, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &m_ItemTexture, 0));
+     R_CHK(REDevice->CreateTexture(32, 32, 1, D3DUSAGE_DYNAMIC, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &m_ItemTexture, 0));
        
 
     InitializeItems();
@@ -412,7 +413,7 @@ void UIEditLightAnim::RenderPointer()
         if (m_PointerTexture) {
             m_PointerTexture->Release(); xr_delete(m_PointerRawImage);
         }
-        R_CHK(HW.pDevice->CreateTexture(m_PointerWeight, POINTER_HEIGHT, 1, D3DUSAGE_DYNAMIC, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &m_PointerTexture, 0));
+        R_CHK(REDevice->CreateTexture(m_PointerWeight, POINTER_HEIGHT, 1, D3DUSAGE_DYNAMIC, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &m_PointerTexture, 0));
         m_PointerRawImage = xr_alloc<u32>(POINTER_HEIGHT* m_PointerWeight);
     }
     for (int x = 0; x < m_PointerWeight; x++)

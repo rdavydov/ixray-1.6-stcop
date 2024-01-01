@@ -3,21 +3,22 @@
 #include "stdafx.h"
 #pragma hdrstop
 
-#include "xr_input.h"
+#include "../xrEngine/xr_input.h"
 #include "UI_ToolsCustom.h"
 
 #include "UI_Main.h"
 #include "d3dutils.h"
 #include "SoundManager.h"
-#include "PSLibrary.h"
+#include "../Layers/xrRender/PSLibrary.h"
+#include "../Layers/xrRender/dxRenderDeviceRender.h"
 
 #include "UIEditLightAnim.h"
 #include "UIImageEditorForm.h"
 #include "UISoundEditorForm.h"
 #include "UIMinimapEditorForm.h"
-#include "..\XrETools\ETools.h"
+#include "..\utils\ETools\ETools.h"
 #include "UILogForm.h"
-#include "gamefont.h"
+#include "../xrEngine/gamefont.h"
 #include "../XrEngine/XR_IOConsole.h"
 TUI* 	UI			= 0;
 
@@ -321,7 +322,7 @@ void TUI::CheckWindowPos(HWND* form)
 	if (form->Top<0) 							form->Top 	= 0;*/
 }
 //---------------------------------------------------------------------------
-#include "igame_persistent.h"
+#include "..\xrEngine\IGame_Persistent.h"
 void TUI::PrepareRedraw()
 {
 	VERIFY(m_bReady);
@@ -342,7 +343,7 @@ void TUI::PrepareRedraw()
 */    
 	EDevice->SetRS( D3DRS_FOGCOLOR,		fog_color			);
 	EDevice->SetRS( D3DRS_RANGEFOGENABLE,	FALSE				);
-	if (HW.Caps.bTableFog)	{
+	if (Caps.bTableFog)	{
 		EDevice->SetRS( D3DRS_FOGTABLEMODE,	D3DFOG_LINEAR 	);
 		EDevice->SetRS( D3DRS_FOGVERTEXMODE,	D3DFOG_NONE	 	);
 	} else {
@@ -352,7 +353,7 @@ void TUI::PrepareRedraw()
 	EDevice->SetRS( D3DRS_FOGSTART,	*(DWORD *)(&fog_start)	);
 	EDevice->SetRS( D3DRS_FOGEND,		*(DWORD *)(&fog_end)	);
     // filter
-    for (u32 k=0; k<HW.Caps.raster.dwStages; k++){
+    for (u32 k=0; k<Caps.raster.dwStages; k++){
         if( psDeviceFlags.is(rsFilterLinear)){
             EDevice->SetSS(k,D3DSAMP_MAGFILTER,D3DTEXF_LINEAR);
             EDevice->SetSS(k,D3DSAMP_MINFILTER,D3DTEXF_LINEAR);
@@ -384,17 +385,17 @@ void TUI::Redraw()
             GetRenderHeight() = RTSize.y * EDevice->m_ScreenQuality;
             RT.destroy();
             ZB.destroy();
-            RT.create("rt_color", RTSize.x * EDevice->m_ScreenQuality, RTSize.y * EDevice->m_ScreenQuality, HW.Caps.fTarget);
+            RT.create("rt_color", RTSize.x * EDevice->m_ScreenQuality, RTSize.y * EDevice->m_ScreenQuality, Caps.fTarget);
             ZB.create("rt_depth", RTSize.x * EDevice->m_ScreenQuality, RTSize.y * EDevice->m_ScreenQuality, D3DFORMAT::D3DFMT_D24X8);
             m_Flags.set(flRedraw, TRUE);
             EDevice->fASPECT = ((float)RTSize.y) / ((float)RTSize.x);
          
             EDevice->m_fNearer = EDevice->mProject._43;
-            EDevice->fWidth_2 = GetRenderWidth() / 2.f;
-            EDevice->fHeight_2 = GetRenderHeight() / 2.f;
+           // EDevice->fWidth_2 = GetRenderWidth() / 2.f;
+           // EDevice->fHeight_2 = GetRenderHeight() / 2.f;
             
-            Device->seqDeviceReset.Process(rp_DeviceReset);
-            Device->seqResolutionChanged.Process(rp_ScreenResolutionChanged);
+            EDevice->seqDeviceReset.Process(rp_DeviceReset);
+            EDevice->seqResolutionChanged.Process(rp_ScreenResolutionChanged);
             RCache.set_xform_project(EDevice->mProject);
             RCache.set_xform_world(Fidentity);
         }
@@ -413,9 +414,9 @@ void TUI::Redraw()
                 m_Flags.set(flRedraw, FALSE);
                 RCache.set_RT(RT->pRT);
                 RCache.set_ZB(ZB->pRT);
-                EDevice->Statistic->RenderDUMP_RT.Begin();
+                //EDevice->Statistic->RenderDUMP_RT.Begin();
                 {
-                    CHK_DX(HW.pDevice->Clear(0, 0, D3DCLEAR_ZBUFFER | D3DCLEAR_TARGET, EPrefs ? EPrefs->scene_clear_color : 0x0, 1, 0));
+                    CHK_DX(REDevice->Clear(0, 0, D3DCLEAR_ZBUFFER | D3DCLEAR_TARGET, EPrefs ? EPrefs->scene_clear_color : 0x0, 1, 0));
                 }
                 EDevice->UpdateView();
                 EDevice->ResetMaterial();
@@ -423,7 +424,7 @@ void TUI::Redraw()
                 Tools->RenderEnvironment();
 
                 //. temporary reset filter (      )
-                for (u32 k = 0; k < HW.Caps.raster.dwStages; k++) {
+                for (u32 k = 0; k < Caps.raster.dwStages; k++) {
                     if (psDeviceFlags.is(rsFilterLinear)) {
                         EDevice->SetSS(k, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
                         EDevice->SetSS(k, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
@@ -456,8 +457,8 @@ void TUI::Redraw()
                 DU_impl.DrawAxis(EDevice->m_Camera.GetTransform());
 
 
-                EDevice->Statistic->RenderDUMP_RT.End();
-                EDevice->EStatistic->Show(EDevice->pSystemFont);
+                //EDevice->Statistic->RenderDUMP_RT.End();
+                //EDevice->EStatistic->Show(EDevice->pSystemFont);
                 UI->OnStats(EDevice->pSystemFont);
                 EDevice->SetRS(D3DRS_FILLMODE, D3DFILL_SOLID);
                 EDevice->pSystemFont->OnRender();
@@ -467,8 +468,8 @@ void TUI::Redraw()
                 {
                     g_pGamePersistent->OnRenderPPUI_main();
                 }
-                RCache.set_RT(HW.pBaseRT);
-                RCache.set_ZB(HW.pBaseZB);
+                RCache.set_RT(RTarget);
+                RCache.set_ZB(RDepth);
             }
 
             try {
@@ -560,10 +561,10 @@ bool TUI::Idle()
     RealRedrawScene();
 
     {
-        for (u32 pit = 0; pit < Device->seqParallel.size(); pit++)
-            Device->seqParallel[pit]();
-        Device->seqParallel.clear_not_free();
-        Device->seqFrameMT.Process(rp_Frame);
+        for (u32 pit = 0; pit < EDevice->seqParallel.size(); pit++)
+            EDevice->seqParallel[pit]();
+        EDevice->seqParallel.clear();
+        EDevice->seqFrameMT.Process(rp_Frame);
     }
     // test quit
     if (m_Flags.is(flNeedQuit))	RealQuit();
@@ -618,7 +619,7 @@ bool TUI::OnCreate()
 	BeginEState		(esEditScene);
     GetRenderWidth() = 128;
     GetRenderHeight() = 128;
-    RTSize.set(GetRenderWidth(), GetRenderHeight());
+    RTSize = { GetRenderWidth(), GetRenderHeight() };
     EDevice->fASPECT = (float)RTSize.x / (float)RTSize.y;
     EDevice->mProject.build_projection(deg2rad(EDevice->fFOV), EDevice->fASPECT, EDevice->m_Camera.m_Znear, EDevice->m_Camera.m_Zfar);
     EDevice->m_fNearer = EDevice->mProject._43;
@@ -626,7 +627,7 @@ bool TUI::OnCreate()
 
     RCache.set_xform_project(EDevice->mProject);
     RCache.set_xform_world(Fidentity);
-    RT.create("rt_color", RTSize .x*EDevice->m_ScreenQuality, RTSize.y * EDevice->m_ScreenQuality, HW.Caps.fTarget);
+    RT.create("rt_color", RTSize .x*EDevice->m_ScreenQuality, RTSize.y * EDevice->m_ScreenQuality, Caps.fTarget);
     ZB.create("rt_depth", RTSize.x * EDevice->m_ScreenQuality, RTSize.y* EDevice->m_ScreenQuality, D3DFORMAT::D3DFMT_D24X8);
 
     return true;
@@ -689,7 +690,7 @@ void TUI::ProgressDraw()
         // progress
         int val = fis_zero(m) ? 0 : (int)((p / m) * 100);
         string2048 out;
-        xr_sprintf(out,"[%d%%]%s\r\n", val, txt.c_str());
+        xr_sprintf(out, sizeof(out), "[%d%%]%s\r\n", val, txt.c_str());
         DWORD  dw;
         SetConsoleTextAttribute(m_HConsole, 10);
         ::WriteConsole(m_HConsole, out, xr_strlen(out), &dw, NULL);
@@ -769,8 +770,13 @@ void TUI::OnStats(CGameFont* font)
 
 void SPBItem::GetInfo			(xr_string& txt, float& p, float& m)
 {
-    if (info.size())txt.sprintf("%s (%s)",text.c_str(),info.c_str());
-    else			txt.sprintf("%s",text.c_str());
+    string128 temp_buff = {};
+
+    if (info.size())sprintf(temp_buff, "%s (%s)",text.c_str(),info.c_str());
+    else			sprintf(temp_buff, "%s",text.c_str());
+
+    txt = temp_buff;
+
     p				= progress;
     m				= max;
 }  

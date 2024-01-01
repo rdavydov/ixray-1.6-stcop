@@ -4,12 +4,12 @@
 #include "ExportObjectOGF.h"
 #include "EditObject.h"
 #include "EditMesh.h"
-#include "fmesh.h"
-#include "bone.h"
-#include "motion.h"
+#include "../xrEngine/fmesh.h"
+#include "../xrEngine/bone.h"
+#include "../xrEngine/motion.h"
 
 #if 1
-#include "std_classes.h"
+//#include "std_classes.h"
 #include "ui_main.h"
 #endif
 
@@ -262,7 +262,7 @@ bool CExportObjectOGF::PrepareMESH(CEditableMesh* MESH)
         if (0==split)
 		{
 #if 1
-            SGameMtl* M = GameMaterialLibrary->GetMaterialByID(surf->_GameMtl());
+            SGameMtl* M = PGMLib->GetMaterialByID(surf->_GameMtl());
             if (0==M)
 			{
                 ELog.DlgMsg		(mtError,"Surface: '%s' contains undefined game material.",surf->_Name());

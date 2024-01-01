@@ -5,17 +5,17 @@
 #include "ExportObjectOGF.h"
 #include "EditObject.h"
 #include "EditMesh.h"
-#include "fmesh.h"
+#include "../xrEngine/fmesh.h"
 
-#include "std_classes.h"
-#include "bone.h"
-#include "SkeletonMotions.h"
-#include "motion.h"
+#include "../xrEngine/std_classes.h"
+#include "../xrEngine/bone.h"
+#include "../xrEngine/SkeletonMotions.h"
+#include "../xrEngine/motion.h"
 
 //#include "library.h"
 
-#include "MgcCont3DBox.h"         
-#include "MgcCont3DMinBox.h"         
+#include "freemagic/MgcCont3DBox.h"         
+#include "freemagic/MgcCont3DMinBox.h"         
 
 #if 1
 #include "ui_main.h"
@@ -23,7 +23,9 @@
 #include "..\Engine\XrGameMaterialLibraryEditors.h"
 #endif
 //#include "../../../Layers/xrRender/SkeletonAnimated.h"
+#include <d3dx9.h>
 
+#define MAX_BONE 64
 
 ECORE_API BOOL g_force16BitTransformQuant = FALSE;
 ECORE_API float g_EpsSkelPositionDelta = EPS_L;
@@ -569,7 +571,7 @@ bool CExportSkeleton::PrepareGeometry(u8 influence)
 
                 {
                     SSkelVert 							v[3];
-					tmp_bone_lst.clear_not_free			();
+					tmp_bone_lst.clear			();
                    	u32 			link_type 			= _max(MESH->m_SVertices[f_idx*3+0].bones.size(),MESH->m_SVertices[f_idx*3+1].bones.size());
                    	link_type 							= _max(link_type,MESH->m_SVertices[f_idx*3+2].bones.size());
                     VERIFY								(link_type>0 && link_type<=(u32)influence);

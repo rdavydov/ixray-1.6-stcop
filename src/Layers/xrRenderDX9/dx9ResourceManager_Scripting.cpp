@@ -2,6 +2,7 @@
 #pragma hdrstop
 
 #include	"../../xrEngine/Render.h"
+#include	"../../xrCore/doug_lea_allocator.h"
 #include	"../xrRender/ResourceManager.h"
 #include	"../xrRender/tss.h"
 #include	"../xrRender/blenders\blender.h"
@@ -254,7 +255,7 @@ Shader*	CResourceManager::_lua_Create		(LPCSTR d_shader, LPCSTR s_textures)
 		C.iElement			= 0;
 //.		C.bDetail			= dxRenderDeviceRender::Instance().Resources->_GetDetailTexture(*C.L_textures[0],C.detail_texture,C.detail_scaler);
 		//C.bDetail			= dxRenderDeviceRender::Instance().Resources->m_textures_description.GetDetailTexture(C.L_textures[0],C.detail_texture,C.detail_scaler);
-		C.bDetail			= dxRenderDeviceRender::Instance().Resources->m_textures_description.GetDetailTexture(C.L_textures[0],C.detail_texture,C.detail_scaler);
+		C.bDetail			= DEV->m_textures_description.GetDetailTexture(C.L_textures[0],C.detail_texture,C.detail_scaler);
 
 		if (C.bDetail)		S.E[0]	= C._lua_Compile(s_shader,"normal_hq");
 		else				S.E[0]	= C._lua_Compile(s_shader,"normal");
@@ -264,7 +265,7 @@ Shader*	CResourceManager::_lua_Create		(LPCSTR d_shader, LPCSTR s_textures)
 			C.iElement			= 0;
 //.			C.bDetail			= dxRenderDeviceRender::Instance().Resources->_GetDetailTexture(*C.L_textures[0],C.detail_texture,C.detail_scaler);
 			//C.bDetail			= dxRenderDeviceRender::Instance().Resources->m_textures_description.GetDetailTexture(C.L_textures[0],C.detail_texture,C.detail_scaler);
-			C.bDetail			= dxRenderDeviceRender::Instance().Resources->m_textures_description.GetDetailTexture(C.L_textures[0],C.detail_texture,C.detail_scaler);
+			C.bDetail			= DEV->m_textures_description.GetDetailTexture(C.L_textures[0],C.detail_texture,C.detail_scaler);
 			S.E[0]				= C._lua_Compile(s_shader,"normal");
 		}
 	}
@@ -275,7 +276,7 @@ Shader*	CResourceManager::_lua_Create		(LPCSTR d_shader, LPCSTR s_textures)
 		C.iElement			= 1;
 //.		C.bDetail			= dxRenderDeviceRender::Instance().Resources->_GetDetailTexture(*C.L_textures[0],C.detail_texture,C.detail_scaler);
 		//C.bDetail			= dxRenderDeviceRender::Instance().Resources->m_textures_description.GetDetailTexture(C.L_textures[0],C.detail_texture,C.detail_scaler);
-		C.bDetail			= dxRenderDeviceRender::Instance().Resources->m_textures_description.GetDetailTexture(C.L_textures[0],C.detail_texture,C.detail_scaler);
+		C.bDetail			= DEV->m_textures_description.GetDetailTexture(C.L_textures[0],C.detail_texture,C.detail_scaler);
 		S.E[1]				= C._lua_Compile(s_shader,"normal");
 	}
 
@@ -324,12 +325,12 @@ ShaderElement*		CBlender_Compile::_lua_Compile	(LPCSTR namesp, LPCSTR name)
 	LPCSTR				t_0		= *L_textures[0]			? *L_textures[0] : "null";
 	LPCSTR				t_1		= (L_textures.size() > 1)	? *L_textures[1] : "null";
 	LPCSTR				t_d		= detail_texture			? detail_texture : "null" ;
-	lua_State*			LSVM	= dxRenderDeviceRender::Instance().Resources->LSVM;
+	lua_State*			LSVM	= DEV->LSVM;
 	object				shader	= get_globals(LSVM)[namesp];
 	functor<void>		element	= object_cast<functor<void> >(shader[name]);
 	adopt_compiler		ac		= adopt_compiler(this);
 	element						(ac,t_0,t_1,t_d);
 	r_End				();
-	ShaderElement*	_r	= dxRenderDeviceRender::Instance().Resources->_CreateElement(E);
+	ShaderElement*	_r	= DEV->_CreateElement(E);
 	return			_r;
 }

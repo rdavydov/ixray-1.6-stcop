@@ -2,7 +2,7 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#ifndef ELocatorAPIH
+#if 0
 #define ELocatorAPIH
 #pragma once
 
@@ -81,6 +81,7 @@ public:
 
 extern XRCORE_API	CLocatorAPI*					xr_FS;
 #define FS (*xr_FS)
-
+#else
+#include "LocatorAPI.h"
 #endif // ELocatorAPIH
 

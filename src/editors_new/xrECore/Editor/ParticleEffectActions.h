@@ -61,7 +61,7 @@ public:
     Flags32		flags;
     u32			clr;
 protected:
-	void  PDomain::OnTypeChange(PropValue* sender);
+	void  OnTypeChange(PropValue* sender);
 public:
 	PDomain 	(){}
 	PDomain		(EType et, BOOL renderable, u32 color=0x00000000, PAPI::PDomainEnum type = PAPI::PDPoint,	
@@ -88,11 +88,20 @@ public:
 };
 struct EParticleAction
 {
-	DEFINE_MAP(xr_string,PDomain,	PDomainMap,	PDomainMapIt);
-	DEFINE_MAP(xr_string,PBool,	PBoolMap,	PBoolMapIt);
-	DEFINE_MAP(xr_string,PFloat,	PFloatMap,	PFloatMapIt);
-    DEFINE_MAP(xr_string,PInt,		PIntMap,	PIntMapIt);
-	DEFINE_MAP(xr_string,PVector,	PVectorMap,	PVectorMapIt);
+    using PDomainMap = xr_map<AnsiString, PDomain>;
+    using PDomainMapIt = PDomainMap::iterator;
+
+    using PBoolMap = xr_map<AnsiString, PBool>;
+    using PBoolMapIt = PBoolMap::iterator;
+
+    using PFloatMap = xr_map<AnsiString, PFloat>;
+    using PFloatMapIt = PFloatMap::iterator;
+
+    using PIntMap = xr_map<AnsiString, PInt>;
+    using PIntMapIt = PIntMap::iterator;
+
+    using PVectorMap = xr_map<AnsiString, PVector>;
+    using PVectorMapIt = PVectorMap::iterator;
 
     shared_str 		actionName;
 	shared_str 		actionType;
@@ -122,7 +131,9 @@ struct EParticleAction
     	xr_string	name;
         SOrder(EValType	_type, xr_string _name):type(_type),name(_name){}
     };
-	DEFINE_VECTOR	(SOrder, OrderVec,	OrderVecIt);
+    using OrderVec = xr_vector<SOrder>;
+    using OrderVecIt = OrderVec::iterator;
+
     OrderVec		orders;
     
     EParticleAction	(PAPI::PActionEnum	_type)

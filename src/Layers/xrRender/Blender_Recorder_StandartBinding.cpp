@@ -314,7 +314,7 @@ static class cl_def_aref : public R_constant_setup
 	#endif
 	}
 } binder_def_aref;
-
+#ifndef _EDITOR
 static class cl_rain_params : public R_constant_setup
 {
 	u32 marker;
@@ -328,6 +328,7 @@ static class cl_rain_params : public R_constant_setup
 		RCache.set_c(C, rainDensity, rainWetness, 0.0f, 0.0f);
 	}
 } binder_rain_params;
+#endif
 
 // Standart constant-binding
 void	CBlender_Compile::SetMapping	()
@@ -381,13 +382,13 @@ void	CBlender_Compile::SetMapping	()
 //	r_Constant				("L_lmap_color",	&binder_lm_color);
 	r_Constant				("L_hemi_color",	&binder_hemi_color);
 	r_Constant				("L_ambient",		&binder_amb_color);
+
+	r_Constant				("rain_params",		&binder_rain_params);
 #endif
 	r_Constant				("screen_res",		&binder_screen_res);
 	r_Constant				("def_aref",		&binder_def_aref);
 	
 	// Rain
-	r_Constant				("rain_params",		&binder_rain_params);
-
 	// detail
 	//if (bDetail	&& detail_scaler)
 	//	Igor: bDetail can be overridden by no_detail_texture option.

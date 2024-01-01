@@ -488,8 +488,8 @@ IC xr_string draw_sprintf(xr_string& s, const T& V, int tag)
 //------------------------------------------------------------------------------
 IC xr_string draw_sprintf(xr_string& s, const float& V, int dec)
 {
-    string32 	fmt; xr_sprintf(fmt,"%%.%df",dec);
-	string256 	tmp; xr_sprintf(tmp,fmt,V);
+    string32 	fmt; xr_sprintf(fmt, sizeof(fmt), "%%.%df",dec);
+	string256 	tmp; xr_sprintf(tmp, sizeof(tmp), fmt,V);
     s			= tmp; 
     return s;
 }

@@ -3,7 +3,7 @@
 #define UI_MainH
 
 #include "UI_MainCommand.h"
-#include "IInputReceiver.h"
+#include "../../xrEngine/IInputReceiver.h"
 
 // refs
 class CCustomObject;
@@ -127,8 +127,8 @@ public:
 
     void			Quit			()	{	m_Flags.set(flNeedQuit,TRUE); }
     
-    u32 			&GetRenderWidth	()	{   return EDevice->dwWidth; }
-    u32&GetRenderHeight	()	{   return EDevice->dwHeight; }
+    u32 			&GetRenderWidth	()	{   return EDevice->TargetWidth; }
+    u32&GetRenderHeight	()	{   return EDevice->TargetHeight; }
     int 			GetRealWidth	()	{   return EDevice->dwRealWidth; }
     int 			GetRealHeight	()  {   return EDevice->dwRealHeight; }
 
@@ -228,7 +228,8 @@ public:
     virtual void	LoadSettings				(CInifile*){}
 protected:    
 // progress bar
-    DEFINE_VECTOR	(SPBItem*,PBVec,PBVecIt);
+    using PBVec = xr_vector<SPBItem*>;
+    using PBVecIt = PBVec::iterator;
     PBVec			m_ProgressItems;
 public:
 	SPBItem*		ProgressStart		(float max_val, LPCSTR text);

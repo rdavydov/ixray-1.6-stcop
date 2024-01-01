@@ -2,7 +2,7 @@
 #pragma hdrstop
 
 #include "EThumbnail.h"
-#include "xrImage_Resampler.h"
+#include "../../xrEngine/xrImage_Resampler.h"
 #pragma package(smart_init)
 //------------------------------------------------------------------------------
 // Custom Thumbnail
@@ -102,7 +102,7 @@ void EImageThumbnail::Update(ImTextureID& Texture)
     }
     else
     {
-        R_CHK(HW.pDevice->CreateTexture(THUMB_WIDTH, THUMB_HEIGHT, 1, 0, D3DFMT_X8R8G8B8, D3DPOOL_MANAGED, &pTexture, 0));
+        R_CHK(REDevice->CreateTexture(THUMB_WIDTH, THUMB_HEIGHT, 1, 0, D3DFMT_X8R8G8B8, D3DPOOL_MANAGED, &pTexture, 0));
         Texture = pTexture;
     }
     {

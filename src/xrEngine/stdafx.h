@@ -1,9 +1,5 @@
 #pragma once
 
-#ifdef _EDITOR
-	#include "..\editors\ECore\stdafx.h"
-#else
-
 #include "../xrCore/xrCore.h"
 #include "../Include/xrAPI/xrAPI.h"
 #include <SDL3/SDL.h>
@@ -71,4 +67,3 @@ extern ENGINE_API CInifile *pGameIni;
 	(((ltx)->line_exist(section, name)) ? ((ltx)->method(section, name)) : (default_value))
 
 #include "FontManager.h"
-#endif // !M_BORLAND

@@ -78,7 +78,7 @@ inline TMsgDlgButtons MessageDlg(const char*text, TMsgDlgType mt, int btn)
 	{
 		R_ASSERT(0);
 	}
-	int msgboxID = MessageBox(
+	int msgboxID = MessageBoxA(
 		NULL,
 		text,
 		Title,

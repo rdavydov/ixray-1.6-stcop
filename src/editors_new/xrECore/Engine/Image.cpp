@@ -1,4 +1,4 @@
-// Image.cpp: implementation of the CImage class.
+// Image.cpp: implementation of the CXImage class.
 //
 //////////////////////////////////////////////////////////////////////
 
@@ -8,13 +8,13 @@
 #include "Image.h"
 #include "../../../Layers/xrRender/tga.h"
 
-void CImage::Create(u32 w, u32 h, u32* data)
+void CXImage::Create(u32 w, u32 h, u32* data)
 {
 	Create(w,h);
     CopyMemory(pData,data,w*h*sizeof(u32));
 }
 
-void CImage::Create(u32 w, u32 h)
+void CXImage::Create(u32 w, u32 h)
 {
 	xr_free		(pData);
 	dwWidth		= w;
@@ -22,7 +22,7 @@ void CImage::Create(u32 w, u32 h)
 	pData		= (u32*)(xr_malloc(w*h*sizeof(u32)));
 }
 
-void CImage::SaveTGA(LPCSTR name, BOOL b24)
+void CXImage::SaveTGA(LPCSTR name, BOOL b24)
 {
 	// Save
 	TGAdesc		tga;
@@ -41,7 +41,7 @@ void CImage::SaveTGA(LPCSTR name, BOOL b24)
     }
 }
 
-void CImage::Vflip()
+void CXImage::Vflip()
 {
 	R_ASSERT(pData);
 	for (u32 y=0; y<dwHeight/2; y++)
@@ -54,7 +54,7 @@ void CImage::Vflip()
 		}
 	}
 }
-void CImage::Hflip()
+void CXImage::Hflip()
 {
 	R_ASSERT(pData);
 	for (u32 y=0; y<dwHeight; y++)
@@ -75,7 +75,7 @@ IC BYTE ClampColor(float a)
     return BYTE(c);
 }
 
-void CImage::Contrast(float _fc)
+void CXImage::Contrast(float _fc)
 {
 	R_ASSERT(pData);
 
@@ -91,7 +91,7 @@ void CImage::Contrast(float _fc)
 		}
     }
 }
-void CImage::Grayscale()
+void CXImage::Grayscale()
 {
 	R_ASSERT(pData);
 
@@ -125,7 +125,7 @@ struct _fileT {
 };
 #pragma pack(pop)
 
-void CImage::LoadT(char *name)
+void CXImage::LoadT(char *name)
 {
 	void*	data	= DownloadFile(name);
 	_fileT*	hdr     = (_fileT*)data;
@@ -184,13 +184,13 @@ struct TGAHeader
 
 extern u32 * Stbi_Load(const char*,u32&,u32&);
 
-void CImage::Load	(LPCSTR name)
+void CXImage::Load	(LPCSTR name)
 {
 	VERIFY		(!pData);
 	pData		= Stbi_Load((LPSTR)name,dwWidth,dwHeight);
 }
 
-bool CImage::LoadTGA(LPCSTR name)
+bool CXImage::LoadTGA(LPCSTR name)
 {
 	destructor<IReader>	TGA(FS.r_open(name));
 

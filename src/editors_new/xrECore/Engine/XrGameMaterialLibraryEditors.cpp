@@ -525,7 +525,7 @@ void SGameMtlPairEditor::CopyFrom(SGameMtlPairEditor* parent)
 }
 
 
-SGameMtlPairEditor::SGameMtlPairEditor(XrGameMaterialLibraryInterface* owner):SGameMtlPair(owner)
+SGameMtlPairEditor::SGameMtlPairEditor(CGameMtlLibrary* owner):SGameMtlPair(owner)
 {
     m_EditParent = false;
     m_EditCommand = false;

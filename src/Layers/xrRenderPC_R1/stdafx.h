@@ -4,8 +4,8 @@
 
 #pragma once
 
-#ifdef XR_EDITOR_NEW
-#include "../../editors_new/xrECore/stdafx.h"
+#ifdef _EDITOR
+#include "../../editors/xrECore/stdafx.h"
 #endif
 
 #pragma warning(disable:4995)

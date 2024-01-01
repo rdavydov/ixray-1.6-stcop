@@ -50,6 +50,7 @@ void dxRainRender::Copy(IRainRender &_in)
 
 void dxRainRender::Render(CEffect_Rain &owner)
 {
+#ifndef _EDITOR
 	float	factor				= g_pGamePersistent->Environment().CurrentEnv->rain_density;
 	if (factor<EPS_L)			return;
 
@@ -248,6 +249,7 @@ void dxRainRender::Render(CEffect_Rain &owner)
 			RCache.Render			(D3DPT_TRIANGLELIST,v_offset,0,vCount_Lock,i_offset,dwNumPrimitives);
 		}
 	}
+#endif
 }
 
 const Fsphere& dxRainRender::GetDropBounds() const

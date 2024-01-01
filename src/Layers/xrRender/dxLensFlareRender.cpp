@@ -29,6 +29,7 @@ void dxLensFlareRender::Copy(ILensFlareRender &_in)
 
 void dxLensFlareRender::Render(CLensFlare &owner, BOOL bSun, BOOL bFlares, BOOL bGradient)
 {
+#ifndef _EDITOR
 	Fcolor				dwLight;
 	Fcolor				color;
 	Fvector				vec, vecSx, vecSy;
@@ -112,6 +113,7 @@ void dxLensFlareRender::Render(CLensFlare &owner, BOOL bSun, BOOL bFlares, BOOL 
 			RCache.Render			(D3DPT_TRIANGLELIST,vBase, 0,4,0,2);
 		}
 	}
+#endif
 }
 
 void dxLensFlareRender::OnDeviceCreate()

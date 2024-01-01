@@ -1,9 +1,7 @@
 //---------------------------------------------------------------------------
 #pragma once
+#include "../xrEngine/GameMtlLib.h"
 
-#include "XrGameMaterialLibraryInterface.h"
-
-class XrGameMaterialLibraryInterface;
 class ECORE_API SGameMtlEditor:public SGameMtl
 {
 public:
@@ -34,7 +32,7 @@ public:
     void OnCommandClick(ButtonValue* sender, bool& bModif, bool& bSafe);
     void FillChooseMtl(ChooseItemVec& items, void* param);
     void CopyFrom(SGameMtlPairEditor* parent);
-	SGameMtlPairEditor(XrGameMaterialLibraryInterface* owner);
+	SGameMtlPairEditor(CGameMtlLibrary* owner);
     void 				FillProp(PropItemVec& values);
     void				TransferFromParent(SGameMtlPairEditor* parent);
     void                OnDrawUI();
@@ -44,7 +42,7 @@ public:
 	virtual void		Save(IWriter& fs);
 };
 
-class ECORE_API XrGameMaterialLibraryEditors:public XrGameMaterialLibraryInterface
+class ECORE_API XrGameMaterialLibraryEditors:public CGameMtlLibrary
 {
 	int					material_index;
 	int					material_pair_index;
@@ -142,7 +140,3 @@ public:
 	}
 
 extern ECORE_API XrGameMaterialLibraryEditors* GameMaterialLibraryEditors;
-#include "../xrapi/xrapi.h"
-
-
-

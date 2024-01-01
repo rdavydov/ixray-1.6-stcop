@@ -68,14 +68,14 @@ void UIMinimapEditorForm::LoadClick()
     xr_string                   fn;
     m_ImageData.clear();
 
-    if (EFS.GetOpenName(EDevice->m_hWnd,"$app_root$", fn, false, NULL, 0))
+    if (EFS.GetOpenName("$app_root$", fn, false, NULL, 0))
     {
         if (Stbi_Load(fn.c_str(), m_ImageData, m_ImageW, m_ImageH, m_ImageA))
         {
             m_TextureRemove = m_Texture;
             ID3DTexture2D* pTexture = nullptr;
             {
-                R_CHK(HW.pDevice->CreateTexture(m_ImageW, m_ImageH, 1, 0, D3DFMT_X8R8G8B8, D3DPOOL_MANAGED, &pTexture, 0));
+                R_CHK(REDevice->CreateTexture(m_ImageW, m_ImageH, 1, 0, D3DFMT_X8R8G8B8, D3DPOOL_MANAGED, &pTexture, 0));
                 m_Texture = pTexture;
 
                 {

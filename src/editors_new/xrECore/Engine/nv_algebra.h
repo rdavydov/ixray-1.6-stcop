@@ -108,8 +108,8 @@ struct vec3t
     vec3t(_T x, _T y, _T z)			: x(x), y(y), z(z)			{ }
     vec3t(const _T* xyz)			: x(xyz[0]), y(xyz[1]), z(xyz[2]) { }
 	vec3t(const vec2& u)			: x(u.x), y(u.y), z(1.0f)	{ }
-	vec3t(const vec3t<float>& u)	: x(_T(u.x)), y(_T(u.y)), z(_T(u.z))	{ }
-	vec3t(const vec3t<double>& u)	: x(_T(u.x)), y(_T(u.y)), z(_T(u.z))	{ }
+	vec3t(const vec3t<float>& u)	: x((u.x)), y((u.y)), z((u.z))	{ }
+	vec3t(const vec3t<double>& u)	: x((u.x)), y((u.y)), z((u.z))	{ }
 	vec3t(const vec4&);
 
     bool operator==(const vec3t<_T> & u) const		{

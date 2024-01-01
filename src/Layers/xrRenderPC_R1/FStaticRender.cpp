@@ -60,13 +60,13 @@ void					CRender::create					()
 	Device.seqFrame.Add	(this,REG_PRIORITY_HIGH+0x12345678);
 
 	// c-setup
-	dxRenderDeviceRender::Instance().Resources->RegisterConstantSetup("L_dynamic_pos",		&r1_dlight_binder_PR);
-	dxRenderDeviceRender::Instance().Resources->RegisterConstantSetup("L_dynamic_color",	&r1_dlight_binder_color);
-	dxRenderDeviceRender::Instance().Resources->RegisterConstantSetup("L_dynamic_xform",	&r1_dlight_binder_xform);
+	DEV->RegisterConstantSetup("L_dynamic_pos",		&r1_dlight_binder_PR);
+	DEV->RegisterConstantSetup("L_dynamic_color",	&r1_dlight_binder_color);
+	DEV->RegisterConstantSetup("L_dynamic_xform",	&r1_dlight_binder_xform);
 
 
 	// distortion
-	u32		v_dev	= CAP_VERSION(dxRenderDeviceRender::Instance().Caps.raster_major, dxRenderDeviceRender::Instance().Caps.raster_minor);
+	u32		v_dev	= CAP_VERSION(Caps.raster_major, Caps.raster_minor);
 	u32		v_need	= CAP_VERSION(1,4);
 	if ( v_dev >= v_need )						o.distortion = TRUE;
 	else										o.distortion = FALSE;

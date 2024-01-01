@@ -295,7 +295,7 @@ extern ENGINE_API bool loading_save_timer_started;
 #ifndef	_EDITOR
 #define	RDEVICE	Device
 #else
-#define RDEVICE	EDevice
+#define RDEVICE	(*EDevice)
 #endif
 
 typedef fastdelegate::FastDelegate0<bool>		LOADING_EVENT;

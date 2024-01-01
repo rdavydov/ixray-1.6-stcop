@@ -103,9 +103,13 @@ void EGroupThumbnail::Save(int age, LPCSTR path)
 
 void EGroupThumbnail::FillProp(PropItemVec& items)
 {
-    PHelper().CreateCaption	(items, "Objects\\Count",						xr_string(objects.size()).c_str());
-    for (SStringVecIt it=objects.begin(); it!=objects.end(); it++)
-	    PHelper().CreateCaption	(items, xr_string().sprintf("Objects\\#%d",it-objects.begin()).c_str(),it->c_str());
+    PHelper().CreateCaption	(items, "Objects\\Count", std::to_string(objects.size()).c_str());
+    for (SStringVecIt it = objects.begin(); it != objects.end(); it++)
+    {
+        string256 Buffer;
+        sprintf(Buffer, "Objects\\#%d", it - objects.begin());
+        PHelper().CreateCaption(items, Buffer, it->c_str());
+    }
 }
 //------------------------------------------------------------------------------
 

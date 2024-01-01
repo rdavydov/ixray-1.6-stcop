@@ -8,6 +8,7 @@
 #include "render.h"
 #include "../Engine/XrGameMaterialLibraryEditors.h"
 #include "../Layers/xrRender/ResourceManager.h"
+#include "../Layers/xrRender/dxRenderDeviceRender.h"
 #include "UI_ToolsCustom.h"
 
 CEditorRenderDevice 	*	EDevice;
@@ -58,7 +59,7 @@ CEditorRenderDevice::CEditorRenderDevice()
 	fFOV 			= 60.f;
     dwPrecacheFrame = 0;
 	GameMaterialLibraryEditors = xr_new<XrGameMaterialLibraryEditors>();
-	//GameMaterialLibrary = GameMaterialLibraryEditors;
+	PGMLib = GameMaterialLibraryEditors;
 
 	g_pDevice = this;
 }
@@ -228,10 +229,10 @@ void CEditorRenderDevice::Destroy()
 //---------------------------------------------------------------------------
 void CEditorRenderDevice::_SetupStates()
 {
-	//HW.Caps.Update();
-	for (u32 i=0; i<HW.Caps.raster.dwStages; i++){
+	//Caps.Update();
+	for (u32 i=0; i<Caps.raster.dwStages; i++){
 		float fBias = -1.f;
-		CHK_DX(HW.pDevice->SetSamplerState( i, D3DSAMP_MIPMAPLODBIAS, *((LPDWORD) (&fBias))));
+		CHK_DX(REDevice->SetSamplerState( i, D3DSAMP_MIPMAPLODBIAS, *((LPDWORD) (&fBias))));
 	}
 	EDevice->SetRS(D3DRS_DITHERENABLE,	TRUE				);
     EDevice->SetRS(D3DRS_COLORVERTEX,		TRUE				);
@@ -298,12 +299,13 @@ void CEditorRenderDevice::_Destroy(BOOL	bKeepTextures)
 //---------------------------------------------------------------------------
 void  CEditorRenderDevice::Resize(int w, int h, bool maximized)
 {
-	if (dwRealWidth == w && dwRealHeight == h&& dwMaximized == maximized)return;
+	if (dwRealWidth == w && dwRealHeight == h)
+		return;
     m_RenderArea	= w*h;
 
 	dwRealWidth = w;
 	dwRealHeight = h;
-	dwMaximized = maximized;
+	//dwMaximized = maximized;
 
     Reset			(false);
     UI->RedrawScene	();
@@ -315,11 +317,11 @@ void CEditorRenderDevice::Reset  	(bool )
     Resources->reset_begin	();
 	UI->ResetBegin();
     Memory.mem_compact		();
-    HW.DevPP.BackBufferWidth= dwRealWidth;
-    HW.DevPP.BackBufferHeight= dwRealHeight;
-    HW.Reset				(m_hWnd);
-    dwRealWidth					= HW.DevPP.BackBufferWidth;
-    dwRealHeight				= HW.DevPP.BackBufferHeight;
+    //HW.DevPP.BackBufferWidth= dwRealWidth;
+    //HW.DevPP.BackBufferHeight= dwRealHeight;
+    //HW.Reset				(m_hWnd);
+   //dwRealWidth					= HW.DevPP.BackBufferWidth;
+   //dwRealHeight				= HW.DevPP.BackBufferHeight;
 //		fWidth_2			= float(dwRealWidth/2);
 //		fHeight_2			= float(dwRealHeight/2);
     Resources->reset_end	();
@@ -336,8 +338,8 @@ bool CEditorRenderDevice::Begin	()
 	mProject_saved = mProject;
 	mView_saved = mView;
 	vCameraPosition_saved = vCameraPosition;
-	HW.Validate		();
-	HRESULT	_hr		= HW.pDevice->TestCooperativeLevel();
+	//HW.Validate		();
+	HRESULT	_hr		= REDevice->TestCooperativeLevel();
     if (FAILED(_hr))
 	{
 		// If the device was lost, do not render until we get it back
@@ -354,10 +356,10 @@ bool CEditorRenderDevice::Begin	()
 	}
 
     VERIFY 					(FALSE==g_bRendering);
-	CHK_DX					(HW.pDevice->BeginScene());
-	CHK_DX(HW.pDevice->Clear(0,0,
+	CHK_DX					(REDevice->BeginScene());
+	CHK_DX(REDevice->Clear(0,0,
 		D3DCLEAR_ZBUFFER|D3DCLEAR_TARGET|
-		(HW.Caps.bStencil?D3DCLEAR_STENCIL:0),
+		(Caps.bStencil?D3DCLEAR_STENCIL:0),
 		EPrefs?EPrefs->scene_clear_color:0x0,1,0
 		));
 	RCache.OnFrameBegin		();
@@ -368,14 +370,13 @@ bool CEditorRenderDevice::Begin	()
 //---------------------------------------------------------------------------
 void CEditorRenderDevice::End()
 {
-	VERIFY(HW.pDevice);
 	VERIFY(b_is_Ready);
 	g_bRendering = 	FALSE;
 	// end scene
 	RCache.OnFrameEnd();
-    CHK_DX(HW.pDevice->EndScene());
+    CHK_DX(REDevice->EndScene());
 
-	CHK_DX(HW.pDevice->Present( NULL, NULL, NULL, NULL ));
+	CHK_DX(REDevice->Present( NULL, NULL, NULL, NULL ));
 
 }
 
@@ -523,7 +524,7 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	
 	case WM_SIZE:
 
-		if (UI && HW.pDevice)
+		if (UI && REDevice)
 		{
 			UI->Resize(LOWORD(lParam), HIWORD(lParam), wParam == SIZE_MAXIMIZED);
 		}

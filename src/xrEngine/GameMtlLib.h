@@ -51,14 +51,14 @@
 
 #ifndef	MTL_EXPORT_API
 #ifdef _EDITOR
-	#include "ElTree.hpp"
+	//#include "ElTree.hpp"
 	#define MTL_EXPORT_API ECORE_API
 #else
 	#define MTL_EXPORT_API ENGINE_API
 #endif
 #endif
 
-#ifdef GM_NON_GAME
+#if defined(GM_NON_GAME) && !defined(XR_EDITOR_NEW)
 	#define SoundVec	shared_str
 	#define PSVec 		shared_str
 	#define ShaderVec 	shared_str
@@ -81,6 +81,7 @@
 struct MTL_EXPORT_API SGameMtl
 {
 	friend class CGameMtlLibrary;
+	friend class XrGameMaterialLibraryEditors;
 protected:
 	int 				ID; 	// auto number
 public:
@@ -162,6 +163,8 @@ using GameMtlIt = GameMtlVec::iterator;
 
 struct MTL_EXPORT_API SGameMtlPair{
 	friend class CGameMtlLibrary;
+	friend class SGameMtlPairEditor;
+	friend class XrGameMaterialLibraryEditors;
     CGameMtlLibrary*	m_Owner;
 private:
 	int					mtl0;

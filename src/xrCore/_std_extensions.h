@@ -1,5 +1,4 @@
-#ifndef _STD_EXT_internal
-#define _STD_EXT_internal
+#pragma once
 
 #ifdef abs
 #undef abs
@@ -22,11 +21,6 @@
 #endif
 
 #ifdef  _EDITOR
-IC char* strncpy_s(char* strDestination, size_t sizeInBytes, const char *strSource, size_t count)
-{
-    return strncpy(strDestination, strSource, count);
-}
-
 IC char* xr_strcpy(char* strDestination,   size_t sizeInBytes,   const char *strSource)
 {
 	return strcpy(strDestination, strSource);
@@ -35,11 +29,6 @@ IC char* xr_strcpy(char* strDestination,   size_t sizeInBytes,   const char *str
 IC char* xr_strcpy(char* strDestination,   const char *strSource)
 {
 	return strcpy(strDestination, strSource);
-}
-
-IC char* _strlwr_s(char* strDestination, size_t sizeInBytes)
-{
-    return strlwr(strDestination);
 }
 
 IC char* xr_strcat(char* strDestination,   size_t sizeInBytes,   const char *strSource)
@@ -266,5 +255,3 @@ XRCORE_API	char*				timestamp				(string64& dest);
 extern XRCORE_API u32			crc32					(const void* P, size_t len);
 extern XRCORE_API u32			crc32					(const void* P, size_t len, u32 starting_crc);
 extern XRCORE_API u32			path_crc32				(const char* path, size_t len); // ignores '/' and '\'
-
-#endif // _STD_EXT_internal

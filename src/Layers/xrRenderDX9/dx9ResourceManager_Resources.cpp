@@ -592,6 +592,7 @@ void			CResourceManager::_DeleteConstantList(const SConstantList* L )
 }
 
 #ifdef _EDITOR
+#include <d3dx9shader.h>
 //--------------------------------------------------------------------------------------------------------------
 class	includer				: public ID3DXInclude
 {
@@ -599,7 +600,7 @@ public:
 	HRESULT __stdcall	Open	(D3DXINCLUDE_TYPE IncludeType, LPCSTR pFileName, LPCVOID pParentData, LPCVOID *ppData, UINT *pBytes)
 	{
 		string_path				pname;
-		strconcat				(sizeof(pname),pname,::Render->getShaderPath(),pFileName);
+		xr_strconcat			(pname,::Render->getShaderPath(),pFileName);
 		IReader*		R		= FS.r_open	("$game_shaders$",pname);
 		if (0==R)				{
 			// possibly in shared directory or somewhere else - open directly
@@ -653,7 +654,7 @@ SVS*	CResourceManager::_CreateVS		(LPCSTR _name)
 		LPD3DXSHADER_CONSTANTTABLE	pConstants	= NULL;
 		HRESULT						_hr			= S_OK;
 		string_path					cname;
-		strconcat					(sizeof(cname),cname,::Render->getShaderPath(),_name,".vs");
+		xr_strconcat				(cname,::Render->getShaderPath(),_name,".vs");
 		FS.update_path				(cname,	"$game_shaders$", cname);
 //		LPCSTR						target		= NULL;
 
@@ -663,9 +664,6 @@ SVS*	CResourceManager::_CreateVS		(LPCSTR _name)
 		// Select target
 		LPCSTR						c_target	= "vs_2_0";
 		LPCSTR						c_entry		= "main";
-		/*if (dxRenderDeviceRender::Instance().Caps.geometry.dwVersion>=CAP_VERSION(3,0))			target="vs_3_0";
-		else*/ if (dxRenderDeviceRender::Instance().Caps.geometry_major>=2)						c_target="vs_2_0";
-		else 														c_target="vs_1_1";
 
 		u32 needed_len				= fs->length() + 1;
 		LPSTR pfs					= xr_alloc<char>(needed_len);
@@ -679,7 +677,8 @@ SVS*	CResourceManager::_CreateVS		(LPCSTR _name)
 
 		// vertex
 		R_ASSERT2					(fs,cname);
-		_hr = ::Render->shader_compile(name, LPCSTR(fs->pointer()), fs->length(), NULL, &Includer, c_entry, c_target, D3DCOMPILE_DEBUG | D3DCOMPILE_PACK_MATRIX_ROW_MAJOR /*| D3DXSHADER_PREFER_FLOW_CONTROL*/, &pShaderBuf, &pErrorBuf, NULL);
+		_hr = ::Render->shader_compile(name, (const DWORD*)(fs->pointer()), fs->length(), c_entry, c_target, D3DCOMPILE_DEBUG | D3DCOMPILE_PACK_MATRIX_ROW_MAJOR, (void*&)_vs);
+		//_hr = ::Render->shader_compile(name, (const DWORD*)(fs->pointer()), fs->length(), NULL, &Includer, c_entry, c_target, D3DCOMPILE_DEBUG | D3DCOMPILE_PACK_MATRIX_ROW_MAJOR /*| D3DXSHADER_PREFER_FLOW_CONTROL*/, &pShaderBuf, &pErrorBuf, NULL);
 		FS.r_close(fs);
 
 		if (SUCCEEDED(_hr))
@@ -755,7 +754,7 @@ SPS*	CResourceManager::_CreatePS			(LPCSTR name)
 		includer					Includer;
 		string_path					cname;
         LPCSTR						shader_path = ::Render->getShaderPath();
-		strconcat					(sizeof(cname), cname,shader_path,name,".ps");
+		xr_strconcat				(cname,shader_path,name,".ps");
 		FS.update_path				(cname,	"$game_shaders$", cname);
 
 		// duplicate and zero-terminate
@@ -781,7 +780,7 @@ SPS*	CResourceManager::_CreatePS			(LPCSTR name)
 		LPD3DXBUFFER				pErrorBuf	= NULL;
 		LPD3DXSHADER_CONSTANTTABLE	pConstants	= NULL;
 		HRESULT						_hr			= S_OK;
-		_hr = ::Render->shader_compile(name, data, size, NULL, &Includer, c_entry, c_target, D3DCOMPILE_DEBUG | D3DCOMPILE_PACK_MATRIX_ROW_MAJOR, &pShaderBuf, &pErrorBuf, NULL);
+		_hr = ::Render->shader_compile(name, (DWORD const*)data, size, c_entry, c_target, D3DCOMPILE_DEBUG | D3DCOMPILE_PACK_MATRIX_ROW_MAJOR, (void*&)pShaderBuf);
 		xr_free(data);
 
 		if (SUCCEEDED(_hr))

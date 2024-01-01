@@ -102,7 +102,7 @@ void CCustomPreferences::OnKeyboardCommonFileClick(ButtonValue* B, bool& bModif,
     xr_string fn;
 	switch(B->btn_num){
     case 0:
-        if(EFS.GetOpenName(EDevice->m_hWnd,"$import$", fn, false, NULL, 6)){
+        if(EFS.GetOpenName("$import$", fn, false, NULL, 6)){
             CInifile* 	I 	= xr_new<CInifile>(fn.c_str(), TRUE, TRUE, TRUE);
 		    LoadShortcuts	(I);
             xr_delete		(I);
@@ -247,8 +247,12 @@ void CCustomPreferences::Load(CInifile* I)
 
     bAllowLogCommands = R_BOOL_SAFE("windows", "log", false);
 	// read recent list    
-    for (u32 i=0; i<scene_recent_count; i++){
-    	shared_str fn  	= R_STRING_SAFE	("editor_prefs",xr_string().sprintf("recent_files_%d",i).c_str(),shared_str("") );
+    for (u32 i=0; i<scene_recent_count; i++)
+    {
+        string64 buffer = {};
+        sprintf(buffer, "recent_files_%d", i);
+
+    	shared_str fn  	= R_STRING_SAFE	("editor_prefs", buffer,shared_str("") );
         if (fn.size())
         {
         	AStringIt it =   std::find(scene_recent_list.begin(), scene_recent_list.end(), fn.c_str() ) ;
@@ -304,13 +308,19 @@ void CCustomPreferences::Save(CInifile* I)
     I->w_u32("editor_prefs", "scene_clear_color", scene_clear_color);
 
     I->w_u32("editor_prefs", "object_flags", object_flags.flags);
-    for (AStringIt it = scene_recent_list.begin(); it != scene_recent_list.end(); it++) {
-        xr_string L; L.sprintf("recent_files_%d", it - scene_recent_list.begin());
-        xr_string V; V.sprintf("\"%s\"", it->c_str());
+    for (AStringIt it = scene_recent_list.begin(); it != scene_recent_list.end(); it++) 
+    {
+        string64 buffer1 = {};
+        string64 buffer2 = {};
+        sprintf(buffer1, "recent_files_%d", it - scene_recent_list.begin());
+        sprintf(buffer2, "\"%s\"", it->c_str());
+
+        xr_string L = buffer1;
+        xr_string V = buffer2;
         I->w_string("editor_prefs", L.c_str(), V.c_str());
     }
     I->w_string("editor_prefs", "weather", sWeather.c_str());
-    I->w_bool("render", "maximized", EDevice->dwMaximized);
+    I->w_bool("render", "maximized", false);
     I->w_u32("render", "w", EDevice->dwRealWidth);
     I->w_u32("render", "h", EDevice->dwRealHeight);
     I->w_bool("windows", "log", bAllowLogCommands);

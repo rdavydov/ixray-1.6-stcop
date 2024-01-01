@@ -97,8 +97,8 @@ u32 m_SelectionRect=D3DCOLOR_RGBA(127,255,127,64);
 
 u32 m_ColorSafeRect = 0xffB040B0;
 
-void 			 SPrimitiveBuffer::RenderDIP() { DU_DRAW_DIP(p_type, pGeom, 0, 0, v_cnt, 0, p_cnt); }
-void 			 SPrimitiveBuffer::RenderDP() { DU_DRAW_DP(p_type, pGeom, 0, p_cnt); }
+//void 			 SPrimitiveBuffer::RenderDIP() { DU_DRAW_DIP(p_type, pGeom, 0, 0, v_cnt, 0, p_cnt); }
+//void 			 SPrimitiveBuffer::RenderDP() { DU_DRAW_DP(p_type, pGeom, 0, p_cnt); }
 void SPrimitiveBuffer::CreateFromData(D3DPRIMITIVETYPE _pt, u32 _p_cnt, u32 FVF, LPVOID vertices, u32 _v_cnt, u16* indices, u32 _i_cnt)
 {
 	IDirect3DVertexBuffer9*	pVB=0;
@@ -1053,10 +1053,10 @@ void CDrawUtilities::DrawAxis(const Fmatrix& T)
     m_Font->Out(p[3].x-1,p[3].y-1,"y");
     m_Font->Out(p[5].x-1,p[5].y-1,"z");
 */
-    if(!m_axis_object)
-    	m_axis_object = Lib.CreateEditObject("editor\\axis");
-    R_ASSERT(m_axis_object);
-    
+    //if(!m_axis_object)
+    //	m_axis_object = Lib.CreateEditObject("editor\\axis");
+    //R_ASSERT(m_axis_object);
+    //
     Fmatrix	M 				= Fidentity;
     Fmatrix	S;
     S.scale					(0.04f,0.04f,0.04f);
@@ -1073,7 +1073,7 @@ void CDrawUtilities::DrawAxis(const Fmatrix& T)
 
     EDevice->m_Camera.MouseRayFromPoint(M.c, dir, pt);
     M.c.mad(dir, _kl);
-    m_axis_object->Render	(M, 2, false);
+    //m_axis_object->Render	(M, 2, false);
 }
 
 void CDrawUtilities::DrawObjectAxis(const Fmatrix& T, float sz, BOOL sel)

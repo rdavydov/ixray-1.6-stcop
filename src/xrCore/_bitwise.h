@@ -1,7 +1,7 @@
 #ifndef _BITWISE_
 #define _BITWISE_
 #pragma once
-
+#include <cmath>
 // float values defines
 #define fdSGN	0x080000000		// mask for sign bit
 #define fdMABS  0x07FFFFFFF		// mask for absolute value (~sgn)

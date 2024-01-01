@@ -166,16 +166,16 @@ void CRender::level_Unload		()
 	//. dbg
 #ifdef DEBUG
 	// dxRenderDeviceRender::Instance().Resources->_DumpMemoryUsage	();
-	dxRenderDeviceRender::Instance().Resources->DBG_VerifyGeoms	();
-	dxRenderDeviceRender::Instance().Resources->DBG_VerifyTextures();
+	DEV->DBG_VerifyGeoms	();
+	DEV->DBG_VerifyTextures();
 #endif
 	b_loaded					= FALSE;
 }
 
 void CRender::LoadBuffers	(CStreamReader *base_fs)
 {
-	dxRenderDeviceRender::Instance().Resources->Evict	();
-	u32	dwUsage				= D3DUSAGE_WRITEONLY | (dxRenderDeviceRender::Instance().Caps.geometry.bSoftware?D3DUSAGE_SOFTWAREPROCESSING:0);
+	DEV->Evict	();
+	u32	dwUsage = D3DUSAGE_WRITEONLY | (Caps.geometry.bSoftware ? D3DUSAGE_SOFTWAREPROCESSING : 0);
 
 	// Vertex buffers
 	if (base_fs->find_chunk(fsL_VB))

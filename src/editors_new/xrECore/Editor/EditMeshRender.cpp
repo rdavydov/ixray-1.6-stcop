@@ -11,6 +11,12 @@
 #include "ui_main.h"
 #include "d3dutils.h"
 #include "render.h"
+
+#pragma warning(push)
+#pragma warning(disable:4995)
+#include <d3dx9.h>
+#pragma warning(pop)
+
 //----------------------------------------------------
 #define F_LIM (10000)
 #define V_LIM (F_LIM*3)
@@ -82,7 +88,7 @@ void CEditableMesh::GenerateRenderBuffers()
             R_ASSERT2(buf_size, "Empty buffer size or bad FVF.");
             u8* bytes = 0;
             IDirect3DVertexBuffer9* pVB = 0;
-            R_CHK(HW.pDevice->CreateVertexBuffer(buf_size, D3DUSAGE_WRITEONLY, 0, D3DPOOL_MANAGED, &pVB, 0));
+            R_CHK(REDevice->CreateVertexBuffer(buf_size, D3DUSAGE_WRITEONLY, 0, D3DPOOL_MANAGED, &pVB, 0));
             rb.pGeom.create(_S->_FVF(), pVB, 0);
             R_CHK(pVB->Lock(0, 0, (LPVOID*)&bytes, 0));
             FillRenderBuffer(face_lst, start_face, num_face, _S, bytes);
@@ -91,7 +97,7 @@ void CEditableMesh::GenerateRenderBuffers()
             start_face += (_S->m_Flags.is(CSurface::sf2Sided)) ? rb.dwNumVertex / 6 : rb.dwNumVertex / 3;
         }
 #endif
-        if (num_verts>0) m_RenderBuffers->insert(mk_pair(_S,rb_vec));
+        if (num_verts>0) m_RenderBuffers->insert(std::make_pair(_S,rb_vec));
     }
     UnloadVNormals();
 }

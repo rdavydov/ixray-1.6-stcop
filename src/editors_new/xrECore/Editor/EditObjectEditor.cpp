@@ -3,15 +3,15 @@
 
 #include "EditObject.h"
 #include "EditMesh.h"
-#include "motion.h"
-#include "bone.h"
+#include "../../xrEngine/motion.h"
+#include "../../xrEngine/bone.h"
 #include "ExportSkeleton.h"
 #include "ExportObjectOGF.h"
 #include "d3dutils.h"
 #include "ui_main.h"
 #include "render.h"
 #include "../Public/PropertiesListHelper.h"
-#include "ResourceManager.h"
+#include "../../Layers/xrRender/ResourceManager.h"
 #include "ImageManager.h"
 
 const float tex_w	= LOD_SAMPLE_COUNT*LOD_IMAGE_SIZE;

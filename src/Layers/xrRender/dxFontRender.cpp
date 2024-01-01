@@ -121,6 +121,10 @@ void dxFontRender::OnRender(CGameFont& owner)
 	}
 }
 
+#ifndef USE_DX11
+#include <d3dx9tex.h>
+#endif
+
 void dxFontRender::CreateFontAtlas(u32 width, u32 height, const char* name, void* bitmap)
 {
 #ifdef USE_DX11

@@ -7,13 +7,13 @@
 
 #include "EditMesh.h"
 #include "EditObject.h"
-#include "Bone.h"
+#include "../xrEngine/bone.h"
 
 #include "face_smoth_flags.h"
 #include "itterate_adjacents.h"
 #include "itterate_adjacents_dynamic.h"
 #	include "UI_ToolsCustom.h"
-#include "..\XrETools\ETools.h"
+#include "..\utils\ETools\ETools.h"
 
 CEditableMesh::~CEditableMesh(){
 	Clear();

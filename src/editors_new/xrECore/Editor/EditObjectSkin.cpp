@@ -208,7 +208,7 @@ int CEditableObject::GetSelectedBones(BoneVec& sel_bones)
 
 //----------------------------------------------------
 
-#include "MgcCont3DMinSphere.h"
+#include <freemagic/MgcCont3DMinSphere.h>
 #include "ExportSkeleton.h"
 BOOL	f_valid		(float f)
 {
@@ -275,7 +275,7 @@ void ComputeSphere(Fsphere &B, FvectorVec& V)
 }
 //----------------------------------------------------
 
-#include "MgcCont3DCylinder.h"
+#include <freemagic/MgcCont3DCylinder.h>
 void ComputeCylinder(Fcylinder& C, Fobb& B, FvectorVec& V)
 {
     if (V.size()<3) 	{ C.invalidate(); return; }

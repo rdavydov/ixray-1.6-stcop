@@ -1,12 +1,9 @@
 // Image.h: interface for the CImage class.
 //
 //////////////////////////////////////////////////////////////////////
-
-#if !defined(AFX_IMAGE_H__4281EEAB_9522_40E5_A90D_831A40E1A344__INCLUDED_)
-#define AFX_IMAGE_H__4281EEAB_9522_40E5_A90D_831A40E1A344__INCLUDED_
 #pragma once
 
-class ECORE_API CImage
+class ECORE_API CXImage
 {
 public:
 	u32   dwWidth;
@@ -14,8 +11,8 @@ public:
 	BOOL	bAlpha;
 	u32*	pData;
 
-	CImage	()			{ ZeroMemory(this,sizeof(*this)); }
-	~CImage	()			{ xr_free(pData); }
+	CXImage()			{ ZeroMemory(this,sizeof(*this)); }
+	~CXImage()			{ xr_free(pData); }
 
 	void	Create		(u32 w, u32 h);
 	void	Create		(u32 w, u32 h, u32* data);
@@ -31,5 +28,3 @@ public:
 	__forceinline u32	GetPixel(int x, int y)			{ return pData[y*dwWidth+x];}
 	__forceinline void	PutPixel(int x, int y, u32 p)	{ pData[y*dwWidth+x] = p;	}
 };
-
-#endif // !defined(AFX_IMAGE_H__4281EEAB_9522_40E5_A90D_831A40E1A344__INCLUDED_)

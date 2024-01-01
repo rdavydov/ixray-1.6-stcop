@@ -15,13 +15,14 @@ extern "C" {
 };
 
 #if 1
-	#include "ResourceManager.h"
+	#include "../Layers/xrRender/ResourceManager.h"
     
 	extern "C" __declspec(dllimport) lwObject* LWO_ImportObject(char* filename, lwObject *new_obj);
 	extern "C" __declspec(dllimport) void LWO_CloseFile(lwObject *new_obj);
 #endif
 
-DEFINE_MAP(void*,int,VMIndexLink,VMIndexLinkIt);
+using VMIndexLink = xr_map<void*, int>;
+using VMIndexLinkIt = VMIndexLink::iterator;
 
 bool CompareFunc(const st_VMapPt& vm0, const st_VMapPt& vm1){
 	return vm0.vmap_index<vm1.vmap_index;

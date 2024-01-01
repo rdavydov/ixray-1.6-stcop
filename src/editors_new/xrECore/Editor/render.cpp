@@ -2,8 +2,8 @@
 #pragma hdrstop
 
 #include "render.h"
-#include "ResourceManager.h"
-#include "../../../xrAPI/xrAPI.h"
+#include "../Layers/xrRender/ResourceManager.h"
+#include "../../../Include/xrAPI/xrAPI.h"
 #include "../../xrEngine/irenderable.h"
 #include "../../xrEngine/xr_object.h"
 #include "../../xrEngine/CustomHUD.h"
@@ -70,11 +70,11 @@ BOOL CRender::occ_visible(vis_data& P)
 void CRender::Calculate()
 {
 	// Transfer to global space to avoid deep pointer access
-	g_fSCREEN						=	float(EDevice->dwWidth*EDevice->dwHeight);
+	g_fSCREEN						=	float(EDevice->TargetWidth*EDevice->TargetHeight);
 	r_ssaDISCARD					=	(ssaDISCARD*ssaDISCARD)/g_fSCREEN;
 //	r_ssaLOD_A						=	(ssaLOD_A*ssaLOD_A)/g_fSCREEN;
 //	r_ssaLOD_B						=	(ssaLOD_B*ssaLOD_B)/g_fSCREEN;
-	lstRenderables.clear_not_free();
+	lstRenderables.clear();
 	ViewBase.CreateFromMatrix		(EDevice->mFullTransform,FRUSTUM_P_LRTB|FRUSTUM_P_FAR);
 	{
 		g_SpatialSpace->q_frustum
@@ -122,7 +122,7 @@ void CRender::Calculate()
 	}
 }
 
-#include "igame_persistent.h"
+#include "../xrEngine/IGame_Persistent.h"
 void CRender::Render()
 {
 	
@@ -156,26 +156,26 @@ void	CRender::rmNear		()
 {
 	CRenderTarget* T	=	getTarget	();
 	D3DVIEWPORT9 VP		=	{0,0,T->get_width(),T->get_height(),0,0.02f };
-	CHK_DX				(HW.pDevice->SetViewport(&VP));
+	CHK_DX				(REDevice->SetViewport(&VP));
 }
 void	CRender::rmFar		()
 {
 	CRenderTarget* T	=	getTarget	();
 	D3DVIEWPORT9 VP		=	{0,0,T->get_width(),T->get_height(),0.99999f,1.f };
-	CHK_DX				(HW.pDevice->SetViewport(&VP));
+	CHK_DX				(REDevice->SetViewport(&VP));
 }
 void	CRender::rmNormal	()
 {
 	CRenderTarget* T	=	getTarget	();
 	D3DVIEWPORT9 VP		= {0,0,T->get_width(),T->get_height(),0,1.f };
-	CHK_DX				(HW.pDevice->SetViewport(&VP));
+	CHK_DX				(REDevice->SetViewport(&VP));
 }
 
 void 	CRender::set_Transform	(Fmatrix* M)
 {
 	current_matrix.set(*M);
 }
-
+#include <d3dx9.h>
 void			CRender::add_Visual   		(IRenderVisual* visual)			{ if (val_bInvisible)		return; Models->RenderSingle	(dynamic_cast<dxRender_Visual*>(visual),current_matrix,1.f);}
 IRenderVisual*	CRender::model_Create		(LPCSTR name, IReader* data)		{ return Models->Create(name,data);		}
 IRenderVisual*	CRender::model_CreateChild	(LPCSTR name, IReader* data)		{ return Models->CreateChild(name,data);}

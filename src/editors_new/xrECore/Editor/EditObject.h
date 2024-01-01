@@ -1,15 +1,15 @@
 #ifndef EditObjectH
 #define EditObjectH
 
-#include "Bone.h"
-#include "Motion.h"
+#include "../../xrEngine/Bone.h"
+#include "../../xrEngine/Motion.h"
 #if 1
 #	include "../../../Editors/Public/PropertiesListTypes.h"
 //	#include "PropertiesListHelper.h"
 #	include "..\Engine\XrGameMaterialLibraryEditors.h"
 #	include "pick_defs.h"
 #endif
-#	include "..\..\..\xrRender\Public\kinematics.h"
+#	include "..\..\..\Include\xrRender\Kinematics.h"
 
 #include "physicsshellholdereditorbase.h"
 //----------------------------------------------------
@@ -108,7 +108,7 @@ public:
     IC void			SetTexture		(LPCSTR name){string512 buf; xr_strcpy(buf, sizeof(buf), name); if(strext(buf)) *strext(buf)=0; m_Texture=buf;}
     IC void			SetVMap			(LPCSTR name){m_VMap=name;}
 #if 1
-    IC u32			_GameMtl		()const	{return GameMaterialLibrary->GetMaterialID	(*m_GameMtlName);}
+    IC u32			_GameMtl		()const	{return PGMLib->GetMaterialID	(*m_GameMtlName);}
     IC void			OnDeviceCreate	()
     { 
         R_ASSERT(!m_RTFlags.is(rtValidShader));
@@ -131,16 +131,25 @@ public:
 #endif
 };
 
-DEFINE_VECTOR	(CSurface*,SurfaceVec,SurfaceIt);
-DEFINE_VECTOR	(CEditableMesh*,EditMeshVec,EditMeshIt);
-DEFINE_VECTOR	(COMotion*,OMotionVec,OMotionIt);
-DEFINE_VECTOR	(CSMotion*,SMotionVec,SMotionIt);
+using SurfaceVec = xr_vector<CSurface*>;
+using SurfaceIt = SurfaceVec::iterator;
+
+using EditMeshVec = xr_vector<CEditableMesh*>;
+using EditMeshIt = EditMeshVec::iterator;
+
+using OMotionVec = xr_vector<COMotion*>;
+using OMotionIt = OMotionVec::iterator;
+
+using SMotionVec = xr_vector<CSMotion*>;
+using SMotionIt = SMotionVec::iterator;
 
 struct ECORE_API SBonePart{
 	shared_str 		alias;
     RStringVec 		bones;
 };
-DEFINE_VECTOR(SBonePart,BPVec,BPIt);
+
+using BPVec = xr_vector<SBonePart>;
+using BPIt = BPVec::iterator;
 
 const u32 FVF_SV	= D3DFVF_XYZ | D3DFVF_TEX1 | D3DFVF_NORMAL;
 
@@ -472,8 +481,8 @@ virtual	const IBoneData&_BCL	GetBoneData(u16 bone_id) const 															{ ret
 
 	virtual BOOL		_BCL	LL_GetBoneVisible(u16 bone_id) 															{ return TRUE; }
 	virtual void				LL_SetBoneVisible(u16 bone_id, BOOL val, BOOL bRecursive) 								{ VERIFY(false); }
-	virtual BonesVisible			_BCL	LL_GetBonesVisible() 																	{ return BonesVisible(-1); }
-	virtual void				LL_SetBonesVisible(BonesVisible mask) 															{ VERIFY(false); }
+	virtual u64			_BCL	LL_GetBonesVisible() 																	{ return u64(-1); }
+	virtual void				LL_SetBonesVisible(u64 mask) 															{ VERIFY(false); }
 
 	// Main functionality
 	virtual void				CalculateBones(BOOL bForceExact	= FALSE) 												{ } // Recalculate skeleton

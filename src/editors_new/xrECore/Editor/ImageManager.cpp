@@ -1,16 +1,16 @@
 #include "stdafx.h"
 #pragma hdrstop
 
-#include "RedImageTool/RedImage.hpp"
+//#include "RedImageTool/RedImage.hpp"
 
 #include "ImageManager.h"
-#include "xrImage_Resampler.h"
+#include "../xrEngine/xrImage_Resampler.h"
 #include "..\Engine\Image.h"
 #include "ui_main.h"
 #include "EditObject.h"
-#include "ResourceManager.h"
-#include "StbImage\stb_image.h"
-#include "../XrETools/ETools.h"
+#include "../Layers/xrRender/ResourceManager.h"
+#include <StbImage/stb_image.h>
+#include "../utils/ETools/ETools.h"
 CImageManager ImageLib;
 //---------------------------------------------------------------------------
 /*
@@ -36,7 +36,7 @@ bool Stbi_Load(LPCSTR full_name, U32Vec& data, u32& w, u32& h, u32& a)
     	return false;
     }
 	if (strstr(full_name,".tga")){
-    	CImage img;
+        CXImage img;
         if (!img.LoadTGA	(full_name)) return false;
 		w 					= img.dwWidth;
         h 					= img.dwHeight;
@@ -62,19 +62,19 @@ bool Stbi_Load(LPCSTR full_name, U32Vec& data, u32& w, u32& h, u32& a)
         }
         else
         {
-            RedImageTool::RedImage img;
-            if (img.LoadFromFile(full_name))
-            {
-                img.ClearMipLevels();
-                img.Convert(RedImageTool::RedTexturePixelFormat::R8G8B8A8);
-                img.SwapRB();
-                w = img.GetWidth();
-                h = img.GetHeight();
-                data.resize(w * h);
-                a = true;
-                CopyMemory(data.data(), *img, w * h*4);
-                return true;
-            }
+           //RedImageTool::RedImage img;
+           //if (img.LoadFromFile(full_name))
+           //{
+           //    img.ClearMipLevels();
+           //    img.Convert(RedImageTool::RedTexturePixelFormat::R8G8B8A8);
+           //    img.SwapRB();
+           //    w = img.GetWidth();
+           //    h = img.GetHeight();
+           //    data.resize(w * h);
+           //    a = true;
+           //    CopyMemory(data.data(), *img, w * h*4);
+           //    return true;
+           //}
         }
 
     }
@@ -293,10 +293,10 @@ void CImageManager::SafeCopyLocalToServer(FS_FileSet& files)
 
     	// copy sources
 		fn 				 = it->name;
-		strconcat		(sizeof(src_name),src_name, p_import, fn.c_str());
+		xr_strconcat		(src_name, p_import, fn.c_str());
 		UpdateFileName	 (fn);
 
-		strconcat(sizeof(dest_name),dest_name, p_textures, EFS.ChangeFileExt(fn,".tga").c_str() );
+        xr_strconcat(dest_name, p_textures, EFS.ChangeFileExt(fn,".tga").c_str() );
 
         if (0==strcmp(strext(src_name),".tga")){
 			FS.file_copy(src_name,dest_name);
@@ -305,7 +305,7 @@ void CImageManager::SafeCopyLocalToServer(FS_FileSet& files)
             U32Vec data;
             u32 w,h,a;
 		    R_ASSERT	(Stbi_Load(src_name,data,w,h,a));
-            CImage* I 	= xr_new<CImage>();
+            CXImage* I 	= xr_new<CXImage>();
             I->Create	(w,h,data.data());
             I->Vflip	();
             I->SaveTGA	(dest_name);
@@ -375,7 +375,7 @@ void CImageManager::SynchronizeTextures(bool sync_thm, bool sync_game, bool bFor
             if (data.empty()){ bool bRes = Stbi_Load(fn,data,w,h,a); R_ASSERT(bRes);}
 			if (IsValidSize(w,h)){
                 string_path 			game_name;
-                strconcat				(sizeof(game_name), game_name, base_name.c_str(), ".dds");
+                xr_strconcat(game_name, base_name.c_str(), ".dds");
 
                 FS.update_path			(game_name,_game_textures_,game_name);
                 if (MakeGameTexture(THM,game_name,data.data()))
@@ -483,9 +483,9 @@ int CImageManager::GetLocalNewTextures(FS_FileSet& files)
 // output: 	соответствие
 //------------------------------------------------------------------------------
 #define SQR(a) ((a)*(a))
-BOOL CImageManager::CheckCompliance(LPCSTR fname, int& compl)
+BOOL CImageManager::CheckCompliance(LPCSTR fname, int& compl_)
 {
-	compl 			= 0;
+    compl_ = 0;
     U32Vec data;
     u32 w, h, a;
     if (!Stbi_Load(fname,data,w,h,a)) return FALSE;
@@ -524,18 +524,18 @@ BOOL CImageManager::CheckCompliance(LPCSTR fname, int& compl)
     difference		= 	difference/(a ? 2.f : sqrtf(3.f));
     difference		=  	difference*100.f;
     clamp 			(difference,0.f,100.f);
-    compl			= 	iFloor(difference)*1000;
+    compl_ = 	iFloor(difference)*1000;
     maximal 		=	maximal/(a ? 2.f : sqrtf(3.f));
     maximal			=  	maximal*100.f;
     clamp 			(maximal,0.f,100.f);
-    compl			+= 	iFloor(maximal);
+    compl_ += 	iFloor(maximal);
 
     // free
     xr_free			(pScaled);
     xr_free   		(pRestored);
     return 			TRUE;
 }
-void CImageManager::CheckCompliance(FS_FileSet& files, FS_FileSet& compl)
+void CImageManager::CheckCompliance(FS_FileSet& files, FS_FileSet& compl_)
 {
 	SPBItem* pb = UI->ProgressStart(files.size(),"Check texture compliance: ");
     FS_FileSetIt it	= files.begin();
@@ -547,7 +547,7 @@ void CImageManager::CheckCompliance(FS_FileSet& files, FS_FileSet& compl)
     	if (!CheckCompliance(fname,val))
         	ELog.Msg(mtError,"Bad texture: '%s'",it->name.c_str());
         FS_File 				F(*it); F.attrib = val;
-        compl.insert			(F);
+        compl_.insert			(F);
 	    pb->Inc					();
 		if (UI->NeedAbort()) break;
     }

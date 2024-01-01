@@ -60,9 +60,6 @@ public:
 	ref_shader			m_WireShader;
 	ref_shader			m_SelectionShader;
 
-#ifndef USE_DX11
-	CHWCaps						Caps;
-#endif
 
 private:
 	CGammaControl		m_Gamma;
@@ -70,5 +67,8 @@ private:
 
 #endif //ifndef _EDITOR
 
+#ifndef USE_DX11
+extern CHWCaps Caps;
+#endif
 
 #endif	//	RenderDeviceRender_included

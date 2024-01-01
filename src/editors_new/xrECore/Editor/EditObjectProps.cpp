@@ -5,8 +5,8 @@
 #include "EditMesh.h"
 #include "ui_main.h"
 #include "../Public/PropertiesListHelper.h"
-#include "motion.h"
-#include "bone.h"
+#include "../xrEngine/motion.h"
+#include "../xrEngine/bone.h"
 
 void CEditableObject::OnChangeShader(PropValue*)
 {
@@ -64,13 +64,19 @@ void CEditableObject::FillBasicProps(LPCSTR pref, PropItemVec& items)
 
 void CEditableObject::FillSummaryProps(LPCSTR pref, PropItemVec& items)
 {
-    xr_string t; t.sprintf("V: %d, F: %d",		GetVertexCount(),GetFaceCount());
-    PHelper().CreateCaption(items,PrepareKey(pref,"Geometry\\Object"),t.c_str());
-    for (EditMeshIt m_it=FirstMesh(); m_it!=LastMesh(); m_it++){
-        CEditableMesh* MESH=*m_it;
-        t.sprintf("V: %d, F: %d",MESH->GetVertexCount(),MESH->GetFaceCount());
-	    PHelper().CreateCaption(items,PrepareKey(pref,xr_string(xr_string("Geometry\\Meshes\\")+MESH->Name().c_str()).c_str()),t.c_str());
+    string128 t; 
+    sprintf(t, "V: %d, F: %d", GetVertexCount(), GetFaceCount());
+
+    PHelper().CreateCaption(items,PrepareKey(pref,"Geometry\\Object"),t);
+
+    for (EditMeshIt m_it = FirstMesh(); m_it != LastMesh(); m_it++)
+    {
+        string128 t1;
+        CEditableMesh* MESH = *m_it;
+        sprintf(t1, "V: %d, F: %d", MESH->GetVertexCount(), MESH->GetFaceCount());
+        PHelper().CreateCaption(items, PrepareKey(pref, xr_string(xr_string("Geometry\\Meshes\\") + MESH->Name().c_str()).c_str()), t1);
     }
+
     PHelper().CreateSText(items,PrepareKey(pref, "Game options\\User Data"),&m_ClassScript);
 }
 //---------------------------------------------------------------------------

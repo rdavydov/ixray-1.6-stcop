@@ -7,14 +7,14 @@
 
 #include "EditObject.h"
 #include "EditMesh.h"
-#include "bone.h"
-#include "motion.h"
+#include "../xrEngine/bone.h"
+#include "../xrEngine/motion.h"
 
  #include "exportskeleton.h"
  #include "exportobjectOGF.h"
 
 #if 1
- #include "Shader.h"
+ #include "../Layers/xrRender/Shader.h"
 
 bool CEditableObject::Load(const char* fname)
 {

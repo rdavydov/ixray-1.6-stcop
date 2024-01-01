@@ -6,6 +6,7 @@
 #pragma hdrstop
 
 #include "../../xrEngine/fmesh.h"
+#include "dxRenderDeviceRender.h"
 #include "FSkinned.h"
 #include "SkeletonX.h"
 
@@ -592,11 +593,8 @@ void CSkeletonX_ext::_Load_hw	(Fvisual& V, void *	_verts_)
 void CSkeletonX_ext::_Load_hw	(Fvisual& V, void *	_verts_)
 {
 	// Create HW VB in case this is possible
-#if !defined(_EDITOR) && !defined(XR_EDITOR_NEW)
-	BOOL	bSoft				= dxRenderDeviceRender::Instance().Caps.geometry.bSoftware;
-#else
-	BOOL	bSoft = true;
-#endif
+	BOOL	bSoft = Caps.geometry.bSoftware;
+
 	u32		dwUsage				= /*D3DUSAGE_WRITEONLY |*/ (bSoft?D3DUSAGE_SOFTWAREPROCESSING:0);	// VB may be read by wallmarks code
 	switch	(RenderMode)
 	{
