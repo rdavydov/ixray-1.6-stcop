@@ -1,8 +1,7 @@
 //----------------------------------------------------
 // file: stdafx.h
 //----------------------------------------------------
-#ifndef stdafxECOREH
-#define stdafxECOREH
+#ifndef XR_EDITOR_NEW
 #pragma once
 
 #pragma warn -pck

@@ -7,7 +7,7 @@
 #include "stdafx.h"
 #include "stats_manager.h"
 
-#ifdef _EDITOR
+#if defined(_EDITOR) || defined(XR_EDITOR_NEW)
     const bool g_dedicated_server = false;
 #endif
 

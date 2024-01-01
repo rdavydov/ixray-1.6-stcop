@@ -5,7 +5,9 @@
 
 #include "hwcaps.h"
 
-#include <renderdoc/api/app/renderdoc_app.h>
+#ifdef USE_DX11
+	#include <renderdoc/api/app/renderdoc_app.h>
+#endif
 
 #ifndef _MAYA_EXPORT
 #include "stats_manager.h"

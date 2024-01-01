@@ -162,8 +162,8 @@ void CTexture::Load		()
 	}
 
 	Preload							();
-//#ifndef		DEDICATED_SERVER
-#ifndef _EDITOR
+
+#if !defined(_EDITOR) && !defined(XR_EDITOR_NEW)
 	if (!g_dedicated_server)
 #endif
 	{

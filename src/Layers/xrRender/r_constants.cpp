@@ -56,6 +56,7 @@ ref_constant R_constant_table::get	(shared_str& S)
 }
 
 #ifndef USE_DX11
+#include <d3dx9shader.h>
 BOOL	R_constant_table::parse	(void* _desc, u32 destination)
 {
 	D3DXSHADER_CONSTANTTABLE* desc	= (D3DXSHADER_CONSTANTTABLE*) _desc;

@@ -132,6 +132,7 @@ add_subdirectory("src/xrParticles")
 add_subdirectory("src/xrScripts")
 
 add_subdirectory("src/plugins")
+add_subdirectory("src/editors_new")
 
 if (IXRAY_USE_R1)
     add_subdirectory("src/Layers/xrRenderPC_R1")

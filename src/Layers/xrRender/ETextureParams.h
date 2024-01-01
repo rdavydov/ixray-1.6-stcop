@@ -1,8 +1,13 @@
 #ifndef ETextureParamsH
 #define ETextureParamsH
 
+#ifdef XR_EDITOR_NEW
+#include "../Public/PropertiesListTypes.h"
+#endif
+
 #pragma pack(push,1)
-struct ECORE_API STextureParams{
+struct ECORE_API STextureParams
+{
 	enum ETType{
     	ttImage	= 0,
         ttCubeMap,
@@ -11,7 +16,9 @@ struct ECORE_API STextureParams{
         ttTerrain,
 		ttForceU32	= u32(-1)
 	};
-	enum ETFormat{
+
+	enum ETFormat
+	{
     	tfDXT1 = 0,
         tfADXT1,
         tfDXT3,
@@ -28,21 +35,26 @@ struct ECORE_API STextureParams{
 		tfA8L8,
 		tfForceU32	= u32(-1)
 	};
-    enum ETBumpMode{
+
+    enum ETBumpMode
+	{
     	tbmResereved	= 0,
         tbmNone,
         tbmUse,
         tbmUseParallax,
 		tbmForceU32	= u32(-1)
     };
-    enum ETMaterial{
+    enum ETMaterial
+	{
 		tmOrenNayar_Blin	= 0,
 		tmBlin_Phong, 
 		tmPhong_Metal,
         tmMetal_OrenNayar,
 		tmForceU32			= u32(-1)
     };
-	enum{
+
+	enum
+	{
 		kMIPFilterAdvanced			= 5,
 
 		kMIPFilterPoint				= 2,    
@@ -64,7 +76,8 @@ struct ECORE_API STextureParams{
 		kMIPFilterKaiser			= 14,
 	};
 
-	enum{
+	enum
+	{
 		flGenerateMipMaps	= (1<<0),
 		flBinaryAlpha		= (1<<1),
 		flAlphaBorder		= (1<<4),
@@ -165,13 +178,13 @@ struct ECORE_API STextureParams{
 	}
     void Load (IReader& F);
     void Save (IWriter& F);
-#ifdef _EDITOR
+#if defined(_EDITOR) || defined(XR_EDITOR_NEW)
 	PropValue::TOnChange			OnTypeChangeEvent;
 	void __stdcall	OnTypeChange	(PropValue* v);
     void 			FillProp		(LPCSTR base_name, PropItemVec& items, PropValue::TOnChange OnChangeEvent);
     LPCSTR 			FormatString	();
 	u32 			MemoryUsage		(LPCSTR base_name);
-    BOOL			similar			(STextureParams& tp1, xr_vector<AnsiString>& sel_params);
+    BOOL			similar			(STextureParams& tp1, xr_vector<xr_string>& sel_params);
     
 #endif
 };

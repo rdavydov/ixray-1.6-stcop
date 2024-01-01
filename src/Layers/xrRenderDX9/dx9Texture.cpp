@@ -9,6 +9,8 @@
 #include "../xrRender/dxRenderDeviceRender.h"
 #endif
 
+#include <d3dx9.h>
+#include <d3dx9tex.h>
 // #include "std_classes.h"
 // #include "xr_avi.h"
 
@@ -109,6 +111,11 @@ ID3DTexture2D*	TW_LoadTextureFromTexture
 	u32&					h
 )
 {
+#ifndef XR_EDITOR_NEW
+	auto poolType = (RImplementation.o.no_ram_textures ? D3DPOOL_DEFAULT : D3DPOOL_MANAGED);
+#else
+	auto poolType = D3DPOOL_DEFAULT;
+#endif
 	// Calculate levels & dimensions
 	ID3DTexture2D*		t_dest			= NULL;
 	D3DSURFACE_DESC			t_from_desc0{};
@@ -124,7 +131,7 @@ ID3DTexture2D*	TW_LoadTextureFromTexture
 		RDevice,
 		top_width,top_height,
 		levels_exist,0,t_dest_fmt,
-		(RImplementation.o.no_ram_textures ? D3DPOOL_DEFAULT : D3DPOOL_MANAGED), 
+		poolType,
 		&t_dest
 		));
 
@@ -334,7 +341,11 @@ _DDS_CUBE:
 					D3DX_DEFAULT,
 					IMG.MipLevels,0,
 					IMG.Format,
+#if !defined(XR_EDITOR_NEW)
 					(RImplementation.o.no_ram_textures ? D3DPOOL_DEFAULT : D3DPOOL_MANAGED),
+#else
+					D3DPOOL_DEFAULT,
+#endif
 					D3DX_DEFAULT,
 					D3DX_DEFAULT,
 					0,&IMG,0,

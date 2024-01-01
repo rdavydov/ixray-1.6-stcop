@@ -8,7 +8,7 @@
 #include "../Include/xrAPI/xrAPI.h"
 #include <SDL3/SDL.h>
 
-#ifndef XRSE_FACTORY_EXPORTS
+#if !defined(XRSE_FACTORY_EXPORTS) && !defined(XR_EDITOR_NEW)
 #include "imgui.h"
 #endif
 

@@ -2,10 +2,10 @@
 #define dxRenderDeviceRender_included
 #pragma once
 
-#ifndef _EDITOR
+#if !defined(_EDITOR) && !defined(XR_EDITOR_NEW)
 	#define DEV dxRenderDeviceRender::Instance().Resources
 #else
-	#define DEV EDevice.Resources
+	#define DEV EDevice->Resources
 #endif
 
 #ifndef _EDITOR

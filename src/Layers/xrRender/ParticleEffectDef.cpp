@@ -127,7 +127,7 @@ void CPEDef::ExecuteCollision(PAPI::Particle* particles, u32 p_cnt, float dt, CP
 			float dist 	= dir.magnitude();
 			if (dist>=EPS){
 				dir.div	(dist);
-#ifdef _EDITOR                
+#if defined(_EDITOR) || defined(XR_EDITOR_NEW)
 				if (Tools->RayPick(m.posB,dir,dist,&pt,&n)){
 #else
 				collide::rq_result	RQ;

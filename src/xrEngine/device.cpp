@@ -23,7 +23,7 @@ using namespace DirectX;
 #include "../xrCore/FS_impl.h"
 #include "igame_persistent.h"
 
-ENGINE_API CRenderDevice Device;
+ENGINE_API CRenderDevice* g_pDevice = nullptr;
 ENGINE_API CLoadScreenRenderer load_screen_renderer;
 ENGINE_API CTimer loading_save_timer;
 ENGINE_API bool loading_save_timer_started = false;

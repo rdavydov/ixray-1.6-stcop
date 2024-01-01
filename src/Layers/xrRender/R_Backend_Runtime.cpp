@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #pragma hdrstop
+#include "dxRenderDeviceRender.h"
 
 using namespace DirectX;
 
@@ -13,7 +14,7 @@ using namespace DirectX;
 void CBackend::OnFrameEnd	()
 {
 //#ifndef DEDICATED_SERVER
-#ifndef _EDITOR
+#if !defined(_EDITOR) && !defined(XR_EDITOR_NEW)
 	if (!g_dedicated_server)
 #endif    
 	{
@@ -37,7 +38,7 @@ void CBackend::OnFrameEnd	()
 void CBackend::OnFrameBegin	()
 {
 //#ifndef DEDICATED_SERVER
-#ifndef _EDITOR
+#if !defined(_EDITOR) && !defined(XR_EDITOR_NEW)
 	if (!g_dedicated_server)
 #endif    
 	{

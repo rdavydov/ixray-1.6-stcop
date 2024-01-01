@@ -105,6 +105,8 @@ ENGINE_API	string_path		g_sLaunchWorkingFolder;
 // startup point
 void InitEngine		()
 {
+	g_pDevice = new CRenderDevice();
+
 	Engine.Initialize			( );
 	while (!g_bIntroFinished)	Sleep	(100);
 	Device.Initialize			( );
@@ -189,17 +191,20 @@ void destroyConsole	()
 	xr_delete					(Console);
 }
 
-void destroyEngine	()
+void destroyEngine()
 {
-	Device.Destroy				( );
-	try {
+	Device.Destroy();
+	try
+	{
 		FlushLog(); // This should prevent empty log file in some cases
 	}
-	catch (...) {
+	catch (...) 
+	{
 		MessageBoxA(NULL, "Could not perform log saving after destroying Render Device",
 			"Cant flush log", MB_OK | MB_ICONWARNING | MB_TASKMODAL);
 	}
-	Engine.Destroy				( );
+	Engine.Destroy();
+	xr_delete(g_pDevice);
 }
 
 void execUserScript				( )

@@ -380,11 +380,14 @@ void CParticleEffect::Render(float) {
                 Fvector wp_eff;
                 m_XFORM.transform_tiny(wp_eff,m.pos);
 
+
+#if !defined(_EDITOR) && !defined(XR_EDITOR_NEW)
 				if (Device.vCameraPosition.distance_to_sqr(wp_eff) > _sqr(g_pGamePersistent->Environment().CurrentEnv->fog_distance))
 				{
 					NeedExit = true;
 					break;
 				}
+#endif
 
 				Fvector2 lt,rb;
 				lt.set			(0.f,0.f);
@@ -471,7 +474,7 @@ void CParticleEffect::Render(float) {
 
 			if (dwCount)    
 			{
-#ifndef _EDITOR
+#if !defined(_EDITOR) && !defined(XR_EDITOR_NEW)
 				Fmatrix Pold						= Device.mProject;
 				Fmatrix FTold						= Device.mFullTransform;
 				if(GetHudMode())
@@ -493,8 +496,8 @@ void CParticleEffect::Render(float) {
 
                 RCache.set_CullMode		(m_Def->m_Flags.is(CPEDef::dfCulling)?(m_Def->m_Flags.is(CPEDef::dfCullCCW)?CULL_CCW:CULL_CW):CULL_NONE);
 				RCache.Render	   		(D3DPT_TRIANGLELIST,dwOffset,0,dwCount,0,dwCount/2);
-                RCache.set_CullMode		(CULL_CCW	); 
-#ifndef _EDITOR
+                RCache.set_CullMode		(CULL_CCW	);
+#if !defined(_EDITOR) && !defined(XR_EDITOR_NEW)
 				if(GetHudMode())
 				{
 					RImplementation.rmNormal	();

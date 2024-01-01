@@ -286,7 +286,9 @@ virtual		void			_BCL	AddSeqFrame			( pureFrame* f, bool mt );
 virtual		void			_BCL	RemoveSeqFrame		( pureFrame* f );
 };
 
-extern		ENGINE_API		CRenderDevice		Device;
+extern ENGINE_API CRenderDevice* g_pDevice;
+#define Device (*g_pDevice)
+
 extern ENGINE_API CTimer loading_save_timer;
 extern ENGINE_API bool loading_save_timer_started;
 

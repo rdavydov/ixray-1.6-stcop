@@ -208,6 +208,32 @@ bool EFS_Utils::GetOpenNameInternal( LPCSTR initial,  LPSTR buffer, int sz_buf, 
 	return 				bRes;
 }
 
+
+bool EFS_Utils::GetOpenName(LPCSTR initial, xr_string& buffer, bool bMulti, LPCSTR offset, int start_flt_ext)
+{
+	char buf[255 * 255]; //max files to select
+	xr_strcpy(buf, buffer.c_str());
+
+	bool bRes = GetOpenNameInternal(initial, buf, sizeof(buf), bMulti, offset, start_flt_ext);
+
+	if (bRes)
+		buffer = (char*)buf;
+
+	return bRes;
+}
+
+
+bool EFS_Utils::GetSaveName(LPCSTR initial, xr_string& buffer, LPCSTR offset, int start_flt_ext)
+{
+	string_path buf;
+	xr_strcpy(buf, sizeof(buf), buffer.c_str());
+	bool bRes = GetSaveName(initial, buf, offset, start_flt_ext);
+	if (bRes)
+		buffer = buf;
+
+	return bRes;
+}
+
 bool EFS_Utils::GetSaveName( LPCSTR initial, string_path& buffer, LPCSTR offset, int start_flt_ext )
 {
 //	unsigned int	dwVersion = GetVersion();

@@ -43,8 +43,9 @@ void Fvisual::Load		(const char* N, IReader *data, u32 dwFlags)
 	dwPrimitives				= 0;
 	BOOL				loaded_v=false;
 
-	if (data->find_chunk(OGF_GCONTAINER)) {
-#ifndef _EDITOR
+	if (data->find_chunk(OGF_GCONTAINER)) 
+	{
+#if !defined(_EDITOR) && !defined(XR_EDITOR_NEW)
 		// verts
 		u32 ID				= data->r_u32					();
 		vBase				= data->r_u32					();
@@ -109,7 +110,7 @@ void Fvisual::Load		(const char* N, IReader *data, u32 dwFlags)
 		if (data->find_chunk(OGF_VCONTAINER)) 
 		{
 			R_ASSERT2			(0,"pls notify andy about this.");
-#ifndef _EDITOR
+#if !defined(_EDITOR) && !defined(XR_EDITOR_NEW)
 			u32 ID				= data->r_u32				();
 			vBase				= data->r_u32				();
 			vCount				= data->r_u32				();
@@ -135,7 +136,11 @@ void Fvisual::Load		(const char* N, IReader *data, u32 dwFlags)
 			VERIFY				(NULL==p_rm_Vertices);
 			R_CHK				(dx10BufferUtils::CreateVertexBuffer(&p_rm_Vertices, data->pointer(), vCount*vStride));
 #else //USE_DX11
-			BOOL	bSoft		= dxRenderDeviceRender::Instance().Caps.geometry.bSoftware;
+#if !defined(_EDITOR) && !defined(XR_EDITOR_NEW)
+			BOOL bSoft = dxRenderDeviceRender::Instance().Caps.geometry.bSoftware;
+#else
+			BOOL bSoft = true;
+#endif
 			u32		dwUsage		= D3DUSAGE_WRITEONLY | (bSoft?D3DUSAGE_SOFTWAREPROCESSING:0);
 			BYTE*	bytes		= 0;
 			VERIFY				(NULL==p_rm_Vertices);
@@ -154,7 +159,7 @@ void Fvisual::Load		(const char* N, IReader *data, u32 dwFlags)
 		if (data->find_chunk(OGF_ICONTAINER)) 
 		{
 			R_ASSERT2			(0,"pls notify andy about this.");
-#ifndef _EDITOR
+#if !defined(_EDITOR) && !defined(XR_EDITOR_NEW)
 			u32 ID				= data->r_u32			();
 			iBase				= data->r_u32			();
 			iCount				= data->r_u32			();
@@ -177,7 +182,11 @@ void Fvisual::Load		(const char* N, IReader *data, u32 dwFlags)
 			VERIFY				(NULL==p_rm_Indices);
 			R_CHK				(dx10BufferUtils::CreateIndexBuffer(&p_rm_Indices, data->pointer(), iCount*2));
 #else //USE_DX11
+#if !defined(_EDITOR) && !defined(XR_EDITOR_NEW)
 			BOOL	bSoft		= dxRenderDeviceRender::Instance().Caps.geometry.bSoftware;
+#else
+			BOOL bSoft = true;
+#endif
 			u32		dwUsage		= /*D3DUSAGE_WRITEONLY |*/ (bSoft?D3DUSAGE_SOFTWAREPROCESSING:0);	// indices are read in model-wallmarks code
 			BYTE*	bytes		= 0;
 

@@ -194,7 +194,7 @@ using LPFloatIt = LPFloatVec::iterator;
 using LPIntVec = xr_vector<int*>;
 using LPIntIt = LPIntVec::iterator;
 
-#ifdef __BORLANDC__
+#if defined(__BORLANDC__) || defined(XR_EDITOR_NEW)
 using boolVec = xr_vector<bool>;
 using boolIt = boolVec::iterator;
 
@@ -209,12 +209,13 @@ using U8It = U8Vec::iterator;
 
 using LPU32Vec = xr_vector<u32*>;
 using LPU32It = LPU32Vec::iterator;
-
-using AStringVec = xr_vector<AnsiString>;
-using AStringIt = AStringVec::iterator;
-
-using LPAStringVec = xr_vector<AnsiString*>;
-using LPAStringIt = LPAStringVec::iterator;
+#	if defined(__BORLANDC__)
+	using AStringVec = xr_vector<AnsiString>;
+	using AStringIt = AStringVec::iterator;
+	
+	using LPAStringVec = xr_vector<AnsiString*>;
+	using LPAStringIt = LPAStringVec::iterator;
+#	endif
 #endif
 
 #endif

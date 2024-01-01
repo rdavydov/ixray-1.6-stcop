@@ -157,7 +157,9 @@ void dxRenderDeviceRender::OnDeviceCreate(LPCSTR shName)
 	::Render->create			();
 
 //#ifndef DEDICATED_SERVER
+#if !defined(_EDITOR) && !defined(XR_EDITOR_NEW)
 	if (!g_dedicated_server)
+#endif
 	{
 		m_WireShader.create			("editor\\wire");
 		m_SelectionShader.create	("editor\\selection");

@@ -4,6 +4,10 @@
 
 #pragma once
 
+#ifdef XR_EDITOR_NEW
+#include "../../editors_new/xrECore/stdafx.h"
+#endif
+
 #pragma warning(disable:4995)
 #include "../../xrEngine/stdafx.h"
 #pragma warning(disable:4995)
@@ -31,7 +35,7 @@
 #include "../../xrEngine/render.h"
 #include "../../xrEngine/_d3d_extensions.h"
 
-#ifndef _EDITOR
+#if !defined(_EDITOR) && !defined(XR_EDITOR_NEW)
 #include "../../xrEngine/igame_level.h"
 
 #include "../xrRender/blenders\blender.h"
@@ -44,4 +48,3 @@
 
 #define		TEX_POINT_ATT	"internal\\internal_light_attpoint"
 #define		TEX_SPOT_ATT	"internal\\internal_light_attclip"
-
