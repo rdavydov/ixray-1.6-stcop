@@ -1,11 +1,10 @@
 #include "stdafx.h"
 #pragma hdrstop
 
-#include "../../xrServerEntities/PropertiesListHelper.h"
+#include "../Public/PropertiesListHelper.h"
 #include "ItemListHelper.h"
-#include "ChoseForm.h"
+//#include "ChoseForm.h"
 //---------------------------------------------------------------------------
-#pragma package(smart_init)
               
 //---------------------------------------------------------------------------
 CPropHelper 	PHelper_impl;
@@ -118,11 +117,11 @@ GameTypeValue* CPropHelper::CreateGameType(PropItemVec& items, shared_str key, G
 ChooseValue*	CPropHelper::CreateChoose	(PropItemVec& items, shared_str key, shared_str* val, u32 mode, LPCSTR path, void* fill_param, u32 sub_item_count, u32 choose_flags)
 {	
 	ChooseValue* cv = (ChooseValue*)AppendValue	(items,key,xr_new<ChooseValue>(val,mode,path,fill_param,sub_item_count,choose_flags),PROP_CHOOSE);
-	SChooseEvents* E= TfrmChoseItem::GetEvents(mode); 
-	if (E&&!E->on_thm.empty()){
+	SChooseEvents* E= UIChooseForm::GetEvents(mode); 
+	/*if (E&&!E->on_thm.empty()){
 	    cv->Owner()->m_Flags.set(PropItem::flDrawThumbnail,TRUE);
-     	cv->OnDrawThumbnailEvent = E->on_thm;
-    }
+     //	cv->OnDrawThumbnailEvent = E->on_thm;
+    }*/
 	return	   	cv;	
 }
 //---------------------------------------------------------------------------
@@ -139,7 +138,7 @@ CTextValue* 	CPropHelper::CreateCName	(PropItemVec& items, shared_str key, LPSTR
     V->OnAfterEditEvent.bind		(this,&CPropHelper::CNameAfterEdit);
     V->OnBeforeEditEvent.bind		(this,&CPropHelper::CNameBeforeEdit);
     V->Owner()->OnDrawTextEvent.bind(this,&CPropHelper::CNameDraw);
-    V->tag							= (u32)owner; VERIFY(owner);
+    V->tag							= (size_t)owner; VERIFY(owner);
     if (V->Owner()->m_Flags.is(PropItem::flMixed)) V->Owner()->m_Flags.set(PropItem::flDisabled,TRUE);
     return V;					
 }
@@ -164,7 +163,7 @@ RTextValue* 	CPropHelper::CreateName		(PropItemVec& items, shared_str key, share
     V->OnAfterEditEvent.bind		(this,&CPropHelper::NameAfterEdit);
     V->OnBeforeEditEvent.bind		(this,&CPropHelper::NameBeforeEdit);
     V->Owner()->OnDrawTextEvent.bind(this,&CPropHelper::NameDraw);
-    V->tag							= (u32)owner; VERIFY(owner);
+    V->tag							= (size_t)owner; VERIFY(owner);
     if (V->Owner()->m_Flags.is(PropItem::flMixed)) V->Owner()->m_Flags.set(PropItem::flDisabled,TRUE);
     return V;					
 }
@@ -255,7 +254,7 @@ bool CPropHelper::CNameAfterEdit(PropValue* sender, xr_string& edit_val)
 	CTextValue* V	= dynamic_cast<CTextValue*>(sender); VERIFY(V);
     ListItem* L		= (ListItem*)sender->tag;
     shared_str tmp	= edit_val.c_str();
-	bool accepted	= LHelper().NameAfterEdit(L,V->GetValue(),tmp);
+    bool accepted = LHelper().NameAfterEdit(L,V->GetValue(),tmp);
     edit_val		= tmp.c_str();
     return 			accepted;
 }

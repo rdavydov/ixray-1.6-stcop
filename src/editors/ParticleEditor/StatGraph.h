@@ -2,7 +2,12 @@
 #ifndef StatGraphH
 #define StatGraphH
 //---------------------------------------------------------------------------
-class ENGINE_API CStatGraph	: public pureRender
+#ifdef _EDITOR
+class CStatGraph
+#else
+class ENGINE_API CStatGraph
+#endif
+	: public pureRender
 {
 public:
 	enum EStyle{
@@ -23,7 +28,6 @@ protected:
             data	= d;
         }
     };
-	
 	using ElementsDeq = xr_deque<SElement>;
 	using ElementsDeqIt = ElementsDeq::iterator;
 
@@ -40,10 +44,9 @@ protected:
 			style = s;
 		};
 	};
-	
-	using SubGraphVec = xr_vector<SSubGraph>;
+	using SubGraphVec = std::vector<SSubGraph>;
 	using SubGraphVecIt = SubGraphVec::iterator;
-
+	//DEFINE_VECTOR	(SSubGraph,SubGraphVec,SubGraphVecIt);
 	SubGraphVec		subgraphs;
 	
 	float			mn, mx;

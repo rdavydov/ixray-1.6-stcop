@@ -1,7 +1,6 @@
 #ifndef UI_ParticleMainH
 #define UI_ParticleMainH
 
-#include "ui_main.h"
 
 enum {
 	COMMAND_EXTFIRST_EXT = COMMAND_MAIN_LAST-1,
@@ -33,7 +32,7 @@ public:
     virtual LPSTR	GetCaption				();
 
     virtual void 	ResetStatus				();
-    virtual void 	SetStatus				(LPSTR s, bool bOutLog);
+    virtual void 	SetStatus				(LPCSTR s, bool bOutLog);
     virtual void	ProgressDraw			();
     virtual void 	OutCameraPos			();
     virtual void 	OutUICursorPos			();
@@ -43,13 +42,14 @@ public:
     virtual LPCSTR	EditorName				(){return "particle";}
     virtual LPCSTR	EditorDesc				(){return "Particle Editor";}
 
-    virtual bool 	ApplyShortCut			(WORD Key, TShiftState Shift);
-    virtual bool 	ApplyGlobalShortCut		(WORD Key, TShiftState Shift);
+    virtual bool 	ApplyShortCut			(DWORD Key, TShiftState Shift);
+    virtual bool 	ApplyGlobalShortCut		(DWORD Key, TShiftState Shift);
 
     // commands
 	virtual	void	RegisterCommands		(); 
+    virtual void OnDrawUI();
 };    
-extern CParticleMain*&	PUI;
+extern CParticleMain*	PUI;
 //---------------------------------------------------------------------------
 #endif //UI_MainCommandH
 

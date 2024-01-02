@@ -3,8 +3,7 @@
 #pragma hdrstop
 
 #include "..\..\Layers\xrRender\ParticleGroup.h"
-#include "../../xrServerEntities/PropertiesListHelper.h"
-#include "ui_main.h"
+#include "../Public/PropertiesListHelper.h"
 #include "ui_particletools.h"
 
 BOOL PS::CPGDef::SEffect::Equal(const SEffect& src)
@@ -37,7 +36,7 @@ bool PS::CPGDef::Validate(bool bMsg)
     for(;pe_it!=pe_it_e;++pe_it)
     {	
         PS::CPGDef::SEffect* Eff		= (*pe_it);
-        PS::CPEDef* ped				= ::Render->PSLibrary.FindPED(Eff->m_EffectName.c_str());
+        PS::CPEDef* ped				= RImplementation.PSLibrary.FindPED(Eff->m_EffectName.c_str());
         if(!ped)
         {
             failed = failed||true;
@@ -103,7 +102,7 @@ void  PS::CPGDef::OnEffectEditClick(ButtonValue* B, bool& bDataModified, bool& b
         bSafe			= true;
     }break;
     case 2:        
-        if (ELog.DlgMsg(mtConfirmation, TMsgDlgButtons() << mbYes << mbNo,"Remove effect?") == mrYes){
+        if (ELog.DlgMsg(mtConfirmation, mbYes| mbNo,"Remove effect?") == mrYes){
         	SEffect* eff	= *(m_Effects.begin()+B->tag);
         	xr_delete		(eff);
             m_Effects.erase	(m_Effects.begin()+B->tag);
@@ -139,8 +138,10 @@ void PS::CPGDef::FillProp(LPCSTR pref, ::PropItemVec& items, ::ListItem* owner)
     u32 i = 0;
     for (EffectIt it=m_Effects.begin(); it!=m_Effects.end(); ++it,++i)
     {
-    	u32 clr					= (*it)->m_Flags.is(CPGDef::SEffect::flEnabled)?clBlack:clSilver;
-        AnsiString nm 			= AnsiString("Effect #")+(i+1);
+    	u32 clr					= (*it)->m_Flags.is(CPGDef::SEffect::flEnabled)? 0xFF000000 :0xFFC0C0C0;
+        xr_string nm;
+        nm.resize(64);
+        sprintf(nm.data(), "Effect #%d", i + 1);
         
         B=PHelper().CreateButton(items,PrepareKey(pref,nm.c_str()),"Preview,Select,Remove",ButtonValue::flFirstOnly); B->tag = it-m_Effects.begin();
         B->OnBtnClickEvent.bind	(this,&PS::CPGDef::OnEffectEditClick);

@@ -3,18 +3,11 @@
 #pragma hdrstop       
 
 #include "UI_ParticleMain.h"
-#include "UI_ParticleTools.h"
-#include "topbar.h"
-#include "leftbar.h"           
-#include "EditorPreferences.h"
-#include "D3DUtils.h"
-#include "bottombar.h"                  
-#include "xr_trims.h"
-#include "main.h"
+#include "UI_ParticleTools.h"     
 #include "xr_input.h"
 
 //---------------------------------------------------------------------------
-CParticleMain*&	PUI=(CParticleMain*)UI;
+CParticleMain*	PUI=(CParticleMain*)UI;
 //---------------------------------------------------------------------------
 
 CParticleMain::CParticleMain()  
@@ -36,7 +29,6 @@ CCommandVar CParticleTool::CommandSelectPreviewObj(CCommandVar p1, CCommandVar p
 }
 CCommandVar CParticleTool::CommandEditPreviewProps(CCommandVar p1, CCommandVar p2)
 {
-    EditPreviewPrefs();
     return TRUE;
 }
 
@@ -50,10 +42,10 @@ CCommandVar CParticleTool::CommandSaveXR(CCommandVar p1, CCommandVar p2)
 CCommandVar CParticleTool::CommandLoadXR(CCommandVar p1, CCommandVar p2)
 {
 	xr_string temp_fn;
-    if (EFS.GetOpenName				( "$game_data$", temp_fn, false, NULL, 0))
+    if (EFS.GetOpenName				("$game_data$", temp_fn, false, NULL, 0))
 	{
-        ::Render->PSLibrary.OnDestroy	();
-        ::Render->PSLibrary.Load		(temp_fn.c_str());
+        RImplementation.PSLibrary.OnDestroy	();
+        RImplementation.PSLibrary.Load		(temp_fn.c_str());
 		ResetCurrent();
         ExecCommand(COMMAND_UPDATE_PROPERTIES);
         ExecCommand(COMMAND_UPDATE_CAPTION);
@@ -86,7 +78,7 @@ CCommandVar CParticleTool::CommandValidate(CCommandVar p1, CCommandVar p2)
 }
 CCommandVar CParticleTool::CommandClear(CCommandVar p1, CCommandVar p2)
 {
-    EDevice.m_Camera.Reset();
+    EDevice->m_Camera.Reset();
     ResetPreviewObject();
     ExecCommand(COMMAND_UPDATE_CAPTION);
     return TRUE;
@@ -101,35 +93,36 @@ CCommandVar CParticleTool::CommandStopCurrent(CCommandVar p1, CCommandVar p2)
     StopCurrent(p1);
     return TRUE;
 }
+
 CCommandVar CommandRefreshUIBar(CCommandVar p1, CCommandVar p2)
 {
-    fraTopBar->RefreshBar	();
+    /*fraTopBar->RefreshBar	();
     fraLeftBar->RefreshBar	();
-    fraBottomBar->RefreshBar();
+    fraBottomBar->RefreshBar();*/
     return TRUE;
 }
 CCommandVar CommandRestoreUIBar(CCommandVar p1, CCommandVar p2)
 {
-    fraTopBar->fsStorage->RestoreFormPlacement();
+   /* fraTopBar->fsStorage->RestoreFormPlacement();
     fraLeftBar->fsStorage->RestoreFormPlacement();
-    fraBottomBar->fsStorage->RestoreFormPlacement();
+    fraBottomBar->fsStorage->RestoreFormPlacement();*/
     return TRUE;
 }
 CCommandVar CommandSaveUIBar(CCommandVar p1, CCommandVar p2)
 {
-    fraTopBar->fsStorage->SaveFormPlacement();
+  /*  fraTopBar->fsStorage->SaveFormPlacement();
     fraLeftBar->fsStorage->SaveFormPlacement();
-    fraBottomBar->fsStorage->SaveFormPlacement();
+    fraBottomBar->fsStorage->SaveFormPlacement();*/
     return TRUE;
 }
 CCommandVar CommandUpdateToolBar(CCommandVar p1, CCommandVar p2)
 {
-    fraLeftBar->UpdateBar();
+    /*fraLeftBar->UpdateBar();*/
     return TRUE;
 }
 CCommandVar CommandUpdateCaption(CCommandVar p1, CCommandVar p2)
 {
-    frmMain->UpdateCaption();
+    /*frmMain->UpdateCaption();*/
     return TRUE;
 }
 
@@ -143,8 +136,8 @@ void CParticleMain::RegisterCommands()
 {
 	inherited::RegisterCommands();
     // tools       
-	REGISTER_CMD_CE	(COMMAND_SELECT_PREVIEW_OBJ,"Select Preview Object",PTools,CParticleTool::CommandSelectPreviewObj, true);
-	REGISTER_CMD_CE	(COMMAND_EDIT_PREVIEW_PROPS,"Select Preview Props",	PTools,CParticleTool::CommandEditPreviewProps, true);
+	//REGISTER_CMD_CE	(COMMAND_SELECT_PREVIEW_OBJ,"Select Preview Object",PTools,CParticleTool::CommandSelectPreviewObj, true);
+	//REGISTER_CMD_CE	(COMMAND_EDIT_PREVIEW_PROPS,"Select Preview Props",	PTools,CParticleTool::CommandEditPreviewProps, true);
 	REGISTER_CMD_CE	(COMMAND_SAVE,            	"File\\Save",			PTools,CParticleTool::CommandSave, true);
 	REGISTER_CMD_C	(COMMAND_SAVE_BACKUP,       PTools,CParticleTool::CommandSaveBackup);
 	REGISTER_CMD_CE	(COMMAND_LOAD,            	"File\\Reload",			PTools,CParticleTool::CommandReload, true);
@@ -165,20 +158,26 @@ void CParticleMain::RegisterCommands()
 	REGISTER_CMD_C	(COMMAND_LOAD_XR,     		PTools, CParticleTool::CommandLoadXR);
 	REGISTER_CMD_C	(COMMAND_COMPACT_PARTICLES,	PTools, CParticleTool::Compact);
 	REGISTER_CMD_CE	(COMMAND_CREATE_GROUP_FROM_SELECTED,"Particles\\CreateGroupFromEffect",	PTools, CParticleTool::CreateGroupFromSelected, true);
-}                                                                    
+}
+
+void CParticleMain::OnDrawUI()
+{
+    inherited::OnDrawUI();
+    PTools->OnDrawUI();
+}
 
 char* CParticleMain::GetCaption()
 {
-	return "particles";
+	return (char*)"particles";
 }
 
-bool __fastcall CParticleMain::ApplyShortCut(WORD Key, TShiftState Shift)
+bool  CParticleMain::ApplyShortCut(DWORD Key, TShiftState Shift)
 {
     return inherited::ApplyShortCut(Key,Shift);
 }
 //---------------------------------------------------------------------------
 
-bool __fastcall CParticleMain::ApplyGlobalShortCut(WORD Key, TShiftState Shift)
+bool  CParticleMain::ApplyGlobalShortCut(DWORD Key, TShiftState Shift)
 {
     return inherited::ApplyGlobalShortCut(Key,Shift);
 }
@@ -196,60 +195,61 @@ void CParticleMain::RealUpdateScene()
 //---------------------------------------------------------------------------
 void CParticleMain::ResetStatus()
 {
-	VERIFY(m_bReady);
+	/*VERIFY(m_bReady);
     if (fraBottomBar->paStatus->Caption!=""){
 	    fraBottomBar->paStatus->Caption=""; fraBottomBar->paStatus->Repaint();
-    }
+    }*/
 }
-void CParticleMain::SetStatus(LPSTR s, bool bOutLog)
+void CParticleMain::SetStatus(LPCSTR s, bool bOutLog)
 {
-	VERIFY(m_bReady);
+	/*VERIFY(m_bReady);
     if (fraBottomBar->paStatus->Caption!=s){
 	    fraBottomBar->paStatus->Caption=s; fraBottomBar->paStatus->Repaint();
     	if (bOutLog&&s&&s[0]) ELog.Msg(mtInformation,s);
-    }
+    }*/
 }
 void CParticleMain::ProgressDraw()
 {
-	fraBottomBar->RedrawBar();
+    inherited::ProgressDraw();
+/*	fraBottomBar->RedrawBar();*/
 }
 //---------------------------------------------------------------------------
 void CParticleMain::OutCameraPos()
 {
 	VERIFY(m_bReady);
-    AnsiString s;
-	const Fvector& c 	= EDevice.m_Camera.GetPosition();
+   /* xr_string s;
+	const Fvector& c 	= EDevice->m_Camera.GetPosition();
 	s.sprintf("C: %3.1f, %3.1f, %3.1f",c.x,c.y,c.z);
-//	const Fvector& hpb 	= EDevice.m_Camera.GetHPB();
-//	s.sprintf(" Cam: %3.1f°, %3.1f°, %3.1f°",rad2deg(hpb.y),rad2deg(hpb.x),rad2deg(hpb.z));
-    fraBottomBar->paCamera->Caption=s; fraBottomBar->paCamera->Repaint();
+//	const Fvector& hpb 	= EDevice->m_Camera.GetHPB();
+//	s.sprintf(" Cam: %3.1fï¿½, %3.1fï¿½, %3.1fï¿½",rad2deg(hpb.y),rad2deg(hpb.x),rad2deg(hpb.z));
+    fraBottomBar->paCamera->Caption=s; fraBottomBar->paCamera->Repaint();*/
 }
 //---------------------------------------------------------------------------
 void CParticleMain::OutUICursorPos()
 {
 	VERIFY(m_bReady);
-    AnsiString s; POINT pt;
+    /*xr_string s; POINT pt;
     GetCursorPos(&pt);
     s.sprintf("Cur: %d, %d",pt.x,pt.y);
-    fraBottomBar->paUICursor->Caption=s; fraBottomBar->paUICursor->Repaint();
+    fraBottomBar->paUICursor->Caption=s; fraBottomBar->paUICursor->Repaint();*/
 }
 //---------------------------------------------------------------------------
 void CParticleMain::OutGridSize()
 {
-	VERIFY(fraBottomBar);
-    AnsiString s;
+	/*VERIFY(fraBottomBar);
+    xr_string s;
     s.sprintf("Grid: %1.1f",EPrefs->grid_cell_size);
-    fraBottomBar->paGridSquareSize->Caption=s; fraBottomBar->paGridSquareSize->Repaint();
+    fraBottomBar->paGridSquareSize->Caption=s; fraBottomBar->paGridSquareSize->Repaint();*/
 }
 //---------------------------------------------------------------------------
 void CParticleMain::OutInfo()
 {
-	fraBottomBar->paSel->Caption = Tools->GetInfo();
+	/*fraBottomBar->paSel->Caption = Tools->GetInfo();*/
 }
 //---------------------------------------------------------------------------
 void CParticleMain::RealQuit()
 {
-	frmMain->Close();
+    inherited::Quit();
 }
 //---------------------------------------------------------------------------
 

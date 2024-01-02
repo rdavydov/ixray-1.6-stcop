@@ -1,68 +1,75 @@
+﻿// ParticleEditor.cpp : Определяет точку входа для приложения.
+//
 #include "stdafx.h"
-#pragma hdrstop
-#include "splash.h"
-#include "LogForm.h"
-#include "main.h"
-#include "ui_particlemain.h"
-#include "UI_ParticleTools.h"
-//---------------------------------------------------------------------------
-USEFORM("Splash.cpp", frmSplash);
-USEFORM("main.cpp", frmMain);
-USEFORM("BottomBar.cpp", fraBottomBar); /* TFrame: File Type */
-USEFORM("TopBar.cpp", fraTopBar); /* TFrame: File Type */
-USEFORM("LeftBar.cpp", fraLeftBar); /* TFrame: File Type */
-USEFORM("ItemPropFormUnit.cpp", fmItemProp);
-//---------------------------------------------------------------------------
-WINAPI WinMain(HINSTANCE hInst, HINSTANCE, LPSTR, int)
+
+void BeginRender()
 {
-//    try{
-        if (!Application->Handle){ 
-            Application->CreateHandle	(); 
-            Application->Icon->Handle 	= LoadIcon(MainInstance, "MAINICON"); 
-			Application->Title 			= "Loading...";
-        } 
-        frmSplash 				= xr_new<TfrmSplash>((TComponent*)0);
-        frmSplash->Show			();
-        frmSplash->Repaint		();
-        frmSplash->SetStatus	("Core initializing...");
+#define D3DCOLOR_RGBA(r,g,b,a) D3DCOLOR_ARGB(a,r,g,b)
+    ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+    RDevice->SetRenderState(D3DRS_ZENABLE, FALSE);
+    RDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
+    RDevice->SetRenderState(D3DRS_SCISSORTESTENABLE, FALSE);
+    D3DCOLOR clear_col_dx = D3DCOLOR_RGBA((int)(clear_color.x * clear_color.w * 255.0f), (int)(clear_color.y * clear_color.w * 255.0f), (int)(clear_color.z * clear_color.w * 255.0f), (int)(clear_color.w * 255.0f));
+    RDevice->Clear(0, nullptr, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, clear_col_dx, 1.0f, 0);
 
-    	Core._initialize		("particle",ELogCallback);
+    RDevice->BeginScene();
+}
 
-        Application->Initialize	();
-                                       
-        frmSplash->SetStatus	("Loading...");
+void EndRender()
+{
+    RDevice->EndScene();
+    RDevice->Present(nullptr, nullptr, nullptr, nullptr);
+}
 
-// startup create
-        Tools					= xr_new<CParticleTool>();
-        UI						= xr_new<CParticleMain>();
-        UI->RegisterCommands	();
+int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow)
+{
+    if (!IsDebuggerPresent()) Debug._initialize(false);
+    const char* FSName = "fs.ltx";
+    //{
+    //    if (strstr(GetCommandLineA(), "-soc_14") || strstr(GetCommandLineA(), "-soc_10004"))
+    //    {
+    //        FSName = "fs_soc.ltx";
+    //    }
+    //    else if (strstr(GetCommandLineA(), "-soc"))
+    //    {
+    //        FSName = "fs_soc.ltx";
+    //    }
+    //    else if (strstr(GetCommandLineA(), "-cs"))
+    //    {
+    //        FSName = "fs_cs.ltx";
+    //    }
+    //}
+    Core._initialize("Patricle", ELogCallback, 1, FSName);
 
-	Application->Title 		= UI->EditorDesc();
-        TfrmLog::CreateLog		();
+    Tools = xr_new<CParticleTool>();
+    PTools = (CParticleTool*)Tools;
+    UI = xr_new<CParticleMain>();
+    UI->RegisterCommands();
 
-	Application->CreateForm(__classid(TfrmMain), &frmMain);
-		frmMain->SetHInst		(hInst);
+    UIMainForm* MainForm = xr_new< UIMainForm>();
+    ::MainForm = MainForm;
+    UI->Push(MainForm, false);
 
-	xr_delete(frmSplash);
+    while (MainForm->Frame())
+    {
+        SDL_Event Event;
+        while (SDL_PollEvent(&Event))
+        {
+            if (!UI->ProcessEvent(&Event))
+                break;
+        }
 
-	Application->Run		();
+        UI->BeginFrame();
+        RDevice->SetRenderTarget(0, RSwapchainTarget);
 
-        TfrmLog::DestroyLog		();
+        UI->Draw();
 
-	UI->ClearCommands		();
-        xr_delete			(Tools);
-        xr_delete			(UI);
+        BeginRender();
+        UI->EndFrame();
+        EndRender();
+    }
 
-    	Core._destroy			();
-//    }
-//    catch (Exception &exception)
-//    {
-//           Application->ShowException(&exception);
-//    }
+    xr_delete(MainForm);
+    Core._destroy();
     return 0;
 }
-//---------------------------------------------------------------------------
-
-
-
-

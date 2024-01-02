@@ -4,12 +4,10 @@
 
 #ifdef _PARTICLE_EDITOR
 
-#include "../xrEProps/ChoseForm.h"
 #include "..\..\Layers\xrRender\ParticleEffect.h"
-#include "ParticleEffectActions.h"
-#include "../../xrServerEntities/PropertiesListHelper.h"
+#include "..\xrEcore\Editor\ParticleEffectActions.h"
+#include "../Public/PropertiesListHelper.h"
 #include "ui_particletools.h"
-#include "ui_main.h"
 #include "../xrEProps/FolderLib.h"
              
 BOOL PS::CPEDef::Equal(const CPEDef* pe)
@@ -52,7 +50,7 @@ void PS::CPEDef::Copy(const CPEDef& src)
 	Compile				(m_EActionList);
 }
 
-void __fastcall PS::CPEDef::OnControlClick(ButtonValue* B, bool& bDataModified, bool& bSafe)
+void  PS::CPEDef::OnControlClick(ButtonValue* B, bool& bDataModified, bool& bSafe)
 {
     switch (B->btn_num){
     case 0: 			PTools->PlayCurrent();		break;
@@ -62,56 +60,100 @@ void __fastcall PS::CPEDef::OnControlClick(ButtonValue* B, bool& bDataModified, 
     bDataModified		= false;
 }
 
-void __fastcall PS::CPEDef::FindActionByName(LPCSTR new_name, bool& res)
+void  PS::CPEDef::FindActionByName(LPCSTR new_name, bool& res)
 {
 	res 				= false;
 	for (EPAVecIt s_it=m_EActionList.begin(); s_it!=m_EActionList.end(); s_it++)
-    	if (0==_stricmp(new_name,*(*s_it)->actionName)){res=true; break;};
+    	if (0==stricmp(new_name,*(*s_it)->actionName)){res=true; break;};
 }
 
-IC __fastcall void PS::CPEDef::FillActionList(ChooseItemVec& items, void* param)
+void PS::CPEDef::FillActionList(ChooseItemVec& items, void* param)
 {
     for(int i=0; actions_token[i].name; i++)
         items.push_back(SChooseItem(actions_token[i].name,actions_token[i].info));
 }
 
-void __fastcall PS::CPEDef::OnActionsClick(ButtonValue* B, bool& bDataModified, bool& bSafe)
+bool m_EditChoose = false;
+
+void  PS::CPEDef::OnDrawUI()
 {
-    switch (B->btn_num){
-    case 0:{
-    	LPCSTR 		nm;
-	    if (TfrmChoseItem::SelectItem(smCustom,nm,1,0,fastdelegate::bind<TOnChooseFillItems>(this,&PS::CPEDef::FillActionList))&&nm){
-            for(int i=0; actions_token[i].name; i++){
-                if (0==strcmp(actions_token[i].name,nm)){
-                    EParticleAction* A = pCreateEAction((PAPI::PActionEnum)actions_token[i].id);
-                    AnsiString pref	= AnsiString(*A->actionName).LowerCase();
-                    A->actionName	= FHelper.GenerateName(pref.c_str(),2,fastdelegate::bind<TFindObjectByName>(this,&PS::CPEDef::FindActionByName),true,true).LowerCase().c_str();
-                    m_EActionList.push_back(A);
-                    ExecCommand		(COMMAND_UPDATE_PROPERTIES);
-                    bDataModified	= true;
-                    bSafe			= true;
-                	return ;
+    if (m_EditChoose)
+    {
+        bool change;
+        shared_str result;
+        if (UIChooseForm::GetResult(change, result))
+        {
+            if (change)
+            {
+                for (int i = 0; actions_token[i].name; i++)
+                {
+                    if (0 == strcmp(actions_token[i].name, result.c_str()))
+                    {
+                        EParticleAction* A = pCreateEAction((PAPI::PActionEnum)actions_token[i].id);
+                        xr_string pref = xr_string(*A->actionName);
+                        strlwr((char*)pref.data());
+                        for (i = 0; true; i++)
+                        {
+                            bool result;
+                            xr_string temp;
+                            if (i == 0)
+                            {
+                                temp = pref;
+                            }
+                            else
+                            {
+                                string64 Buffer;
+                                sprintf(Buffer, "%s_%02d", pref.c_str(), i - 1);
+                                temp = Buffer;
+                            }
+                            FindActionByName(temp.c_str(), result);
+                            if (!result)
+                            {
+                                pref = temp;
+                                break;
+                            }
+                        }
+                        A->actionName = pref.c_str();
+                        m_EActionList.push_back(A);
+                        ExecCommand(COMMAND_UPDATE_PROPERTIES);
+
+                        break;
+                    }
                 }
-			}        	
+            }
+
+            m_EditChoose = false;
         }
-    }break;
+        UIChooseForm::Update();
+    }
+}
+void  PS::CPEDef::OnActionsClick(ButtonValue* B, bool& bDataModified, bool& bSafe)
+{
+    switch (B->btn_num)
+    {
+        case 0:
+        {
+            m_EditChoose = true;
+            UIChooseForm::SelectItem(smCustom, 1, 0, TOnChooseFillItems(this, &PS::CPEDef::FillActionList));
+        }
+        break;
     }
     bDataModified	= false;
 }
 
-void __fastcall PS::CPEDef::OnFlagChange(PropValue* sender)
+void  PS::CPEDef::OnFlagChange(PropValue* sender)
 {
     ExecCommand			(COMMAND_UPDATE_PROPERTIES);
 }          
 
-void __fastcall PS::CPEDef::OnShaderChange(PropValue* sender)
+void  PS::CPEDef::OnShaderChange(PropValue* sender)
 {
 	m_CachedShader.destroy	();
 	if (m_ShaderName.size()&&m_TextureName.size())
 		m_CachedShader.create(m_ShaderName.c_str(),m_TextureName.c_str());
 }          
 
-void __fastcall PS::CPEDef::OnFrameResize(PropValue* sender)
+void  PS::CPEDef::OnFrameResize(PropValue* sender)
 {
 	m_Frame.m_iFrameDimX	= iFloor(1.f/m_Frame.m_fTexSize.x);
 }
@@ -136,7 +178,7 @@ void PS::CPEDef::CollisionCutoffOnDraw(PropValue* sender, xr_string& draw_val)
 }
 
 
-void __fastcall PS::CPEDef::OnActionEditClick(ButtonValue* B, bool& bDataModified, bool& bSafe)
+void  PS::CPEDef::OnActionEditClick(ButtonValue* B, bool& bDataModified, bool& bSafe)
 {
     bDataModified	= false;
     int idx			= B->tag;
@@ -161,7 +203,7 @@ void __fastcall PS::CPEDef::OnActionEditClick(ButtonValue* B, bool& bDataModifie
         bDataModified	= true;
     break;
     case 2:        
-        if (ELog.DlgMsg(mtConfirmation, TMsgDlgButtons() << mbYes << mbNo,"Remove action?") == mrYes){
+        if (ELog.DlgMsg(mtConfirmation, mbYes | mbNo,"Remove action?") == mrYes){
             PTools->RemoveAction(idx);
             ExecCommand		(COMMAND_UPDATE_PROPERTIES);
             bDataModified	= true;
@@ -173,16 +215,18 @@ void __fastcall PS::CPEDef::OnActionEditClick(ButtonValue* B, bool& bDataModifie
 bool PS::CPEDef::OnAfterActionNameEdit(PropValue* sender, shared_str& edit_val)
 {
 	bool found				= false;
-	edit_val				= AnsiString(edit_val.c_str()).LowerCase().c_str();
+    xr_string tmp(edit_val.c_str());
+    strlwr((char*)tmp.data());
+	edit_val				= tmp.c_str();
     FindActionByName		(edit_val.c_str(),found); 
     return 					!found;
 }
 
-AnsiString _item_to_select_after_edit;
+xr_string _item_to_select_after_edit;
 
-bool __stdcall PS::CPEDef::NameOnAfterEdit(PropValue* sender, shared_str& edit_val)
+bool  PS::CPEDef::NameOnAfterEdit(PropValue* sender, shared_str& edit_val)
 {
-    for (PS::PGDIt g_it= ::Render->PSLibrary.FirstPGD(); g_it!=::Render->PSLibrary.LastPGD(); ++g_it)
+    for (PS::PGDIt g_it= RImplementation.PSLibrary.FirstPGD(); g_it!=RImplementation.PSLibrary.LastPGD(); ++g_it)
     {
     	PS::CPGDef*	pg 	= (*g_it);
         xr_vector<PS::CPGDef::SEffect*>::const_iterator pe_it 		= pg->m_Effects.begin();
@@ -292,8 +336,10 @@ void PS::CPEDef::FillProp(LPCSTR pref, ::PropItemVec& items, ::ListItem* owner)
     B->OnBtnClickEvent.bind	(this,&PS::CPEDef::OnActionsClick);
 	for (EPAVecIt s_it=m_EActionList.begin(); s_it!=m_EActionList.end(); s_it++)
     {
-    	u32 clr				= (*s_it)->flags.is(EParticleAction::flEnabled)?clBlack:clSilver;
-    	shared_str a_pref		= PrepareKey(pref,"Actions",AnsiString().sprintf("%s (%s)",*(*s_it)->actionType,*(*s_it)->actionName).c_str());
+    	u32 clr				= (*s_it)->flags.is(EParticleAction::flEnabled)?0xFF000000:0xFFC0C0C0;
+        string128 buffer;
+        sprintf(buffer, "%s (%s)", *(*s_it)->actionType, *(*s_it)->actionName);
+    	shared_str a_pref		= PrepareKey(pref,"Actions", buffer);
 
         ButtonValue* B			= PHelper().CreateButton(items,a_pref,"Up,Down,Remove",ButtonValue::flFirstOnly); B->tag = (s_it-m_EActionList.begin());
         B->Owner()->prop_color	= clr;

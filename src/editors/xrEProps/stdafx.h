@@ -1,34 +1,35 @@
-//----------------------------------------------------
-// file: stdafx.h
-//----------------------------------------------------
-#ifndef stdafxH
-#define stdafxH
+#pragma once
+#ifdef XREPROPS_EXPORTS
+#	define smart_cast dynamic_cast
+#define XREPROPS_API __declspec(dllexport)
+#else
+#define XREPROPS_API __declspec(dllimport)
+#endif
 
-#pragma once   
+#include <limits>
+#include "..\..\XrCore\xrCore.h"
+#ifdef XREPROPS_EXPORTS
+inline void not_implemented()
+{
+	if (IsDebuggerPresent())
+		DebugBreak();
+	else R_ASSERT(0);
+}
+#endif
 
-#include <xrCore.h>
-
-#define smart_cast dynamic_cast
-
-//refs
-namespace CDB{
-	class MODEL;
-};
-
-#include "../../xrServerEntities/xrEProps.h"
-
-#include "FolderLib.h"                 
-
-#define ENGINE_API
-#define DLL_API		__declspec(dllimport)
-#define ECORE_API	__declspec(dllexport)
-
-#include "Defines.h"                 
-
-// libs
-#pragma comment		(lib,"xrSoundB.lib")
-#pragma comment		(lib,"xrCoreB.lib")
-#pragma comment		(lib,"EToolsB.lib")
-
-#endif //stdafxH
-
+#include "..\XrEUI\stdafx.h"
+#include "..\..\XrEngine\stdafx.h"
+#include "..\Public\xrEProps.h"
+#include "..\..\XrCore\ChooseTypes.H"
+#include "FolderLib.h"
+#include "Tree\Base\UITreeItem.h"
+#include "ItemListHelper.h"
+#include "UITextForm.h"
+#include "UINumericVectorForm.h"
+#include "Tree\Properties\UIPropertiesItem.h"
+#include "Tree\Properties\UIPropertiesForm.h"
+#include "Tree\ItemList\UIItemListFormItem.h"
+#include "Tree\ItemList\UIItemListForm.h"
+#include "Tree\Choose\UIChooseFormItem.h"
+#include "Tree\Choose\UIChooseForm.h"
+#include "UIKeyPressForm.h"

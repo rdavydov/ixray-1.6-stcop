@@ -3,34 +3,21 @@
 #include "stdafx.h"
 #pragma hdrstop
 
-#include "../xrEProps/ChoseForm.h"
 #include "UI_ParticleTools.h"
-#include "../ECore/Editor/EditObject.h"
-#include "ui_main.h"
-#include "leftbar.h"
-#include "..\..\Layers\xrRender\PSLibrary.h"
-#include "xr_trims.h"
-#include "../ECore/Editor/library.h"
-#include "../ECore/Editor/Render.h"
-#include "../xrEProps/folderlib.h"
-#include "../xrEProps/itemdialog.h"
 
-#include "../xrEProps/TextForm.h"
-#include "d3dutils.h"
 #include "ObjectAnimator.h"
-#include "../xrEProps/ItemList.h"
-#include "ParticleEffectActions.h"
-#include "ItemPropFormUnit.h"
+#include "..\XrECore\Editor\ParticleEffectActions.h"
 //------------------------------------------------------------------------------
-CParticleTool*&	PTools=(CParticleTool*)Tools;
+CParticleTool*	PTools=(CParticleTool*)Tools;
 //------------------------------------------------------------------------------
 #define CHECK_SNAP(R,A,C){ R+=A; if(fabsf(R)>=C){ A=snapto(R,C); R=0; }else{A=0;}}
 //static Fvector zero_vec={0.f,0.f,0.f};
-
+ 
 EParticleAction* 	pCreateEActionImpl(PAPI::PActionEnum type);
 
 CParticleTool::CParticleTool()
 {
+    m_CreatingParticle = false;
 	m_EditMode			= emNone;
     m_ItemProps 		= 0;
 	m_EditObject		= 0;
@@ -42,19 +29,20 @@ CParticleTool::CParticleTool()
     dwFogColor			= 0xffffffff;
     m_Flags.zero		();
     pCreateEAction		= pCreateEActionImpl;
+    m_LibPED = 0;
+    m_EditPG = 0;
+    m_EditPE = 0;
 }
 //---------------------------------------------------------------------------
 
 CParticleTool::~CParticleTool()
 {
-	xr_delete(fmItemProp);
 }
 //---------------------------------------------------------------------------
 
 bool CParticleTool::OnCreate()
 {
-     fmItemProp = xr_new<TfmItemProp>((TComponent*)NULL);
-     fmItemProp->Visible = true;
+
 
     m_bReady 		= true;
 
@@ -63,29 +51,24 @@ bool CParticleTool::OnCreate()
     SetAction		(etaSelect);
 
 
-    m_EditPE 		= (PS::CParticleEffect*)::Render->Models->CreatePE(0);
-    m_EditPG		= (PS::CParticleGroup*)::Render->Models->CreatePG(0);
-    m_ItemProps 	= TProperties::CreateForm(   "Item Props",
-    						fmItemProp,
-                                                alClient,
-                                                fastdelegate::bind<TOnModifiedEvent>(this,&CParticleTool::OnItemModified),
-                                                0,
-                                                0,
-                                                TProperties::plFolderStore | TProperties::plFullExpand  /*| TProperties::plItemFolders*/  | TProperties::plIFTop );
-	m_ItemProps->Visible = true;
-    // item list
-    m_PList			= TItemList::CreateForm(	"Items",
-    						fraLeftBar->paPSList,
-                                                alClient,
-                                                TItemList::ilEditMenu | TItemList::ilDragAllowed);
-                                                
-    m_PList->SetOnItemsFocusedEvent	(fastdelegate::bind<TOnILItemsFocused>(this,&CParticleTool::OnParticleItemFocused));
-	m_PList->SetOnItemRenameEvent	(fastdelegate::bind<TOnItemRename>(this,&CParticleTool::OnParticleItemRename));
-    m_PList->SetOnItemRemoveEvent	(fastdelegate::bind<TOnItemRemove>(this,&CParticleTool::OnParticleItemRemove));
-    m_PList->SetImages				(fraLeftBar->ilModeIcons);
+    m_EditPE 		= (PS::CParticleEffect*)((CRender*)::Render)->Models->CreatePE(0);
+    m_EditPG		= (PS::CParticleGroup*)((CRender*)::Render)->Models->CreatePG(0);
+    m_ItemProps = xr_new<UIPropertiesForm>();
+    m_ItemProps->SetModifiedEvent(TOnModifiedEvent(this, &CParticleTool::OnItemModified));
 
+    // item list
+    m_PList = xr_new<UIItemListForm>();
+    m_PList->m_Flags.set(UIItemListForm::fMenuEdit, true);
+    m_PList->SetOnItemFocusedEvent	(TOnILItemFocused(this,&CParticleTool::OnParticleItemFocused));
+    //m_PList->SetOnItemCloneEvent(TOnItemClone(this, &CParticleTool::OnParticleCloneItem));
+    //m_PList->SetOnItemCreaetEvent(TOnItemCreate(this, &CParticleTool::OnParticleCreateItem));
+	//m_PList->SetOnItemRenameEvent	(TOnItemRename(this,&CParticleTool::OnParticleItemRename));
+    //m_PList->SetOnItemRemoveEvent	(TOnItemRemove(this,&CParticleTool::OnParticleItemRemove));
+    //
     m_ParentAnimator= xr_new<CObjectAnimator>();
 
+    m_ObjectProps = xr_new<UIPropertiesForm>();
+    FillObjectPrefs();
     return true;
 }
 
@@ -97,8 +80,10 @@ void CParticleTool::OnDestroy()
     xr_delete			(m_ParentAnimator);
 
 	Lib.RemoveEditObject(m_EditObject);
-    TItemList::DestroyForm(m_PList);
-	TProperties::DestroyForm(m_ItemProps);
+
+    xr_delete(m_ObjectProps);
+    xr_delete(m_ItemProps);
+    xr_delete(m_PList);
     xr_delete			(m_EditPG);
     xr_delete			(m_EditPE);
 }
@@ -172,8 +157,8 @@ void CParticleTool::Render()
     default: THROW;
     }
 	// Draw the particles.
-    ::Render->Models->RenderSingle(m_EditPG,Fidentity,1.f);
-    ::Render->Models->RenderSingle(m_EditPE,Fidentity,1.f);
+    ((CRender*)::Render)->Models->RenderSingle(m_EditPG,Fidentity,1.f);
+    ((CRender*)::Render)->Models->RenderSingle(m_EditPE,Fidentity,1.f);
 
     if (m_Flags.is(flAnimatedPath))
     	m_ParentAnimator->DrawPath();
@@ -189,11 +174,11 @@ void CParticleTool::OnFrame()
     	m_EditObject->OnFrame();
 
     if (m_Flags.is(flAnimatedParent)){
-    	m_ParentAnimator->Update(EDevice.fTimeDelta);
+    	m_ParentAnimator->Update(EDevice->fTimeDelta);
         if (m_ParentAnimator->IsPlaying()){
         	Fvector new_vel;
             new_vel.sub (m_ParentAnimator->XFORM().c,m_Transform.c);
-            new_vel.div (EDevice.fTimeDelta);
+            new_vel.div (EDevice->fTimeDelta);
             m_Vel.lerp	(m_Vel,new_vel,0.9);
             m_Transform	= m_ParentAnimator->XFORM();
             m_Flags.set	(flApplyParent,TRUE);
@@ -207,30 +192,43 @@ void CParticleTool::OnFrame()
 	if (m_Flags.is(flCompileEffect))
     	RealCompileEffect();
 
-    m_EditPE->OnFrame(EDevice.dwTimeDelta);
-    m_EditPG->OnFrame(EDevice.dwTimeDelta);
+    m_EditPE->OnFrame(EDevice->dwTimeDelta);
+    m_EditPG->OnFrame(EDevice->dwTimeDelta);
 
 	if (m_Flags.is(flRefreshProps))
     	RealUpdateProperties();
 
     if (m_Flags.is(flSelectEffect)){
-        m_PList->SelectItem	(sel_eff_name.c_str(),true,false,true);
+        m_PList->SelectItem	(sel_eff_name.c_str());
         m_Flags.set			(flSelectEffect,FALSE);
         sel_eff_name		= "";
     }
 
-    AnsiString tmp;
+    xr_string tmp;
     switch(m_EditMode){
     case emNone: break;
     case emEffect:
-    	if (m_EditPE->IsPlaying())
-        	UI->SetStatus(AnsiString().sprintf(" PE Playing...[%d]",m_EditPE->ParticlesCount()).c_str(),false);
+        if (m_EditPE->IsPlaying())
+        {
+
+            xr_string nn;
+            nn.resize(64);
+            sprintf(nn.data(), " PE Playing...[%d]", m_EditPE->ParticlesCount());
+
+            UI->SetStatus(nn.c_str(), false);
+        }
+        
         else
         	UI->SetStatus(" Stopped.",false);
     break;
     case emGroup:
-    	if (m_EditPG->IsPlaying())
-        	UI->SetStatus(AnsiString().sprintf(" PE Playing...[%d]",m_EditPG->ParticlesCount()).c_str(),false);
+        if (m_EditPG->IsPlaying())
+        {
+            xr_string nn;
+            nn.resize(64);
+            sprintf(nn.data(), " PE Playing...[%d]", m_EditPG->ParticlesCount());
+        	UI->SetStatus(nn.c_str(),false);
+        }
         else
         	UI->SetStatus(" Stopped.",false);
     break;
@@ -242,7 +240,7 @@ void CParticleTool::ZoomObject(BOOL bSelOnly)
 {
 	VERIFY(m_bReady);
     if (!bSelOnly&&m_EditObject){
-        EDevice.m_Camera.ZoomExtents(m_EditObject->GetBox());
+        EDevice->m_Camera.ZoomExtents(m_EditObject->GetBox());
 	}else{
     	Fbox box; box.invalidate();
         switch(m_EditMode){
@@ -251,7 +249,7 @@ void CParticleTool::ZoomObject(BOOL bSelOnly)
         case emGroup:	box.set(m_EditPG->vis.box);	break;
 	    default: THROW;
         }
-        if (box.is_valid()){ box.grow(1.f); EDevice.m_Camera.ZoomExtents(box); }
+        if (box.is_valid()){ box.grow(1.f); EDevice->m_Camera.ZoomExtents(box); }
     }
 }
 
@@ -263,28 +261,28 @@ void CParticleTool::PrepareLighting()
     L.type = D3DLIGHT_DIRECTIONAL;
     L.diffuse.set(1,1,1,1);
     L.direction.set(1,-1,1); L.direction.normalize();
-	EDevice.SetLight(0,L);
-	EDevice.LightEnable(0,true);
+	EDevice->SetLight(0,L);
+	EDevice->LightEnable(0,true);
 
     L.diffuse.set(0.3,0.3,0.3,1);
     L.direction.set(-1,-1,-1); L.direction.normalize();
-	EDevice.SetLight(1,L);
-	EDevice.LightEnable(1,true);
+	EDevice->SetLight(1,L);
+	EDevice->LightEnable(1,true);
 
     L.diffuse.set(0.3,0.3,0.3,1);
     L.direction.set(1,-1,-1); L.direction.normalize();
-	EDevice.SetLight(2,L);
-	EDevice.LightEnable(2,true);
+	EDevice->SetLight(2,L);
+	EDevice->LightEnable(2,true);
 
     L.diffuse.set(0.3,0.3,0.3,1);
     L.direction.set(-1,-1,1); L.direction.normalize();
-	EDevice.SetLight(3,L);
-	EDevice.LightEnable(3,true);
+	EDevice->SetLight(3,L);
+	EDevice->LightEnable(3,true);
 
 	L.diffuse.set(1.0,0.8,0.7,1);
     L.direction.set(0,1,0); L.direction.normalize();
-	EDevice.SetLight(4,L);
-	EDevice.LightEnable(4,true);
+	EDevice->SetLight(4,L);
+	EDevice->LightEnable(4,true);
 }
 
 void CParticleTool::OnDeviceCreate()
@@ -295,13 +293,9 @@ void CParticleTool::OnDeviceDestroy()
 {
 }
 
-void CParticleTool::SelectPreviewObject(int p){
-    LPCSTR fn;
-    if (!TfrmChoseItem::SelectItem(smObject,fn,1,m_EditObject?m_EditObject->GetName():0)) return;
-    Lib.RemoveEditObject(m_EditObject);
-    m_EditObject = fn?Lib.CreateEditObject(fn):0;
-//	ZoomObject(TRUE);
-    UI->RedrawScene();
+void CParticleTool::SelectPreviewObject(int p)
+{
+
 }
 
 void CParticleTool::ResetPreviewObject()
@@ -331,10 +325,10 @@ bool CParticleTool::Save(bool bAsXR)
 	bool bRes			= false;
 	if(bAsXR)
     {
-        bRes 			= ::Render->PSLibrary.Save();
+        bRes 			= RImplementation.PSLibrary.Save();
     }else
     {
-        bRes 			= ::Render->PSLibrary.Save2();
+        bRes 			= RImplementation.PSLibrary.Save2();
     }
 
     if (bRes)		m_bModified = false;
@@ -346,7 +340,7 @@ void CParticleTool::Reload()
 {
 	VERIFY(m_bReady);
     ResetCurrent	();
-	::Render->PSLibrary.Reload();
+	RImplementation.PSLibrary.Reload();
     // visual part
     m_ItemProps->ClearProperties();
     UpdateProperties(true);
@@ -356,33 +350,33 @@ void CheckEffect(const xr_string& group_path, const shared_str& eff_full_name, x
 {
  	res_name						= group_path + "effects\\" + EFS.ExtractFileName(eff_full_name.c_str());
 
-    if(0!=_stricmp(res_name.c_str(),eff_full_name.c_str()))
+    if(0!=stricmp(res_name.c_str(),eff_full_name.c_str()))
     {
-        PS::CPEDef* old_ped			= ::Render->PSLibrary.FindPED(eff_full_name.c_str());
-        PS::CPEDef* new_ped			= ::Render->PSLibrary.FindPED(res_name.c_str());
+        PS::CPEDef* old_ped			= RImplementation.PSLibrary.FindPED(eff_full_name.c_str());
+        PS::CPEDef* new_ped			= RImplementation.PSLibrary.FindPED(res_name.c_str());
         if(bRenameOnly)
         {
-       		::Render->PSLibrary.Remove	(res_name.c_str());
+       		RImplementation.PSLibrary.Remove	(res_name.c_str());
             new_ped					= NULL;
         }
 
         if(!new_ped)
         {
-            new_ped					= (bRenameOnly)? old_ped : ::Render->PSLibrary.AppendPED(old_ped);
+            new_ped					= (bRenameOnly)? old_ped : RImplementation.PSLibrary.AppendPED(old_ped);
         	new_ped->m_Name			= res_name.c_str();
             if(bRenameOnly)
         		Msg						("rename effect [%s]->[%s]", eff_full_name.c_str(), res_name.c_str());
             else
         		Msg						("create new effect [%s]", res_name.c_str());
         }
-        VERIFY( 0==_stricmp(new_ped->m_Name.c_str(), res_name.c_str()) );
+        VERIFY( 0==stricmp(new_ped->m_Name.c_str(), res_name.c_str()) );
     }
 
 }
 
 CCommandVar CParticleTool::CreateGroupFromSelected(CCommandVar p1, CCommandVar p2)
 {
-	PS::CPEDef* curr = m_LibPED;
+	/*PS::CPEDef* curr = m_LibPED;
 	if(!curr)
     {
     	ELog.DlgMsg	(mtError,"Select Effect first.");
@@ -391,7 +385,7 @@ CCommandVar CParticleTool::CreateGroupFromSelected(CCommandVar p1, CCommandVar p
     const shared_str& eff_name		= curr->m_Name;
     PS::CPGDef* pg					= AppendPG(0);
 
-    AnsiString grp_name				= eff_name.c_str();
+    xr_string grp_name				= eff_name.c_str();
     pg->m_Name						= grp_name.c_str();
 
     pg->m_fTimeLimit				= 0.0f;
@@ -414,7 +408,7 @@ CCommandVar CParticleTool::CreateGroupFromSelected(CCommandVar p1, CCommandVar p
     
     ExecCommand						(COMMAND_UPDATE_PROPERTIES);
     
-   	m_PList->SelectItem				(grp_name.c_str(), true, false, true);
+   	m_PList->SelectItem				(grp_name.c_str());*/
    
 	return 							TRUE;
 }
@@ -427,7 +421,7 @@ CCommandVar CParticleTool::Compact(CCommandVar p1, CCommandVar p2)
         return false;
     }
     
-    for (PS::PGDIt g_it= ::Render->PSLibrary.FirstPGD(); g_it!=::Render->PSLibrary.LastPGD(); ++g_it)
+    for (PS::PGDIt g_it= RImplementation.PSLibrary.FirstPGD(); g_it!=RImplementation.PSLibrary.LastPGD(); ++g_it)
     {
     	PS::CPGDef*	pg 		= (*g_it);
         shared_str& group_name	= pg->m_Name;
@@ -471,15 +465,15 @@ CCommandVar CParticleTool::Compact(CCommandVar p1, CCommandVar p2)
 bool CParticleTool::Validate(bool bMsg)
 {
     if (bMsg)		ELog.Msg	(mtInformation,"Begin validation...");
-    PS::PEDIt _eI 	= ::Render->PSLibrary.FirstPED();
-    PS::PEDIt _eE 	= ::Render->PSLibrary.LastPED();
+    PS::PEDIt _eI 	= RImplementation.PSLibrary.FirstPED();
+    PS::PEDIt _eE 	= RImplementation.PSLibrary.LastPED();
     u32 error_cnt	= 0;
     for (; _eI!=_eE; ++_eI)
     {
     	if (!(*_eI)->Validate(bMsg)) 
         	error_cnt++;
     }
-    for (PS::PGDIt g_it= ::Render->PSLibrary.FirstPGD(); g_it!=::Render->PSLibrary.LastPGD(); ++g_it)
+    for (PS::PGDIt g_it= RImplementation.PSLibrary.FirstPGD(); g_it!=RImplementation.PSLibrary.LastPGD(); ++g_it)
     {
     	PS::CPGDef*	pg 		= (*g_it);
     	if (!pg->Validate(bMsg)) 
@@ -496,8 +490,7 @@ bool CParticleTool::Validate(bool bMsg)
 void CParticleTool::Rename(LPCSTR old_full_name, LPCSTR ren_part, int level)
 {
     VERIFY(level<_GetItemCount(old_full_name,'\\'));
-    AnsiString new_full_name;
-    _ReplaceItem(old_full_name,level,ren_part,new_full_name,'\\');
+    xr_string new_full_name;
     Rename(old_full_name, new_full_name.c_str());
 }
 
@@ -505,52 +498,41 @@ void CParticleTool::Rename(LPCSTR old_full_name, LPCSTR new_full_name)
 {
 	VERIFY(m_bReady);
     // is effect
-	PS::CPEDef* E = ::Render->PSLibrary.FindPED(old_full_name);
+	PS::CPEDef* E = RImplementation.PSLibrary.FindPED(old_full_name);
     if (E){
-        ::Render->PSLibrary.RenamePED(E,new_full_name);
+        RImplementation.PSLibrary.RenamePED(E,new_full_name);
     	return;
     }
     // is group
-	PS::CPGDef* G = ::Render->PSLibrary.FindPGD(old_full_name);
+	PS::CPGDef* G = RImplementation.PSLibrary.FindPGD(old_full_name);
     if (G){
-        ::Render->PSLibrary.RenamePGD(G,new_full_name);
+        RImplementation.PSLibrary.RenamePGD(G,new_full_name);
     	return;
     }
 }
 
 void CParticleTool::Remove(LPCSTR name)
 {
+
+    if (RImplementation.PSLibrary.FindPED(name) == m_LibPED || RImplementation.PSLibrary.FindPGD(name) == m_LibPGD)
+    {
+        m_ItemProps->ClearProperties();
+    }
+
 	VERIFY(m_bReady);
-	::Render->PSLibrary.Remove	(name);
-	SetCurrentPE				(0);
-	SetCurrentPG				(0);
+    SetCurrentPE(0);
+    SetCurrentPG(0);
+	RImplementation.PSLibrary.Remove	(name);
 }
 
 void CParticleTool::RemoveCurrent()
 {
-	m_PList->RemoveSelItems		();
+    R_ASSERT(0);
 }
 
 void CParticleTool::CloneCurrent()
 {
-    TElTreeItem* pNode = m_PList->GetSelected();
-    if (pNode&&FHelper.IsObject(pNode)){
-		AnsiString full_name;
-		FHelper.MakeName(pNode,0,full_name,false);
-        PS::CPEDef* PE=FindPE(full_name.c_str());
-        if (PE){
-        	AppendPE(PE);
-            Modified();
-        }else{
-	        PS::CPGDef* PG=FindPG(full_name.c_str());
-            if (PG){
-	        	AppendPG(PG);
-    	        Modified();
-            }
-        }
-    }else{
-		ELog.DlgMsg(mtInformation, "At first select object.");
-    }
+    R_ASSERT(0);
 }
 
 void CParticleTool::ResetCurrent()
@@ -572,7 +554,6 @@ void CParticleTool::SetCurrentPE(PS::CPEDef* P)
 		if (m_LibPED)
 			m_EditMode		= emEffect;
     }
-    FillReferenceList		();
 }
 
 void CParticleTool::SetCurrentPG(PS::CPGDef* P)
@@ -585,82 +566,79 @@ void CParticleTool::SetCurrentPG(PS::CPGDef* P)
         if (m_LibPGD)
 			m_EditMode		= emGroup;
     }
-    FillReferenceList		();
 }
 
-void CParticleTool::FillReferenceList()
+void CParticleTool::DrawReferenceList()
 {
-    string128 str	= "";
-	fraLeftBar->refLB->Clear();
-    if(m_EditMode==emGroup)
+    if (m_EditMode == emGroup)
     {
-    	if(m_EditPG->GetDefinition())
+        if (m_EditPG->GetDefinition())
         {
-            xr_vector<PS::CPGDef::SEffect*>::const_iterator pe_it 		= m_EditPG->GetDefinition()->m_Effects.begin();
-            xr_vector<PS::CPGDef::SEffect*>::const_iterator pe_it_e 	= m_EditPG->GetDefinition()->m_Effects.end();
-            for(;pe_it!=pe_it_e;++pe_it)
+            xr_vector<PS::CPGDef::SEffect*>::const_iterator pe_it = m_EditPG->GetDefinition()->m_Effects.begin();
+            xr_vector<PS::CPGDef::SEffect*>::const_iterator pe_it_e = m_EditPG->GetDefinition()->m_Effects.end();
+            for (; pe_it != pe_it_e; ++pe_it)
             {
-                fraLeftBar->refLB->AddItem( (*pe_it)->m_EffectName.c_str(), NULL );
+                ImGui::Text((*pe_it)->m_EffectName.c_str()? (*pe_it)->m_EffectName.c_str() :0);
             }
-            if(m_EditPG->GetDefinition()->m_Flags.test(PS::CPGDef::SEffect::flOnPlayChild))
-                fraLeftBar->refLB->AddItem( (*pe_it)->m_OnPlayChildName.c_str(), NULL );
-            if(m_EditPG->GetDefinition()->m_Flags.test(PS::CPGDef::SEffect::flOnBirthChild))
-                fraLeftBar->refLB->AddItem( (*pe_it)->m_OnBirthChildName.c_str(), NULL );
-            if(m_EditPG->GetDefinition()->m_Flags.test(PS::CPGDef::SEffect::flOnDeadChild))
-                fraLeftBar->refLB->AddItem( (*pe_it)->m_OnDeadChildName.c_str(), NULL );
+            if (m_EditPG->GetDefinition()->m_Flags.test(PS::CPGDef::SEffect::flOnPlayChild))
+                ImGui::Text((*pe_it)->m_OnPlayChildName.c_str());
+            if (m_EditPG->GetDefinition()->m_Flags.test(PS::CPGDef::SEffect::flOnBirthChild))
+                ImGui::Text((*pe_it)->m_OnBirthChildName.c_str());
+            if (m_EditPG->GetDefinition()->m_Flags.test(PS::CPGDef::SEffect::flOnDeadChild))
+                ImGui::Text((*pe_it)->m_OnDeadChildName.c_str());
         }
-        xr_sprintf							(str, sizeof(str), "Effect(s): %d", fraLeftBar->refLB->Count );
-    }else
+    }
+    else
     {
-    	if(m_EditPE->GetDefinition())
+        if (m_EditPE->GetDefinition())
         {
-        	PS::PGDIt G		= ::Render->PSLibrary.FirstPGD(); 
-            PS::PGDIt G_e 	= ::Render->PSLibrary.LastPGD();
-            for (; G!=G_e; ++G)
+            PS::PGDIt G = RImplementation.PSLibrary.FirstPGD();
+            PS::PGDIt G_e = RImplementation.PSLibrary.LastPGD();
+            for (; G != G_e; ++G)
             {
-                PS::CPGDef* def 				= (*G);
-                PS::CPGDef::EffectIt pe_it 		= def->m_Effects.begin();
-                PS::CPGDef::EffectIt pe_it_e 	= def->m_Effects.end();
-                for(;pe_it!=pe_it_e;++pe_it)
+                PS::CPGDef* def = (*G);
+                PS::CPGDef::EffectIt pe_it = def->m_Effects.begin();
+                PS::CPGDef::EffectIt pe_it_e = def->m_Effects.end();
+                for (; pe_it != pe_it_e; ++pe_it)
                 {
-                   if( (*pe_it)->m_EffectName==m_EditPE->Name() )
-                     fraLeftBar->refLB->AddItem(def->m_Name.c_str(), NULL);
-                   else
-                   if( (*pe_it)->m_OnPlayChildName==m_EditPE->Name() )
-                     fraLeftBar->refLB->AddItem(def->m_Name.c_str(), NULL);
-                   else
-                   if( (*pe_it)->m_OnBirthChildName==m_EditPE->Name() )
-                     fraLeftBar->refLB->AddItem(def->m_Name.c_str(), NULL);
-                   else
-                   if( (*pe_it)->m_OnDeadChildName==m_EditPE->Name() )
-                     fraLeftBar->refLB->AddItem(def->m_Name.c_str(), NULL);
+                    if ((*pe_it)->m_EffectName == m_EditPE->Name())
+                        ImGui::Text(def->m_Name.c_str());
+                    else
+                        if ((*pe_it)->m_OnPlayChildName == m_EditPE->Name())
+                            ImGui::Text(def->m_Name.c_str());
+                        else
+                            if ((*pe_it)->m_OnBirthChildName == m_EditPE->Name())
+                                ImGui::Text(def->m_Name.c_str());
+                            else
+                                if ((*pe_it)->m_OnDeadChildName == m_EditPE->Name())
+                                    ImGui::Text(def->m_Name.c_str());
                 }
             }
         }
-        xr_sprintf							(str, sizeof(str), "Group(s): %d", fraLeftBar->refLB->Count );
     }
-    fraLeftBar->refName->Caption 	= str;
 }
+
+
 void CParticleTool::CommandJumpToItem()
 {
-   for(int i=0; i<fraLeftBar->refLB->Count; ++i)
+  /* for(int i=0; i<fraLeftBar->refLB->Count; ++i)
    {
         if(fraLeftBar->refLB->Selected[i])
         {
         	m_PList->SelectItem((fraLeftBar->refLB->Items->Strings[i]).c_str(),true,false,true);
         	break;
         }
-    }
+    }*/
 }
 
 PS::CPEDef*	CParticleTool::FindPE(LPCSTR name)
 {
-	return ::Render->PSLibrary.FindPED(name);
+	return RImplementation.PSLibrary.FindPED(name);
 }
 
 PS::CPGDef*	CParticleTool::FindPG(LPCSTR name)
 {
-	return ::Render->PSLibrary.FindPGD(name);
+	return RImplementation.PSLibrary.FindPGD(name);
 }
 
 void CParticleTool::PlayCurrent(int idx)
@@ -703,6 +681,7 @@ void CParticleTool::OnShowHint(AStringVec& SS)
 {
 }
 
+float m_MoveSnap = 1;
 bool CParticleTool::MouseStart(TShiftState Shift)
 {
 	inherited::MouseStart(Shift);
@@ -710,7 +689,7 @@ bool CParticleTool::MouseStart(TShiftState Shift)
     case etaSelect: break;
     case etaAdd:	break;
     case etaMove:{
-        if (Shift.Contains(ssCtrl)){
+        if (Shift|ssCtrl){
         	if (m_EditObject){
                 float dist = UI->ZFar();
                 SRayPickInfo pinf;
@@ -803,51 +782,36 @@ LPCSTR CParticleTool::GetInfo()
 
 void CParticleTool::SelectListItem(LPCSTR pref, LPCSTR name, bool bVal, bool bLeaveSel, bool bExpand)
 {
-	AnsiString nm = (name&&name[0])?PrepareKey(pref,name).c_str():pref;
-	m_PList->SelectItem(nm.c_str(),bVal,bLeaveSel,bExpand);
+	xr_string nm = (name&&name[0])?PrepareKey(pref,name).c_str():pref;
+	m_PList->SelectItem(nm.c_str());
 	if (pref){
-    	m_PList->SelectItem(pref,true,true,bExpand);
+    	m_PList->SelectItem(pref);
     }
 }
 //------------------------------------------------------------------------------
 
-PS::CPEDef* CParticleTool::AppendPE(PS::CPEDef* src)
+PS::CPEDef* CParticleTool::AppendPE(PS::CPEDef* src, const char* path)
 {
-	VERIFY(m_bReady);
-	AnsiString folder_name;
-	FHelper.MakeName	(m_PList->GetSelected(),0,folder_name,true);
-    string64 pref		={0};
-    if (src){
-    	strcpy(pref,*src->m_Name);folder_name="";
-    }else
-	    strconcat		(sizeof(pref),pref,folder_name.c_str(),"pe");
-
-    AnsiString new_name	= FHelper.GenerateName(pref,2,fastdelegate::bind<TFindObjectByName>(&(::Render->PSLibrary),&CPSLibrary::FindByName),false,true);
-    PS::CPEDef* S 		= ::Render->PSLibrary.AppendPED(src);
-    S->m_Name			= new_name.c_str();
-    ExecCommand			(COMMAND_UPDATE_PROPERTIES,true);
-    if (!new_name.IsEmpty()) SelectListItem(0,new_name.c_str(),true,false,true);
+    VERIFY(m_bReady);
+    PS::CPEDef* S = RImplementation.PSLibrary.AppendPED(src);
+    S->m_Name = path;
+    ExecCommand(COMMAND_UPDATE_PROPERTIES, true);
+    SelectListItem(0, path, true, false, true);
     return S;
 }
 
-PS::CPGDef*	CParticleTool::AppendPG(PS::CPGDef* src)
+PS::CPGDef*	CParticleTool::AppendPG(PS::CPGDef* src, const char* path)
 {
 	VERIFY(m_bReady);
-	AnsiString folder_name;
-	FHelper.MakeName	(m_PList->GetSelected(),0,folder_name,true);
-    string64 pref		={0};
-    if (src){ 			strcpy(pref,*src->m_Name);folder_name="";}
-    else strconcat		(sizeof(pref),pref,folder_name.c_str(),"pg");
-    AnsiString new_name	= FHelper.GenerateName(pref,2,fastdelegate::bind<TFindObjectByName>(&(::Render->PSLibrary),&CPSLibrary::FindByName),false,true);
-    PS::CPGDef* S 		= ::Render->PSLibrary.AppendPGD(src);
-    S->m_Name			= new_name.c_str();
+	PS::CPGDef* S 		= RImplementation.PSLibrary.AppendPGD(src);
+    S->m_Name			= path;
 
     ExecCommand			(COMMAND_UPDATE_PROPERTIES,true);
-    if (!new_name.IsEmpty()) SelectListItem(0,new_name.c_str(),true,false,true);
+     SelectListItem(0, path,true,false,true);
     return S;
 }
 
-#include "EditMesh.h"
+#include "../XrECore/Editor/EditMesh.h"
 
 bool CParticleTool::RayPick(const Fvector& start, const Fvector& dir, float& dist, Fvector* pt, Fvector* n)
 {
@@ -882,23 +846,37 @@ void CParticleTool::OnChangeMotion	(PropValue* sender)
     }
     if (m_Flags.is(flAnimatedParent))
 		m_ParentAnimator->Play	(true);
+    FillObjectPrefs();
 }
 
-void CParticleTool::EditPreviewPrefs()
+void CParticleTool::OnChangeObject(PropValue* sender)
+{
+    ChooseValue* V = dynamic_cast<ChooseValue*>(sender);
+    if (V)
+    {
+        Lib.RemoveEditObject(m_EditObject);
+        m_EditObject = V->value->c_str() ? Lib.CreateEditObject(V->value->c_str()) : 0;
+        //	ZoomObject(TRUE); 
+
+        UI->RedrawScene();
+    }
+    FillObjectPrefs();
+}
+
+void CParticleTool::FillObjectPrefs()
 {
 	PropItemVec		items;
-    shared_str	motion_name		= m_ParentAnimator->Name();
+    m_MotionName = m_ParentAnimator->Name();
 	PropValue *V;
+    V = PHelper().CreateChoose(items, "Object", &m_ObjectName, smObject);
+    V->OnChangeEvent.bind       (this, &CParticleTool::OnChangeObject);
     V=PHelper().CreateFlag32	(items, "Parent\\Allow Animated",	&m_Flags, 		flAnimatedParent);
 	V->OnChangeEvent.bind		(this,&CParticleTool::OnChangeMotion);
     PHelper().CreateFlag32		(items, "Parent\\Draw Path",		&m_Flags, 		flAnimatedPath);
-    V=PHelper().CreateChoose	(items, "Parent\\Motion",			&motion_name, 	smGameAnim);
+    V=PHelper().CreateChoose	(items, "Parent\\Motion",			&m_MotionName, 	smGameAnim);
 	V->OnChangeEvent.bind		(this,&CParticleTool::OnChangeMotion);
     PHelper().CreateFloat		(items, "Parent\\Motion Speed",		&m_ParentAnimator->Speed(), 0.f, 10000.f);
-    TProperties* P				= TProperties::CreateModalForm("Preview properties");
-    P->AssignItems				(items);
-    P->ShowPropertiesModal		();
-    TProperties::DestroyForm	(P);
+    m_ObjectProps->AssignItems				(items);
 }
 
 bool CParticleTool::GetSelectionPosition	(Fmatrix& result)

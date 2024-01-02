@@ -4,13 +4,9 @@
 #include "..\..\Layers\xrRender\PSLibrary.h"
 #include "..\..\Layers\xrRender\ParticleEffect.h"
 #include "..\..\Layers\xrRender\ParticleGroup.h"
-#include "..\ECore\Editor\ui_main.h"
 //------------------------------------------------------------------------------
 
-void __fastcall CPSLibrary::FindByName(LPCSTR new_name, bool& res)
-{
-	res = (FindPED(new_name)||FindPGD(new_name));
-}
+
 
 PS::CPEDef* CPSLibrary::AppendPED(PS::CPEDef* src)
 {

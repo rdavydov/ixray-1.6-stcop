@@ -1,12 +1,11 @@
 #include "stdafx.h"
 #pragma hdrstop
-
 #include "StatGraph.h"
 //---------------------------------------------
 
 CStatGraph::CStatGraph()
 {
-	EDevice.seqRender.Add		(this,REG_PRIORITY_LOW-1000);
+	EDevice->seqRender.Add		(this,REG_PRIORITY_LOW-1000);
 	OnDeviceCreate();
 	mn					= 0;
 	mx					= 1;
@@ -23,7 +22,7 @@ CStatGraph::CStatGraph()
 
 CStatGraph::~CStatGraph()
 {
-	EDevice.seqRender.Remove		(this);
+	EDevice->seqRender.Remove		(this);
 	OnDeviceDestroy();
 	m_Markers.clear();
 }
@@ -101,7 +100,7 @@ void CStatGraph::RenderBack	()
 		pv->set				(rb.x,int(base_y+g_y*grid_step.y*elem_factor),grid_color); pv++;
 	};
 
-	for (g_y=1; g_y<=Num_H_LinesUp; g_y++)
+	for (int g_y=1; g_y<=Num_H_LinesUp; g_y++)
 	{									
 		pv->set				(lt.x,int(base_y-g_y*grid_step.y*elem_factor),grid_color); pv++; 	
 		pv->set				(rb.x,int(base_y-g_y*grid_step.y*elem_factor),grid_color); pv++; 	
