@@ -262,7 +262,7 @@ CCommandVar CommandInitialize(CCommandVar p1, CCommandVar p2)
         Lib.OnCreate	();
         BOOL bWeather = psDeviceFlags.is(rsEnvironment);
         psDeviceFlags.set(rsEnvironment, FALSE);
-        //g_pGamePersistent= xr_new<XrGamePersistentEditors>();
+        g_pGamePersistent= xr_new<XrGamePersistentEditors>();
         if (Tools)
         {
             if (Tools->OnCreate())

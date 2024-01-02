@@ -29,6 +29,8 @@ ENGINE_API CTimer loading_save_timer;
 ENGINE_API bool loading_save_timer_started = false;
 ENGINE_API BOOL g_bRendering = FALSE; 
 
+ENGINE_API bool g_bIsEditor = false;
+
 BOOL		g_bLoaded = FALSE;
 ref_light	precache_light = 0;
 

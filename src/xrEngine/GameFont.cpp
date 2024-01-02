@@ -7,6 +7,7 @@
 #include "../Include/xrRender/FontRender.h"
 #include <freetype/freetype.h>
 
+extern ENGINE_API bool g_bIsEditor;
 FT_Library FreetypeLib = nullptr;
 
 bool CGameFont::bFreetypeInitialized = false;
@@ -308,6 +309,9 @@ void CGameFont::Initialize2(const char* name, const char* shader, const char* st
 	string128 textureName;
 	xr_sprintf(textureName, "$user$%s", Name); //#TODO optimize
 
+	if (g_bIsEditor)
+		return;
+
 	pFontRender = RenderFactory->CreateFontRender();
 	pFontRender->CreateFontAtlas(TextureDimension, TextureDimension, textureName, FontBitmap);
 	Memory.mem_free(FontBitmap);
@@ -328,7 +332,12 @@ void CGameFont::OutSetI(float x, float y)
 
 void CGameFont::OnRender()
 {
-	pFontRender->OnRender(*this);
+	if (g_bIsEditor)
+		return;
+
+	if (pFontRender != nullptr)
+		pFontRender->OnRender(*this);
+
 	if (!strings.empty())
 		strings.clear();
 }

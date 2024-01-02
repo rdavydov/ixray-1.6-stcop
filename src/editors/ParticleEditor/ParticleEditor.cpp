@@ -1,6 +1,9 @@
 ﻿// ParticleEditor.cpp : Определяет точку входа для приложения.
 //
 #include "stdafx.h"
+#include "../xrEProps/UIFileLoad.h"
+
+CUFileOpen* FileOpen = nullptr;
 
 void BeginRender()
 {
@@ -25,30 +28,20 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 {
     if (!IsDebuggerPresent()) Debug._initialize(false);
     const char* FSName = "fs.ltx";
-    //{
-    //    if (strstr(GetCommandLineA(), "-soc_14") || strstr(GetCommandLineA(), "-soc_10004"))
-    //    {
-    //        FSName = "fs_soc.ltx";
-    //    }
-    //    else if (strstr(GetCommandLineA(), "-soc"))
-    //    {
-    //        FSName = "fs_soc.ltx";
-    //    }
-    //    else if (strstr(GetCommandLineA(), "-cs"))
-    //    {
-    //        FSName = "fs_cs.ltx";
-    //    }
-    //}
+
     Core._initialize("Patricle", ELogCallback, 1, FSName);
 
     Tools = xr_new<CParticleTool>();
     PTools = (CParticleTool*)Tools;
     UI = xr_new<CParticleMain>();
     UI->RegisterCommands();
+    
+    FileOpen = new CUFileOpen;
 
     UIMainForm* MainForm = xr_new< UIMainForm>();
     ::MainForm = MainForm;
     UI->Push(MainForm, false);
+    UI->Push(FileOpen, false);
 
     while (MainForm->Frame())
     {
@@ -57,8 +50,24 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
         {
             if (!UI->ProcessEvent(&Event))
                 break;
+
+            switch (Event.type)
+            {
+                case SDL_EVENT_WINDOW_SHOWN:
+                case SDL_EVENT_WINDOW_MOUSE_ENTER:
+                    Device.b_is_Active = true;
+                    //if (UI) UI->OnAppActivate();
+
+                    break;
+                case SDL_EVENT_WINDOW_HIDDEN:
+                case SDL_EVENT_WINDOW_MOUSE_LEAVE:
+                    Device.b_is_Active = false;
+                    //if (UI)UI->OnAppDeactivate();
+                    break;
+            }
         }
 
+#if 0
         UI->BeginFrame();
         RDevice->SetRenderTarget(0, RSwapchainTarget);
 
@@ -67,6 +76,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
         BeginRender();
         UI->EndFrame();
         EndRender();
+#endif
     }
 
     xr_delete(MainForm);

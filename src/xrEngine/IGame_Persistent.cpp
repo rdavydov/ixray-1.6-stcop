@@ -17,33 +17,35 @@
 	bool g_dedicated_server	= false;
 #endif
 
+extern ENGINE_API bool g_bIsEditor;
+
 ENGINE_API	IGame_Persistent*		g_pGamePersistent	= NULL;
 
-IGame_Persistent::IGame_Persistent	()
+IGame_Persistent::IGame_Persistent()
 {
-	RDEVICE.seqAppStart.Add			(this);
-	RDEVICE.seqAppEnd.Add			(this);
-	RDEVICE.seqFrame.Add			(this,REG_PRIORITY_HIGH+1);
-	RDEVICE.seqAppActivate.Add		(this);
-	RDEVICE.seqAppDeactivate.Add	(this);
+	RDEVICE.seqAppStart.Add(this);
+	RDEVICE.seqAppEnd.Add(this);
+	RDEVICE.seqFrame.Add(this, REG_PRIORITY_HIGH + 1);
+	RDEVICE.seqAppActivate.Add(this);
+	RDEVICE.seqAppDeactivate.Add(this);
 
-	m_pMainMenu						= NULL;
+	m_pMainMenu = NULL;
 
-	#ifndef _EDITOR
-	pEnvironment					= xr_new<CEnvironment>();
-	#endif
+
+	if (!g_bIsEditor)
+		pEnvironment = xr_new<CEnvironment>();
 }
 
-IGame_Persistent::~IGame_Persistent	()
+IGame_Persistent::~IGame_Persistent()
 {
-	RDEVICE.seqFrame.Remove			(this);
-	RDEVICE.seqAppStart.Remove		(this);
-	RDEVICE.seqAppEnd.Remove			(this);
-	RDEVICE.seqAppActivate.Remove	(this);
-	RDEVICE.seqAppDeactivate.Remove	(this);
-#ifndef _EDITOR
-	xr_delete						(pEnvironment);
-#endif
+	RDEVICE.seqFrame.Remove(this);
+	RDEVICE.seqAppStart.Remove(this);
+	RDEVICE.seqAppEnd.Remove(this);
+	RDEVICE.seqAppActivate.Remove(this);
+	RDEVICE.seqAppDeactivate.Remove(this);
+
+	if (!g_bIsEditor)
+		xr_delete(pEnvironment);
 }
 
 void IGame_Persistent::OnAppActivate		()

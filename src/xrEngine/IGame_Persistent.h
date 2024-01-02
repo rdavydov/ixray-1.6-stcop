@@ -1,21 +1,15 @@
-#ifndef IGame_PersistentH
-#define IGame_PersistentH
 #pragma once
 
 #include "..\xrServerEntities\gametype_chooser.h"
-#ifndef _EDITOR
 #include "Environment.h"
 #include "IGame_ObjectPool.h"
-#endif
 
 class IRenderVisual;
 class IMainMenu;
 class ENGINE_API CPS_Instance;
 //-----------------------------------------------------------------------------------------------------------
-class ENGINE_API IGame_Persistent	: 
-#ifndef _EDITOR
+class ENGINE_API IGame_Persistent	:
 	public DLL_Pure,
-#endif
 	public pureAppStart, 
 	public pureAppEnd,
 	public pureAppActivate, 
@@ -61,12 +55,12 @@ public:
 	virtual void					PreStart			(LPCSTR op);
 	virtual void					Start				(LPCSTR op);
 	virtual void					Disconnect			();
-#ifndef _EDITOR
+
 	IGame_ObjectPool				ObjectPool;
 	CEnvironment*					pEnvironment;
 	CEnvironment&					Environment()	{return *pEnvironment;};
 	void							Prefetch			( );
-#endif
+
 	IMainMenu*						m_pMainMenu;	
 
 
@@ -90,29 +84,15 @@ public:
 	virtual void					OnSectorChanged		(int sector){};
 	virtual void					OnAssetsChanged		();
 
-	virtual void					RegisterModel		(IRenderVisual* V)
-#ifndef _EDITOR
-     = 0;
-#else
-	{}
-#endif
-	virtual	float					MtlTransparent		(u32 mtl_idx)
-#ifndef _EDITOR
-	= 0;
-#else
-	{return 1.f;}
-#endif
+	virtual void					RegisterModel		(IRenderVisual* V) = 0;
+
+	virtual	float					MtlTransparent		(u32 mtl_idx) = 0;
 
 	IGame_Persistent				();
 	virtual ~IGame_Persistent		();
 
 	ICF		u32						GameType			() {return m_game_params.m_e_game_type;};
-	virtual void					Statistics			(CGameFont* F)
-#ifndef _EDITOR
-     = 0;
-#else
-	{}
-#endif
+	virtual void					Statistics			(CGameFont* F)  = 0;
 	virtual	void					LoadTitle			(bool change_tip=false, shared_str map_name=""){}
 	virtual bool					CanBePaused			()		{ return true;}
 };
@@ -129,5 +109,3 @@ public:
 
 extern ENGINE_API	bool g_dedicated_server;
 extern ENGINE_API	IGame_Persistent*	g_pGamePersistent;
-#endif //IGame_PersistentH
-

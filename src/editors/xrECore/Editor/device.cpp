@@ -12,6 +12,7 @@
 #include "UI_ToolsCustom.h"
 
 CEditorRenderDevice 	*	EDevice;
+extern ENGINE_API bool g_bIsEditor;
 
 extern int	rsDVB_Size;
 extern int	rsDIB_Size;
@@ -62,6 +63,7 @@ CEditorRenderDevice::CEditorRenderDevice()
 	PGMLib = GameMaterialLibraryEditors;
 
 	g_pDevice = this;
+	g_bIsEditor = true;
 }
 
 CEditorRenderDevice::~CEditorRenderDevice(){
@@ -316,8 +318,6 @@ void  CEditorRenderDevice::Resize(int w, int h, bool maximized)
     UI->RedrawScene	();
 }
 
-ENGINE_API void ResizeBuffersD3D9(u16 Width, u16 Height);
-
 void CEditorRenderDevice::Reset  	(bool )
 {
     u32 tm_start			= TimerAsync();
@@ -376,6 +376,7 @@ void CEditorRenderDevice::End()
 	g_bRendering = 	FALSE;
 	// end scene
 	RCache.OnFrameEnd();
+
     CHK_DX(REDevice->EndScene());
 
 	CHK_DX(REDevice->Present( NULL, NULL, NULL, NULL ));

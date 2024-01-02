@@ -54,6 +54,7 @@ void dxStatsRender::GuardDrawCalls (CGameFont &F)
 	if (RCache.stat.calls>1000)		F.OutNext	("DIP/DP    > 1k:   %d",	RCache.stat.calls);
 }
 
+#ifdef XR_EDITOR_NEW
 void dxStatsRender::SetDrawParams (IRenderDeviceRender *pRender)
 {
 	//dxRenderDeviceRender *pR = (dxRenderDeviceRender*) pRender;
@@ -62,3 +63,13 @@ void dxStatsRender::SetDrawParams (IRenderDeviceRender *pRender)
 	RCache.set_Shader		(EDevice->m_SelectionShader);
 	RCache.set_c			("tfactor",1,1,1,1);
 }
+#else
+void dxStatsRender::SetDrawParams(IRenderDeviceRender* pRender)
+{
+	dxRenderDeviceRender* pR = (dxRenderDeviceRender*)pRender;
+
+	RCache.set_xform_world(Fidentity);
+	RCache.set_Shader(pR->m_SelectionShader);
+	RCache.set_c("tfactor", 1, 1, 1, 1);
+}
+#endif

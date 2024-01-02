@@ -278,42 +278,46 @@ void XrUIManager::Push(XrUI* ui, bool need_deleted)
 
 void XrUIManager::Draw()
 {
+	//BeginFrame(); 
+
 	ImGui::NewFrame();
 
-   ImGui::DockSpaceOverViewport();
+	ImGui::DockSpaceOverViewport();
 	{
-	    ImGuiViewport* viewport = ImGui::GetMainViewport();
-	    ImGui::SetNextWindowPos( ImVec2(viewport->Pos.x, viewport->Pos.y+ UIToolBarSize));
-	    ImGui::SetNextWindowSize( ImVec2(viewport->Size.x, viewport->Size.y- UIToolBarSize));
-	    ImGui::SetNextWindowViewport(viewport->ID);
-	    ImGuiWindowFlags window_flags = 0
-	        | ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking
-	        | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse
-	        | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove
-	        | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
-	
-	    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
-	    ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
-	    ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
-	    ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(3, 2));
-	    ImGui::Begin("Master DockSpace", NULL, window_flags);
-	    ImGuiID dockMain = ImGui::GetID("MyDockspace");
-	
-	    m_MenuBarHeight = ImGui::GetWindowBarHeight();
-	    // Save off menu bar height for later.
-	
-	    ImGui::DockSpace(dockMain);
-	    ImGui::End();
-	    ImGui::PopStyleVar(4);
-	
+		ImGuiViewport* viewport = ImGui::GetMainViewport();
+		ImGui::SetNextWindowPos(ImVec2(viewport->Pos.x, viewport->Pos.y + UIToolBarSize));
+		ImGui::SetNextWindowSize(ImVec2(viewport->Size.x, viewport->Size.y - UIToolBarSize));
+		ImGui::SetNextWindowViewport(viewport->ID);
+		ImGuiWindowFlags window_flags = 0
+			| ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking
+			| ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse
+			| ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove
+			| ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
+
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(3, 2));
+		ImGui::Begin("Master DockSpace", NULL, window_flags);
+		ImGuiID dockMain = ImGui::GetID("MyDockspace");
+
+		m_MenuBarHeight = ImGui::GetWindowBarHeight();
+		// Save off menu bar height for later.
+
+		ImGui::DockSpace(dockMain);
+		ImGui::End();
+		ImGui::PopStyleVar(4);
+
 	}
 	for (XrUI* ui : m_UIArray)
 	{
 		ui->Draw();
 	}
-	
+
 	OnDrawUI();
-	ImGui::EndFrame();
+	//ImGui::EndFrame();
+
+	//EndFrame();
 }
 
 static bool ImGui_ImplWin32_UpdateMouseCursor()

@@ -38,6 +38,7 @@ file(GLOB_RECURSE ECORE_SOURCE_RENDER_FILES
     "../../Layers/xrRender/dxApplicationRender.*"
     "../../Layers/xrRender/dxConsoleRender.*"
     "../../Layers/xrRender/dxDebugRender.*"
+    "../../Layers/xrRender/dxStatGraphRender.*"
     "../../Layers/xrRender/dxEnvironmentRender.*"
     "../../Layers/xrRender/dxFontRender.*"
     "../../Layers/xrRender/dxLensFlareRender.*"

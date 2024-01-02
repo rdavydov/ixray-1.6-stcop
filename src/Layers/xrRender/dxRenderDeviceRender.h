@@ -1,5 +1,3 @@
-#ifndef dxRenderDeviceRender_included
-#define dxRenderDeviceRender_included
 #pragma once
 
 #if !defined(_EDITOR) && !defined(XR_EDITOR_NEW)
@@ -8,7 +6,6 @@
 	#define DEV EDevice->Resources
 #endif
 
-#ifndef _EDITOR
 
 #include "..\..\Include\xrRender\RenderDeviceRender.h"
 #include "xr_effgamma.h"
@@ -65,10 +62,6 @@ private:
 	CGammaControl		m_Gamma;
 };
 
-#endif //ifndef _EDITOR
-
 #ifndef USE_DX11
 extern ECORE_API CHWCaps Caps;
 #endif
-
-#endif	//	RenderDeviceRender_included

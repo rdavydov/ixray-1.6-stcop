@@ -385,7 +385,7 @@ void TUI::Redraw()
             GetRenderHeight() = RTSize.y * EDevice->m_ScreenQuality;
             RT.destroy();
             ZB.destroy();
-            RT.create("rt_color", RTSize.x * EDevice->m_ScreenQuality, RTSize.y * EDevice->m_ScreenQuality, Caps.fTarget);
+            RT.create("rt_color", RTSize.x * EDevice->m_ScreenQuality, RTSize.y * EDevice->m_ScreenQuality, D3DFMT_X8R8G8B8);
             ZB.create("rt_depth", RTSize.x * EDevice->m_ScreenQuality, RTSize.y * EDevice->m_ScreenQuality, D3DFORMAT::D3DFMT_D24X8);
             m_Flags.set(flRedraw, TRUE);
             EDevice->fASPECT = ((float)RTSize.y) / ((float)RTSize.x);
@@ -404,6 +404,9 @@ void TUI::Redraw()
 			EDevice->mProject.build_projection(deg2rad(EDevice->fFOV), EDevice->fASPECT, EDevice->m_Camera.m_Znear, EDevice->m_Camera.m_Zfar);
         }
 
+        CHK_DX(REDevice->Clear(0, 0, D3DCLEAR_ZBUFFER | D3DCLEAR_TARGET, EPrefs ? EPrefs->scene_clear_color : 0xFFF, 1, 0));
+
+
         if (EDevice->Begin())
         {
             if (psDeviceFlags.is(rsRenderRealTime))
@@ -415,16 +418,14 @@ void TUI::Redraw()
                 RCache.set_RT(RT->pRT);
                 RCache.set_ZB(ZB->pRT);
                 //EDevice->Statistic->RenderDUMP_RT.Begin();
-                {
-                    CHK_DX(REDevice->Clear(0, 0, D3DCLEAR_ZBUFFER | D3DCLEAR_TARGET, EPrefs ? EPrefs->scene_clear_color : 0x0, 1, 0));
-                }
                 EDevice->UpdateView();
                 EDevice->ResetMaterial();
 
                 Tools->RenderEnvironment();
 
                 //. temporary reset filter (      )
-                for (u32 k = 0; k < Caps.raster.dwStages; k++) {
+                for (u32 k = 0; k < Caps.raster.dwStages; k++) 
+                {
                     if (psDeviceFlags.is(rsFilterLinear)) {
                         EDevice->SetSS(k, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
                         EDevice->SetSS(k, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
@@ -458,7 +459,7 @@ void TUI::Redraw()
 
 
                 //EDevice->Statistic->RenderDUMP_RT.End();
-                //EDevice->EStatistic->Show(EDevice->pSystemFont);
+                //->EStatistic->Show(EDevice->pSystemFont);
                 UI->OnStats(EDevice->pSystemFont);
                 EDevice->SetRS(D3DRS_FILLMODE, D3DFILL_SOLID);
                 EDevice->pSystemFont->OnRender();
@@ -468,16 +469,21 @@ void TUI::Redraw()
                 {
                     g_pGamePersistent->OnRenderPPUI_main();
                 }
-                RCache.set_RT(RTarget);
-                RCache.set_ZB(RDepth);
+
+                RCache.set_RT(RSwapchainTarget);
+                //RCache.set_ZB(RDepth);
             }
 
-            try {
+            try
+            {
                 EDevice->SetRS(D3DRS_FILLMODE, D3DFILL_SOLID);
                 g_bRendering = FALSE;
-                Draw();
                 EDevice->SetRS(D3DRS_FILLMODE, EDevice->dwFillMode);
-                // end draw
+                //  Draw(); 
+                  // end draw
+                UI->BeginFrame();
+                Draw();
+                UI->EndFrame();
                 EDevice->End();
             }
             catch (...) {
@@ -557,8 +563,8 @@ bool TUI::Idle()
     Sleep(1);
 
     OnFrame			();
-    if (m_bAppActive && !m_Flags.is(flNeedQuit) && !m_AppClosed)
-    RealRedrawScene();
+    if (EDevice->b_is_Active && !m_Flags.is(flNeedQuit) && !m_AppClosed)
+        RealRedrawScene();
 
     {
         for (u32 pit = 0; pit < EDevice->seqParallel.size(); pit++)
@@ -627,7 +633,7 @@ bool TUI::OnCreate()
 
     RCache.set_xform_project(EDevice->mProject);
     RCache.set_xform_world(Fidentity);
-    RT.create("rt_color", RTSize .x*EDevice->m_ScreenQuality, RTSize.y * EDevice->m_ScreenQuality, Caps.fTarget);
+    RT.create("rt_color", RTSize .x*EDevice->m_ScreenQuality, RTSize.y * EDevice->m_ScreenQuality, D3DFMT_X8R8G8B8);
     ZB.create("rt_depth", RTSize.x * EDevice->m_ScreenQuality, RTSize.y* EDevice->m_ScreenQuality, D3DFORMAT::D3DFMT_D24X8);
 
     return true;
@@ -682,7 +688,7 @@ void TUI::ProgressEnd			(SPBItem*& pbi)
 void TUI::ProgressDraw()
 {
     SPBItem* pbi = UI->ProgressLast();
-    if (pbi) 
+    if (pbi)
     {
         xr_string txt;
         float 		p, m;

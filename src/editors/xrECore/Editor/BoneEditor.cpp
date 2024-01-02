@@ -291,4 +291,13 @@ void ELightAnimLibrary::RenameObject(LPCSTR nm0, LPCSTR nm1, EItemType type)
 	}
 
 FACTORY_PTR_INSTANCIATE(UIShader)
+
+FACTORY_PTR_INSTANCIATE(FlareRender)
+FACTORY_PTR_INSTANCIATE(LensFlareRender)
+FACTORY_PTR_INSTANCIATE(RainRender)
+FACTORY_PTR_INSTANCIATE(EnvironmentRender)
+FACTORY_PTR_INSTANCIATE(ThunderboltRender)
+FACTORY_PTR_INSTANCIATE(ThunderboltDescRender)
+FACTORY_PTR_INSTANCIATE(EnvDescriptorRender)
+FACTORY_PTR_INSTANCIATE(EnvDescriptorMixerRender)
 #endif
