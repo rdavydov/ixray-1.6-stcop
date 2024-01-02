@@ -569,8 +569,9 @@ _BUMP_from_base:
 		return				T_normal_1C;
 	}
 }
-
+#ifdef XR_EDITOR_NEW
 IDirect3DBaseTexture9* CRender::texture_load_software(LPCSTR fname, u32& mem_size)
 {
 	return texture_load(fname, mem_size);
 }
+#endif

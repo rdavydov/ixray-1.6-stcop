@@ -322,6 +322,7 @@ void CEditorRenderDevice::Reset  	(bool )
 {
     u32 tm_start			= TimerAsync();
     Resources->reset_begin	();
+    Resources->DeferredUnload	();
 	UI->ResetBegin();
     Memory.mem_compact		();
 
@@ -472,7 +473,7 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 void CEditorRenderDevice::CreateWindow()
 {
-	g_AppInfo.Window = SDL_CreateWindow("IX-Ray Editor", 1024, 800, 0);
+	g_AppInfo.Window = SDL_CreateWindow("IX-Ray Editor", 1024, 800, SDL_WINDOW_RESIZABLE);
 	//m_WC = { sizeof(WNDCLASSEX), CS_CLASSDC, WndProc, 0L, 0L, GetModuleHandle(NULL), NULL, NULL, NULL, NULL, TEXT("XRay Editor"), NULL };
 	//::RegisterClassEx(&m_WC);
 	//m_hWnd= ::CreateWindowA(m_WC.lpszClassName, TEXT("XRay Editor"), WS_OVERLAPPEDWINDOW, 100, 100, 1280, 800, NULL, NULL, m_WC.hInstance, NULL);

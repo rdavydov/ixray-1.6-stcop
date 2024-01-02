@@ -43,16 +43,20 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
     UI->Push(MainForm, false);
     UI->Push(FileOpen, false);
 
-    while (MainForm->Frame())
+    //MainForm->Frame();
+    while (true)
     {
         SDL_Event Event;
         while (SDL_PollEvent(&Event))
         {
-            if (!UI->ProcessEvent(&Event))
-                break;
-
             switch (Event.type)
             {
+                case SDL_EVENT_WINDOW_RESIZED:
+                   if (UI && REDevice)
+                   {
+                       UI->Resize(Event.window.data1, Event.window.data2);
+                   }
+                    break;
                 case SDL_EVENT_WINDOW_SHOWN:
                 case SDL_EVENT_WINDOW_MOUSE_ENTER:
                     Device.b_is_Active = true;
@@ -65,8 +69,11 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
                     //if (UI)UI->OnAppDeactivate();
                     break;
             }
-        }
 
+            if (!UI->ProcessEvent(&Event))
+                break;
+        }
+        MainForm->Frame();
 #if 0
         UI->BeginFrame();
         RDevice->SetRenderTarget(0, RSwapchainTarget);

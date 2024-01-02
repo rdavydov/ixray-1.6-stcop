@@ -181,7 +181,7 @@ SVS*	CResourceManager::_CreateVS		(LPCSTR _name)
 		LPCSTR c_target = "vs_3_0";
 		LPCSTR c_entry = "main";
 
-		HRESULT const _hr = ::Render->shader_compile(name, (DWORD const*)data, size, c_entry, c_target, D3DCOMPILE_DEBUG | D3DCOMPILE_PACK_MATRIX_ROW_MAJOR, (void*&)_vs);
+		HRESULT const _hr = ((CRender*)::Render)->shader_compile(name, (DWORD const*)data, size, c_entry, c_target, D3DCOMPILE_DEBUG | D3DCOMPILE_PACK_MATRIX_ROW_MAJOR, (void*&)_vs);
 
 		R_ASSERT3(SUCCEEDED(_hr), "Can't compile shader", name);
 
@@ -238,7 +238,7 @@ SPS*	CResourceManager::_CreatePS			(LPCSTR name)
 		LPCSTR c_target = "ps_3_0";
 		LPCSTR c_entry = "main";
 
-		HRESULT const _hr = ::Render->shader_compile(name, (DWORD const*)data, size, c_entry, c_target, D3DCOMPILE_DEBUG | D3DCOMPILE_PACK_MATRIX_ROW_MAJOR, (void*&)_ps);
+		HRESULT const _hr = ((CRender*)::Render)->shader_compile(name, (DWORD const*)data, size, c_entry, c_target, D3DCOMPILE_DEBUG | D3DCOMPILE_PACK_MATRIX_ROW_MAJOR, (void*&)_ps);
 
 		R_ASSERT3(SUCCEEDED(_hr), "Can't compile shader", name);
 

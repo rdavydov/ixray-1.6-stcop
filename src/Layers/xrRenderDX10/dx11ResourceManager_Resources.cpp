@@ -193,7 +193,7 @@ SVS*	CResourceManager::_CreateVS		(LPCSTR _name)
 			flags |= D3DCOMPILE_DEBUG_NAME_FOR_SOURCE;
 		}
 
-		HRESULT	const _hr = ::Render->shader_compile(name, (DWORD const*)data, size, c_entry, c_target, flags, (void*&)_vs);
+		HRESULT	const _hr = ((CRender*)::Render)->shader_compile(name, (DWORD const*)data, size, c_entry, c_target, flags, (void*&)_vs);
 
 		R_ASSERT3(SUCCEEDED(_hr), "Can't compile shader", name);
 
@@ -296,7 +296,7 @@ SPS*	CResourceManager::_CreatePS			(LPCSTR _name)
 			flags |= D3DCOMPILE_DEBUG_NAME_FOR_SOURCE;
 		}
 
-		HRESULT	const _hr = ::Render->shader_compile(name, (DWORD const*)data, size, c_entry, c_target, flags, (void*&)_ps);
+		HRESULT	const _hr = ((CRender*)::Render)->shader_compile(name, (DWORD const*)data, size, c_entry, c_target, flags, (void*&)_ps);
 
 		R_ASSERT3(SUCCEEDED(_hr), "Can't compile shader", name);
 
@@ -367,7 +367,7 @@ SGS*	CResourceManager::_CreateGS			(LPCSTR name)
 			flags |= D3DCOMPILE_DEBUG_NAME_FOR_SOURCE;
 		}
 
-		HRESULT	const _hr = ::Render->shader_compile(name, (DWORD const*)file->pointer(), file->length(), c_entry, c_target, flags, (void*&)_gs);
+		HRESULT	const _hr = ((CRender*)::Render)->shader_compile(name, (DWORD const*)file->pointer(), file->length(), c_entry, c_target, flags, (void*&)_gs);
 
 		R_ASSERT3(SUCCEEDED(_hr), "Can't compile shader", name);
 

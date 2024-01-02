@@ -195,7 +195,7 @@ void CSCompiler::compile(const char* name)
 	LPCSTR						c_target	= "cs_5_0";
 	LPCSTR						c_entry		= "main";
 
-	HRESULT	const _hr = ::Render->shader_compile(name, (DWORD const*)file->pointer(), file->length(), c_entry, c_target, D3DCOMPILE_PACK_MATRIX_ROW_MAJOR, (void*&)m_cs);
+	HRESULT	const _hr = ((CRender*)::Render)->shader_compile(name, (DWORD const*)file->pointer(), file->length(), c_entry, c_target, D3DCOMPILE_PACK_MATRIX_ROW_MAJOR, (void*&)m_cs);
 
 	R_ASSERT3(SUCCEEDED(_hr), "Can't compile shader", name);
 

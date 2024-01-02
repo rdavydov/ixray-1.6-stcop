@@ -17,6 +17,10 @@ file(GLOB_RECURSE ECORE_SOURCE_WM_FILES CONFIGURE_DECORENDS
     "WildMagic/*.*"
 )
 
+file(GLOB_RECURSE ECORE_SOURCE_ERR_FILES CONFIGURE_DECORENDS
+    "dxerr/*.*"
+)
+
 file(GLOB_RECURSE ECORE_SOURCE_RENDER_FILES
     "../../Layers/xrRenderDX9/dx9r_constants_cache.*"
     "../../Layers/xrRender/Animation.*"
@@ -123,6 +127,7 @@ source_group("Editor" FILES ${ECORE_SOURCE_EDITOR_FILES})
 source_group("WildMagic" FILES ${ECORE_SOURCE_WM_FILES})
 source_group("Render" FILES ${ECORE_SOURCE_RENDER_FILES})
 source_group("Other"  FILES ${ECORE_SOURCE_EXT_FILES})
+source_group("dxerr"  FILES ${ECORE_SOURCE_ERR_FILES})
 
 # Apply list
 list(APPEND ECORE_SRC_FILES ${ECORE_SOURCE_ALL_FILES})

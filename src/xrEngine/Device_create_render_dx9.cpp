@@ -91,6 +91,8 @@ D3DPRESENT_PARAMETERS GetPresentParameter(int Width = psCurrentVidMode[0], int H
 	return P;
 }
 
+#include "dxerr/dxerr.h"
+
 ENGINE_API void ResizeBuffersD3D9(u16 Width, u16 Height)
 {
 	if (RenderDSV != nullptr) {
@@ -124,14 +126,20 @@ ENGINE_API void ResizeBuffersD3D9(u16 Width, u16 Height)
 
 	IDirect3DDevice9*& DxDevice = *((IDirect3DDevice9**)&HWRenderDevice);
 	auto P = GetPresentParameter(Width, Height);
-	if (HWRenderDevice != nullptr) {
+
+	bool NeedResize = !Device.b_is_Active|| DxDevice->TestCooperativeLevel();
+
+	if (HWRenderDevice != nullptr && NeedResize)
+	{
 		while (TRUE) {
 			HRESULT _hr = DxDevice->Reset(&P);
 			if (SUCCEEDED(_hr))					break;
-			Msg("! ERROR: [%dx%d]: %s", P.BackBufferWidth, P.BackBufferHeight, Debug.error2string(_hr));
+			Msg("! ERROR: [%dx%d]: %s", P.BackBufferWidth, P.BackBufferHeight, DXGetErrorStringA(_hr));
 			Sleep(100);
 		}
-	} else {
+	}
+	else 
+	{
 		HWND hwnd = (HWND)SDL_GetProperty(SDL_GetWindowProperties(g_AppInfo.Window), "SDL.window.win32.hwnd", nullptr);
 		HRESULT hr = D3D->CreateDevice(
 			D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, hwnd,

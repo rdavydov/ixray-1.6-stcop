@@ -404,9 +404,6 @@ void TUI::Redraw()
 			EDevice->mProject.build_projection(deg2rad(EDevice->fFOV), EDevice->fASPECT, EDevice->m_Camera.m_Znear, EDevice->m_Camera.m_Zfar);
         }
 
-        CHK_DX(REDevice->Clear(0, 0, D3DCLEAR_ZBUFFER | D3DCLEAR_TARGET, EPrefs ? EPrefs->scene_clear_color : 0xFFF, 1, 0));
-
-
         if (EDevice->Begin())
         {
             if (psDeviceFlags.is(rsRenderRealTime))
@@ -417,6 +414,9 @@ void TUI::Redraw()
                 m_Flags.set(flRedraw, FALSE);
                 RCache.set_RT(RT->pRT);
                 RCache.set_ZB(ZB->pRT);
+
+                CHK_DX(REDevice->Clear(0, 0, D3DCLEAR_ZBUFFER | D3DCLEAR_TARGET, EPrefs ? EPrefs->scene_clear_color : 0xFFF, 1, 0));
+
                 //EDevice->Statistic->RenderDUMP_RT.Begin();
                 EDevice->UpdateView();
                 EDevice->ResetMaterial();
