@@ -25,15 +25,18 @@ PS::CPGDef* CPSLibrary::AppendPGD(PS::CPGDef* src)
     return m_PGDs.back();
 }
 //------------------------------------------------------------------------------
+#include "../xrEProps/UIFileLoad.h"
+extern CUFileOpen* FileOpen;
 
 bool CPSLibrary::Save()
 {
-	xr_string temp_fn;
-    if (EFS.GetSaveName	( "$game_data$", temp_fn))
-	{    
-    	return Save		(temp_fn.c_str());
-    }else
-    	return 			false;
+    FileOpen->AfterLoadCallback = [](const xr_string& filePathName)
+    {
+       RImplementation.PSLibrary.Save(filePathName.c_str());
+    };
+    FileOpen->ShowDialog("$game_data$", "");
+
+    return true;
 }
 //------------------------------------------------------------------------------
  bool CPSLibrary::Save2()
