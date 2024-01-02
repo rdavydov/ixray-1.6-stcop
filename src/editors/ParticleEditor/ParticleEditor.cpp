@@ -51,6 +51,9 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
         {
             switch (Event.type)
             {
+                case SDL_EVENT_WINDOW_CLOSE_REQUESTED:
+                    return 0;
+
                 case SDL_EVENT_WINDOW_RESIZED:
                    if (UI && REDevice)
                    {

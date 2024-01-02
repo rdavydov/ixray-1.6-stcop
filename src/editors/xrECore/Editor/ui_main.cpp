@@ -45,7 +45,21 @@ TUI::TUI()
 
     m_bHintShowing	= false;
 	m_LastHint		= "";
-    m_Size.set(1280, 800);
+
+    int DisplayX = GetSystemMetrics(SM_CXFULLSCREEN);
+    int DisplayY = GetSystemMetrics(SM_CYFULLSCREEN);
+
+       //RECT rect;
+       //HWND taskBar = FindWindow(L"Shell_traywnd", NULL);
+       //if (taskBar && GetWindowRect(taskBar, &rect)) 
+       //{
+       //    if (rect.top > 0)
+       //        DisplayY -= rect.bottom - rect.top;
+       //
+       //    DisplayX -= rect.right - rect.left;
+       //}
+
+    m_Size.set(DisplayX, DisplayY);
 }
 //---------------------------------------------------------------------------
 TUI::~TUI()

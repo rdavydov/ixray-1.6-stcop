@@ -240,9 +240,12 @@ void CCustomPreferences::Load(CInifile* I)
     object_flags.flags	= R_U32_SAFE	("editor_prefs","object_flags"		,object_flags.flags );
     EDevice->RadiusRender = R_FLOAT_SAFE("render", "render_radius", EDevice->RadiusRender);
 
+    int DisplayX = GetSystemMetrics(SM_CXFULLSCREEN);
+    int DisplayY = GetSystemMetrics(SM_CYFULLSCREEN);
 
-    start_w = R_U32_SAFE("render", "w", 1280);
-    start_h = R_U32_SAFE("render", "h",800);
+    start_w = R_U32_SAFE("render", "w", DisplayX);
+    start_h = R_U32_SAFE("render", "h", DisplayY);
+
     start_maximized = R_BOOL_SAFE("render", "maximized", false);
 
     bAllowLogCommands = R_BOOL_SAFE("windows", "log", false);
