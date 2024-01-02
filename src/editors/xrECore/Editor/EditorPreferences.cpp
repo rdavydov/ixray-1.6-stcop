@@ -245,6 +245,10 @@ void CCustomPreferences::Load(CInifile* I)
 
     start_w = R_U32_SAFE("render", "w", DisplayX);
     start_h = R_U32_SAFE("render", "h", DisplayY);
+    int x = R_U32_SAFE("render", "x", 0);
+    int y = R_U32_SAFE("render", "y", 0);
+
+    SDL_SetWindowPosition(g_AppInfo.Window, x, y);
 
     start_maximized = R_BOOL_SAFE("render", "maximized", false);
 
@@ -326,6 +330,12 @@ void CCustomPreferences::Save(CInifile* I)
     I->w_bool("render", "maximized", false);
     I->w_u32("render", "w", EDevice->dwRealWidth);
     I->w_u32("render", "h", EDevice->dwRealHeight);
+
+    int X, Y;
+    SDL_GetWindowPosition(g_AppInfo.Window, &X, &Y);
+    I->w_u32("render", "x", X);
+    I->w_u32("render", "y", Y);
+
     I->w_bool("windows", "log", bAllowLogCommands);
     I->w_float("render", "render_radius", EDevice->RadiusRender);
 
@@ -361,6 +371,8 @@ void CCustomPreferences::Load()
     Load				(I);
     xr_delete			(I);
     ApplyValues			();
+
+    UI->m_Size.set((int)start_w, (int)start_h);
 }
 void CCustomPreferences::Save()
 {

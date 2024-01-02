@@ -57,7 +57,10 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
                 case SDL_EVENT_WINDOW_RESIZED:
                    if (UI && REDevice)
                    {
-                       UI->Resize(Event.window.data1, Event.window.data2);
+                       EDevice->dwRealWidth = Event.window.data1;
+                       EDevice->dwRealHeight = Event.window.data2;
+                       EPrefs->Save();
+                       //UI->Resize(Event.window.data1, Event.window.data2);
                    }
                     break;
                 case SDL_EVENT_WINDOW_SHOWN:
@@ -76,6 +79,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
             if (!UI->ProcessEvent(&Event))
                 break;
         }
+       // UI->RedrawScene();
         MainForm->Frame();
 #if 0
         UI->BeginFrame();

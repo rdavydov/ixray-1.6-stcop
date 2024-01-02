@@ -24,16 +24,16 @@ void UITopBarForm::Draw()
 	ImGui::SetNextWindowViewport(viewport->ID);
 
 	ImGuiWindowFlags window_flags = 0
-		| ImGuiWindowFlags_NoDocking
 		| ImGuiWindowFlags_NoTitleBar
 		| ImGuiWindowFlags_NoResize
+		| ImGuiWindowFlags_NoDocking
 		| ImGuiWindowFlags_NoMove
 		| ImGuiWindowFlags_NoScrollbar
 		| ImGuiWindowFlags_NoSavedSettings
 		;
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0);
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.f);
-	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding,ImVec2( 2,2));
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding,ImVec2( 2,4));
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowMinSize, ImVec2(2, 2));
 	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(4, 2));
 	ImGui::Begin("TOOLBAR", NULL, window_flags);

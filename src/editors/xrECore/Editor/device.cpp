@@ -312,9 +312,8 @@ void  CEditorRenderDevice::Resize(int w, int h, bool maximized)
 
 	dwRealWidth = w;
 	dwRealHeight = h;
-	//dwMaximized = maximized;
 
-    Reset			(false);
+    Reset(false);
     UI->RedrawScene	();
 }
 
@@ -325,7 +324,6 @@ void CEditorRenderDevice::Reset  	(bool )
     Resources->DeferredUnload	();
 	UI->ResetBegin();
     Memory.mem_compact		();
-
 	ResizeBuffers(dwRealWidth, dwRealHeight);
     Resources->reset_end	();
 	UI->ResetEnd(RDevice);
