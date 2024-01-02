@@ -1,4 +1,5 @@
 #include "stdafx.h"
+
 UITextForm* UITextForm::Form = nullptr;
 UITextForm::UITextForm(const char* text) :m_Text(text)
 {

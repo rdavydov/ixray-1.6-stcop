@@ -950,6 +950,21 @@ void	CLocatorAPI::file_list_close	(xr_vector<char*>* &lst)
 	}
 }
 
+BOOL CLocatorAPI::file_find(LPCSTR full_name, FS_File& f)
+{
+	intptr_t		hFile;
+	_FINDDATA_T		sFile;
+	// find all files    
+	if (-1 != (hFile = _findfirst((LPSTR)full_name, &sFile))) {
+		f = FS_File(sFile);
+		_findclose(hFile);
+		return		TRUE;
+	}
+	else {
+		return		FALSE;
+	}
+}
+
 int CLocatorAPI::file_list(FS_FileSet& dest, LPCSTR path, u32 flags, LPCSTR mask)
 {
 	R_ASSERT(path);

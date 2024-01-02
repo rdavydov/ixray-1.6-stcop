@@ -180,7 +180,7 @@ void CToolCustom::Render()
 
     cnt = 0;
     for (SDebugDraw::LineIt eit = m_DebugDraw.m_Lines.begin(); eit != m_DebugDraw.m_Lines.end(); eit++) {
-        if (eit->i)        sprintf(temp.data(), ("L: %d", cnt++);
+        if (eit->i)        sprintf(temp.data(), "L: %d", cnt++);
         DU_impl.dbgDrawEdge(eit->p[0], eit->p[1], eit->c, eit->i ? temp.c_str() : "");
     }
     EDevice->SetShader(EDevice->m_SelectionShader);
@@ -189,7 +189,7 @@ void CToolCustom::Render()
     temp.resize(64);
     cnt = 0;
     for (SDebugDraw::FaceIt fwit = m_DebugDraw.m_WireFaces.begin(); fwit != m_DebugDraw.m_WireFaces.end(); fwit++) {
-        if (fwit->i)        sprintf(temp.data(), ("F: %d", cnt++);
+        if (fwit->i)        sprintf(temp.data(), "F: %d", cnt++);
         DU_impl.dbgDrawFace(fwit->p[0], fwit->p[1], fwit->p[2], fwit->c, fwit->i ? temp.c_str() : "");
     }
     

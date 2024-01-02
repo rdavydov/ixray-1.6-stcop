@@ -106,7 +106,8 @@ private:
 	xr_vector<ID3DShaderResourceView*>m_seqSRView;
 #endif //USE_DX11
 };
-struct 		resptrcode_texture	: public resptr_base<CTexture>
+
+struct ECORE_API resptrcode_texture	: public resptr_base<CTexture>
 {
 	void				create			(LPCSTR	_name);
 	void				destroy			()					{ _set(NULL);					}

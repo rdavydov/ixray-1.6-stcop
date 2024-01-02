@@ -23,7 +23,7 @@
 #define ENGINE_BUILD
 #endif	//	XRRENDER_R1_EXPORTS
 
-#ifndef ENGINE_BUILD
+#if !defined (ENGINE_BUILD) && !defined(XR_EDITOR_NEW)
 	#include "ai_space.h"
 #endif
 
@@ -31,7 +31,7 @@ using namespace Script;
 
 int Lua::LuaOut(Lua::ELuaMessageType tLuaMessageType, LPCSTR caFormat, ...)
 {
-#ifndef ENGINE_BUILD
+#if !defined (ENGINE_BUILD) && !defined(XR_EDITOR_NEW)
 	if (!psAI_Flags.test(aiLua))
 		return(0);
 #endif
@@ -96,7 +96,7 @@ int Lua::LuaOut(Lua::ELuaMessageType tLuaMessageType, LPCSTR caFormat, ...)
 	S1		= S2 + xr_strlen(SS);
 	vsprintf(S1,caFormat,l_tMarker);
 
-#ifdef ENGINE_BUILD
+#if defined (ENGINE_BUILD) || defined(XR_EDITOR_NEW)
 	// Msg("[LUA Output] : %s",S2);
 #else
 	ai().lua_output().w_string(S2);
@@ -107,10 +107,10 @@ int Lua::LuaOut(Lua::ELuaMessageType tLuaMessageType, LPCSTR caFormat, ...)
 	return	(l_iResult);
 }
 
-#ifndef ENGINE_BUILD
+#if !defined(ENGINE_BUILD) && !defined(XR_EDITOR_NEW)
 void Script::vfLoadStandardScripts(CLuaVirtualMachine *tpLuaVM)
 {
-	string256		S,S1;
+	string_path		S,S1;
 	FS.update_path	(S,"$game_data$","script.ltx");
 	CInifile		*l_tpIniFile = xr_new<CInifile>(S);
 	R_ASSERT		(l_tpIniFile);
@@ -118,25 +118,29 @@ void Script::vfLoadStandardScripts(CLuaVirtualMachine *tpLuaVM)
 
 	u32				caNamespaceName = _GetItemCount(caScriptString);
 	string256		I;
-	for (u32 i=0; i<caNamespaceName; ++i) {
-		FS.update_path(S,"$game_scripts$",strconcat(S1,_GetItem(caScriptString,i,I),".script"));
+	for (u32 i=0; i<caNamespaceName; ++i) 
+	{
+		FS.update_path(S,"$game_scripts$",xr_strconcat(S1,_GetItem(caScriptString,i,I),".script"));
 		bfLoadFile	(tpLuaVM,S,true);
 		if (bfIsObjectPresent(tpLuaVM,"_G",xr_strcat(I,"_initialize"),LUA_TFUNCTION))
-			lua_dostring(tpLuaVM,xr_strcat(I,"()"));
+			luaL_dostring(tpLuaVM,xr_strcat(I,"()"));
 	}
 	xr_delete		(l_tpIniFile);
 }
 
+#ifndef XR_EDITOR_NEW
 void LuaError(lua_State* L)
 {
 	Debug.fatal(DEBUG_INFO,"LUA error: %s",lua_tostring(L,-1));
 }
+#endif
 
 void Script::vfExportToLua(CLuaVirtualMachine *tpLuaVM)
 {
 	luabind::open					(tpLuaVM);
+#ifdef LUABIND_NO_EXCEPTIONS
 	luabind::set_error_callback		(LuaError);
-
+#endif
 	lua_atpanic		(tpLuaVM,Script::LuaPanic);
 
 	vfExportGlobals				(tpLuaVM);

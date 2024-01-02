@@ -142,6 +142,7 @@ namespace PS
 		void __stdcall  	FillActionList		(ChooseItemVec& items, void* param);
         bool 				Validate 			(bool bMsg);
 		void 				Compile				(EPAVec& v);
+		void				OnDrawUI			();
 #endif
 	};
 };

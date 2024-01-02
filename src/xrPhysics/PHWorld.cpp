@@ -165,7 +165,7 @@ void CPHWorld::SetStep(float s)
 	world_damping										=	1.0f*DAMPING(world_cfm,world_erp);
 	if(ph_world&&ph_world->Exist())
 	{
-		float	frame_time					=	Device().fTimeDelta;
+		float	frame_time					= GetDevice().fTimeDelta;
 		u32		it_number					=	iFloor	(frame_time /fixed_step);
 		frame_time							-=	it_number*fixed_step;
 		ph_world->m_previous_frame_time		=	frame_time;
@@ -187,7 +187,7 @@ void CPHWorld::Create( bool mt, CObjectSpace * os, CObjectList *lo, CRenderDevic
 	//else								
 	//	Device().seqFrame.Add		(this,REG_PRIORITY_LOW);
 
-	Device().AddSeqFrame( this, mt );
+	GetDevice().AddSeqFrame( this, mt );
 
 	//m_commander							=xr_new<CPHCommander>();
 	//dVector3 extensions={2048,256,2048};
@@ -254,9 +254,9 @@ void CPHWorld::Destroy()
 	dCylinderClassUser=-1;
 	dRayMotionsClassUser=-1;
 
-//	Device().seqFrameMT.Remove	(this);
-//	Device().seqFrame.Remove		(this);
-	Device().RemoveSeqFrame( this );
+//	GetDevice().seqFrameMT.Remove	(this);
+//	GetDevice().seqFrame.Remove		(this);
+	GetDevice().RemoveSeqFrame( this );
 	b_exist=false;
 }
 void CPHWorld::SetGravity(float g)
@@ -270,7 +270,7 @@ void CPHWorld::SetGravity(float g)
 void CPHWorld::OnFrame()
 {
 	SCOPE_EVENT_NAME_GROUP("Physics", "Engine");
-	FrameStep(Device().fTimeDelta);
+	FrameStep(GetDevice().fTimeDelta);
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -518,7 +518,7 @@ void CPHWorld::FrameStep(dReal step)
 #endif
 	b_processing=true;
 
-	start_time = Device().dwTimeGlobal;// - u32(m_frame_time*1000);
+	start_time = GetDevice().dwTimeGlobal;// - u32(m_frame_time*1000);
 	if( ph_console::g_bDebugDumpPhysicsStep && it_number > 20 )
 		Msg("!!!TOO MANY PHYSICS STEPS PER FRAME = %d !!!",it_number);
 	for( UINT i=0; i < it_number;++i )	

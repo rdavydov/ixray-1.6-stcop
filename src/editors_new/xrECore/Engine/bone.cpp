@@ -1,7 +1,7 @@
 #include "stdafx.h"
 
-#include "bone.h"
-#include "envelope.h"
+#include "../xrEngine/bone.h"
+#include "../xrEngine/envelope.h"
 #include "..\Editor\UI_ToolsCustom.h"
 ECORE_API void ShapeRotate(CBone&Bone,const Fvector& _amount)
 {

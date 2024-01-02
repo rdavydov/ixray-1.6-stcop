@@ -471,6 +471,19 @@ void CSoundRender_Core::object_relcase( CObject* obj )
     }
 }
 
+void CSoundRender_Core::refresh_sources()
+{
+	for (u32 eit = 0; eit < s_emitters.size(); eit++)
+		s_emitters[eit]->stop(FALSE);
+
+	for (u32 sit = 0; sit < s_sources.size(); sit++) 
+	{
+		CSoundRender_Source* s = s_sources[sit];
+		s->unload();
+		s->load(*s->fname);
+	}
+}
+
 #ifdef _EDITOR
 void						CSoundRender_Core::set_user_env		( CSound_environment* E)
 {
@@ -493,16 +506,6 @@ void						CSoundRender_Core::refresh_env_library()
 	env_unload			();
 	env_load			();
 	env_apply			();
-}
-void						CSoundRender_Core::refresh_sources()
-{
-	for (u32 eit=0; eit<s_emitters.size(); eit++)
-    	s_emitters[eit]->stop(FALSE);
-	for (u32 sit=0; sit<s_sources.size(); sit++){
-    	CSoundRender_Source* s = s_sources[sit];
-    	s->unload		();
-		s->load			(*s->fname);
-    }
 }
 void CSoundRender_Core::set_environment_size	(CSound_environment* src_env, CSound_environment** dst_env)
 {

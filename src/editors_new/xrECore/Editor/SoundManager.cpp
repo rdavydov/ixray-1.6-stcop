@@ -267,11 +267,11 @@ void CSoundManager::SynchronizeSounds(bool sync_thm, bool sync_game, bool bForce
         	if (!THM) THM 			= xr_new<ESoundThumbnail>(it->name.c_str());
             R_ASSERT(THM);
             string_path 			src_name;
-            strconcat				(sizeof(src_name),src_name, base_name.c_str(), ".wav");
+            xr_strconcat			(src_name, base_name.c_str(), ".wav");
 
             FS.update_path			(src_name,_sounds_,src_name);
             string_path 			game_name;
-            strconcat				(sizeof(game_name),game_name, base_name.c_str(), ".ogg");
+            xr_strconcat			(game_name, base_name.c_str(), ".ogg");
             FS.update_path			(game_name,_game_sounds_,game_name);
             MakeGameSound			(THM,src_name,game_name);
 

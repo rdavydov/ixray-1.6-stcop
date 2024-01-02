@@ -58,7 +58,7 @@
 #endif
 #endif
 
-#if defined(GM_NON_GAME) && !defined(XR_EDITOR_NEW)
+#if defined(GM_NON_GAME) && !defined(USE_NORMAL_TYPES)
 	#define SoundVec	shared_str
 	#define PSVec 		shared_str
 	#define ShaderVec 	shared_str
@@ -190,9 +190,11 @@ public:
     PSVec				CollideParticles;
 
 
-#ifdef	GM_NON_GAME
+#if defined(GM_NON_GAME) && !defined(USE_NORMAL_TYPES)
 	#define ShaderVec 	shared_str
     ShaderVec			CollideMarks;
+#elif defined(USE_NORMAL_TYPES)
+    xr_vector<ref_shader> CollideMarks;
 #else	//	GM_NON_GAME
 	FactoryPtr<IWallMarkArray> m_pCollideMarks;
 #endif	//	GM_NON_GAME

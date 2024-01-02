@@ -39,13 +39,16 @@ virtual void Destroy##Class(I##Class *pObject) = 0;
 class IRenderFactory
 {
 public:
+//#ifdef XR_EDITOR_NEW
+	RENDER_FACTORY_INTERFACE(UIShader)
+//#endif
 #ifndef _EDITOR
 	/*
 	virtual IStatsRender* CreateStatsRender() = 0;
 	virtual void DestroyStatsRender(IStatsRender *pObject) = 0;
 	*/
 	RENDER_FACTORY_INTERFACE(UISequenceVideoItem)
-	RENDER_FACTORY_INTERFACE(UIShader)
+//	RENDER_FACTORY_INTERFACE(UIShader)
 	RENDER_FACTORY_INTERFACE(StatGraphRender)
 	RENDER_FACTORY_INTERFACE(RenderDeviceRender)
 #	ifdef DEBUG

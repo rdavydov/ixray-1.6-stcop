@@ -122,7 +122,7 @@ bool file_handle_internal	(LPCSTR file_name, u32 &size, int &file_handle)
 
 void *FileDownload		(LPCSTR file_name, const int &file_handle, u32 &file_size)
 {
-	void				*buffer = Memory.mem_alloc(file_size);
+	char*				buffer = new char[file_size];
 
 	int					r_bytes	= _read(file_handle,buffer,file_size);
 	R_ASSERT3			(

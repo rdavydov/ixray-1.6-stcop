@@ -2,7 +2,7 @@
 #include "stdafx.h"
 #pragma hdrstop
 
-#include "..\..\XrRender\Private\ParticleGroup.h"
+#include "..\..\Layers\xrRender\ParticleGroup.h"
 #include "../Public/PropertiesListHelper.h"
 #include "ui_particletools.h"
 
@@ -140,7 +140,8 @@ void PS::CPGDef::FillProp(LPCSTR pref, ::PropItemVec& items, ::ListItem* owner)
     {
     	u32 clr					= (*it)->m_Flags.is(CPGDef::SEffect::flEnabled)? 0xFF000000 :0xFFC0C0C0;
         xr_string nm;
-        nm.sprintf("Effect #%d", i + 1);
+        nm.resize(64);
+        sprintf(nm.data(), "Effect #%d", i + 1);
         
         B=PHelper().CreateButton(items,PrepareKey(pref,nm.c_str()),"Preview,Select,Remove",ButtonValue::flFirstOnly); B->tag = it-m_Effects.begin();
         B->OnBtnClickEvent.bind	(this,&PS::CPGDef::OnEffectEditClick);

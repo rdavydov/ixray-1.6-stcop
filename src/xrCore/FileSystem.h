@@ -7,7 +7,8 @@
 
 #define BACKUP_FILE_LEVEL 5
 
-class XRCORE_API EFS_Utils {
+class XRCORE_API EFS_Utils 
+{
 protected:
 	bool 		GetOpenNameInternal		(LPCSTR initial, LPSTR buffer, int sz_buf, bool bMulti=false, LPCSTR offset=0, int start_flt_ext=-1 );
 public:

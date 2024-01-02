@@ -42,7 +42,7 @@ CCommandVar CParticleTool::CommandSaveXR(CCommandVar p1, CCommandVar p2)
 CCommandVar CParticleTool::CommandLoadXR(CCommandVar p1, CCommandVar p2)
 {
 	xr_string temp_fn;
-    if (EFS.GetOpenName				(EDevice.m_hWnd, "$game_data$", temp_fn, false, NULL, 0))
+    if (EFS.GetOpenName				("$game_data$", temp_fn, false, NULL, 0))
 	{
         RImplementation.PSLibrary.OnDestroy	();
         RImplementation.PSLibrary.Load		(temp_fn.c_str());
@@ -78,7 +78,7 @@ CCommandVar CParticleTool::CommandValidate(CCommandVar p1, CCommandVar p2)
 }
 CCommandVar CParticleTool::CommandClear(CCommandVar p1, CCommandVar p2)
 {
-    EDevice.m_Camera.Reset();
+    EDevice->m_Camera.Reset();
     ResetPreviewObject();
     ExecCommand(COMMAND_UPDATE_CAPTION);
     return TRUE;
@@ -168,7 +168,7 @@ void CParticleMain::OnDrawUI()
 
 char* CParticleMain::GetCaption()
 {
-	return "particles";
+	return (char*)"particles";
 }
 
 bool  CParticleMain::ApplyShortCut(DWORD Key, TShiftState Shift)
@@ -218,9 +218,9 @@ void CParticleMain::OutCameraPos()
 {
 	VERIFY(m_bReady);
    /* xr_string s;
-	const Fvector& c 	= EDevice.m_Camera.GetPosition();
+	const Fvector& c 	= EDevice->m_Camera.GetPosition();
 	s.sprintf("C: %3.1f, %3.1f, %3.1f",c.x,c.y,c.z);
-//	const Fvector& hpb 	= EDevice.m_Camera.GetHPB();
+//	const Fvector& hpb 	= EDevice->m_Camera.GetHPB();
 //	s.sprintf(" Cam: %3.1f�, %3.1f�, %3.1f�",rad2deg(hpb.y),rad2deg(hpb.x),rad2deg(hpb.z));
     fraBottomBar->paCamera->Caption=s; fraBottomBar->paCamera->Repaint();*/
 }

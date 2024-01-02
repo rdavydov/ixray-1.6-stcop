@@ -308,6 +308,7 @@ class ECORE_API CBone:
 	public CBoneInstance,
 	public IBoneData
 {
+public:
 	shared_str			name;
 	shared_str			parent_name;
 	shared_str			wmap;

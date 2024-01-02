@@ -10,9 +10,12 @@
 
 class dxRenderFactory : public IRenderFactory
 {
+//#ifdef XR_EDITOR_NEW
+	RENDER_FACTORY_DECLARE(UIShader)
+//#endif
 #ifndef _EDITOR	
 	RENDER_FACTORY_DECLARE(UISequenceVideoItem)
-	RENDER_FACTORY_DECLARE(UIShader)
+//	RENDER_FACTORY_DECLARE(UIShader)
 	RENDER_FACTORY_DECLARE(StatGraphRender)
 	RENDER_FACTORY_DECLARE(RenderDeviceRender)
 #	ifdef DEBUG

@@ -6,7 +6,7 @@
 #define XRPHYSICS_API __declspec(dllimport)
 	#ifndef	_EDITOR
 	#else
-		#pragma comment( lib, "xrPhysicsB.lib"	)
+		//#pragma comment( lib, "xrPhysicsB.lib"	)
 	#endif
 #endif
 

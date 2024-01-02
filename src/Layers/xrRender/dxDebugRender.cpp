@@ -176,7 +176,9 @@ public:
 	RDebugRender()
 	{
 		//Device.seqRender.Add		(this);
+#ifndef XR_EDITOR_NEW
 		Device.seqRender.Add		(this,REG_PRIORITY_LOW-100);
+#endif
 	}
 
 virtual	~RDebugRender()

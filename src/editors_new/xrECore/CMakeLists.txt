@@ -5,24 +5,24 @@ file(GLOB_RECURSE ECORE_SOURCE_ALL_FILES CONFIGURE_DECORENDS
     "*.*"
 )
 
-file(GLOB_RECURSE ECORE_SOURCE_ENGINE_FILES
+file(GLOB_RECURSE ECORE_SOURCE_ENGINE_FILES CONFIGURE_DECORENDS
     "Engine/*.*"
 )
 
-file(GLOB_RECURSE ECORE_SOURCE_EDITOR_FILES
+file(GLOB_RECURSE ECORE_SOURCE_EDITOR_FILES CONFIGURE_DECORENDS
     "Editor/*.*"
 )
 
-file(GLOB_RECURSE ECORE_SOURCE_WM_FILES
+file(GLOB_RECURSE ECORE_SOURCE_WM_FILES CONFIGURE_DECORENDS
     "WildMagic/*.*"
 )
 
 file(GLOB_RECURSE ECORE_SOURCE_RENDER_FILES
     "../../Layers/xrRenderDX9/dx9r_constants_cache.*"
     "../../Layers/xrRender/Animation.*"
-    "../../Layers/xrRender/blenders/Blender..*"
-    "../../Layers/xrRender/blenders/Blender_Palette..*"
-    "../../Layers/xrRender/blenders/Blender_Recorder..*"
+    "../../Layers/xrRender/blenders/Blender.*"
+    "../../Layers/xrRender/blenders/Blender_Palette.*"
+    "../../Layers/xrRender/blenders/Blender_Recorder.*"
     "../../Layers/xrRender/Blender_BmmD.*"
     "../../Layers/xrRender/Blender_detail_still.*"
     "../../Layers/xrRender/Blender_Editor_Selection.*"
@@ -107,6 +107,10 @@ file(GLOB_RECURSE ECORE_SOURCE_RENDER_FILES
 )
 
 file(GLOB_RECURSE ECORE_SOURCE_EXT_FILES
+    "../../xrEngine/motion.cpp"
+    "../../xrEngine/fmesh.cpp"
+    "../../xrEngine/xrHemisphere.cpp"
+    "../../xrEngine/ObjectAnimator.cpp"
     "../../xrEngine/ai_script_lua_debug.cpp"
     "../../xrEngine/ai_script_lua_extension.cpp"
 )
@@ -150,6 +154,15 @@ target_compile_definitions(xrECore PRIVATE "$<$<CONFIG:Debug>:DEBUG>")
 target_link_libraries(xrECore PUBLIC xrCore)
 target_link_libraries(xrECore PUBLIC xrEUI)
 target_link_libraries(xrECore PUBLIC xrEProps)
+target_link_libraries(xrECore PUBLIC xrCDB)
+target_link_libraries(xrECore PUBLIC luabind)
+target_link_libraries(xrECore PUBLIC xrParticles)
+target_link_libraries(xrECore PUBLIC xrSound)
+target_link_libraries(xrECore PUBLIC ETools)
+target_link_libraries(xrECore PUBLIC xrAbstractions)
+target_link_libraries(xrECore PUBLIC xrPhysics)
+target_link_libraries(xrECore PUBLIC xrDXT)
+target_link_libraries(xrECore PUBLIC "MagicFM.lib")
 
 # Move precompiled header
 set_target_properties(xrECore PROPERTIES DISABLE_PRECOMPILE_HEADERS ON)
@@ -166,3 +179,26 @@ endif()
 
 target_include_directories(xrECore PUBLIC "${CMAKE_BINARY_DIR}/packages/Microsoft.DXSDK.D3DX.9.29.952.8/build/native/include/")
 target_include_directories(xrECore PUBLIC "${CMAKE_BINARY_DIR}/packages/directxmesh_desktop_win10.2023.4.28.1/include/")
+
+# Nuget
+set(SNDE_OGG ${CMAKE_BINARY_DIR}/packages/ImeSense.Packages.LibOgg.1.3.5.4/)
+set(SNDE_OAL ${CMAKE_BINARY_DIR}/packages/ImeSense.Packages.OpenALSoft.1.23.1.1/)
+set(SNDE_VOB ${CMAKE_BINARY_DIR}/packages/ImeSense.Packages.LibVorbis.1.3.7.4/)
+
+## LibOGG
+target_link_libraries(xrECore PRIVATE ${SNDE_OGG}native/lib/${CMAKE_VS_PLATFORM_NAME}/Release/libogg.lib)
+target_include_directories(xrECore PRIVATE "${SNDE_OGG}/native/include/")
+
+## Vorbis
+target_link_libraries(xrECore PRIVATE ${SNDE_VOB}/native/lib/${CMAKE_VS_PLATFORM_NAME}/Release/libvorbisfile.lib)
+target_link_libraries(xrECore PRIVATE ${SNDE_VOB}/native/lib/${CMAKE_VS_PLATFORM_NAME}/Release/libvorbis.lib)
+target_include_directories(xrECore PRIVATE "${SNDE_VOB}/native/include/")
+
+## OpenAL
+target_link_libraries(xrECore PRIVATE ${SNDE_OAL}/native/lib/${CMAKE_VS_PLATFORM_NAME}/Release/OpenAL32.lib)
+target_include_directories(xrECore PRIVATE "${SNDE_OAL}/native/include/")
+
+add_custom_command(TARGET ${PROJECT_NAME}
+    POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different ${IXRAY_SDK_BIN}MagicFM.dll ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>/
+)

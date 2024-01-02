@@ -89,6 +89,7 @@ void CEditorRenderDevice::Initialize()
 	DRender = &DebugRenderImpl;
 #endif
 
+	SDL_Init(0);
 	// compiler shader
     string_path fn;
     FS.update_path(fn,_game_data_,"shaders_xrlc.xr");
@@ -180,7 +181,11 @@ bool CEditorRenderDevice::Create()
 		xr_strcpy			(ini_name, UI->EditorName());
 		xr_strcat			(ini_name, "_imgui.ini");
 		FS.update_path(ini_path, "$local_root$", ini_name);
-		if (!FS.exist(ini_path))UI->ResetUI();
+		
+		if (!FS.exist(ini_path))
+			UI->ResetUI();
+		
+		InitRenderDeviceEditor();
 		UI->Initialize(hwnd, RDevice, ini_path);
 	}
 	
@@ -311,21 +316,18 @@ void  CEditorRenderDevice::Resize(int w, int h, bool maximized)
     UI->RedrawScene	();
 }
 
+ENGINE_API void ResizeBuffersD3D9(u16 Width, u16 Height);
+
 void CEditorRenderDevice::Reset  	(bool )
 {
     u32 tm_start			= TimerAsync();
     Resources->reset_begin	();
 	UI->ResetBegin();
     Memory.mem_compact		();
-    //HW.DevPP.BackBufferWidth= dwRealWidth;
-    //HW.DevPP.BackBufferHeight= dwRealHeight;
-    //HW.Reset				(m_hWnd);
-   //dwRealWidth					= HW.DevPP.BackBufferWidth;
-   //dwRealHeight				= HW.DevPP.BackBufferHeight;
-//		fWidth_2			= float(dwRealWidth/2);
-//		fHeight_2			= float(dwRealHeight/2);
+
+	ResizeBuffers(dwRealWidth, dwRealHeight);
     Resources->reset_end	();
-	UI->ResetEnd();
+	UI->ResetEnd(RDevice);
     _SetupStates			();
     u32 tm_end				= TimerAsync();
     Msg						("*** RESET [%d ms]",tm_end-tm_start);
@@ -469,7 +471,7 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 void CEditorRenderDevice::CreateWindow()
 {
-	g_AppInfo.Window = SDL_CreateWindow("IX-Ray Editor", 600, 800, 0);
+	g_AppInfo.Window = SDL_CreateWindow("IX-Ray Editor", 1024, 800, 0);
 	//m_WC = { sizeof(WNDCLASSEX), CS_CLASSDC, WndProc, 0L, 0L, GetModuleHandle(NULL), NULL, NULL, NULL, NULL, TEXT("XRay Editor"), NULL };
 	//::RegisterClassEx(&m_WC);
 	//m_hWnd= ::CreateWindowA(m_WC.lpszClassName, TEXT("XRay Editor"), WS_OVERLAPPEDWINDOW, 100, 100, 1280, 800, NULL, NULL, m_WC.hInstance, NULL);

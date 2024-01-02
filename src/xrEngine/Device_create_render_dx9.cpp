@@ -91,7 +91,7 @@ D3DPRESENT_PARAMETERS GetPresentParameter(int Width = psCurrentVidMode[0], int H
 	return P;
 }
 
-void ResizeBuffersD3D9(u16 Width, u16 Height)
+ENGINE_API void ResizeBuffersD3D9(u16 Width, u16 Height)
 {
 	if (RenderDSV != nullptr) {
 		((IDirect3DSurface9*)RenderDSV)->Release();

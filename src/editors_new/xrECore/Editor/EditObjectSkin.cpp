@@ -10,6 +10,9 @@
 #include "d3dutils.h"
 #include "../Public/PropertiesListHelper.h"
 
+// FX: link sphere symbols 
+#include <freemagic/MgcSphere.h>
+
 const u32 color_bone_sel_color	=0xFFFFFFFF;
 const u32 color_bone_norm_color	=0xFFFFFF00;
 const u32 color_bone_link_color	=0xFFA0A000;
@@ -210,6 +213,7 @@ int CEditableObject::GetSelectedBones(BoneVec& sel_bones)
 
 #include <freemagic/MgcCont3DMinSphere.h>
 #include "ExportSkeleton.h"
+
 BOOL	f_valid		(float f)
 {
 	return _finite(f) && !_isnan(f);
@@ -419,4 +423,3 @@ void CEditableObject::ClampByLimits(bool bSelOnly)
     for(BoneIt b_it=lst.begin(); b_it!=lst.end(); b_it++)
     	if (!bSelOnly||(bSelOnly&&(*b_it)->Selected())) (*b_it)->ClampByLimits();
 }
-

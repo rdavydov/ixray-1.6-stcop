@@ -31,6 +31,8 @@ target_compile_definitions(xrEUI PRIVATE "$<$<CONFIG:Debug>:DEBUG>")
 
 # Linker list
 target_link_libraries(xrEUI PUBLIC xrCore)
+target_link_libraries(xrEUI PUBLIC "SDL3.lib" imm32)
+#target_link_libraries(xrEUI PUBLIC imgui)
 
 # Move precompiled header
 set_target_properties(xrEUI PROPERTIES DISABLE_PRECOMPILE_HEADERS ON)

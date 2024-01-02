@@ -8,7 +8,9 @@ enum ECameraStyle{
     csFreeFly
 };
 
-class ECORE_API CUI_Camera{
+using TShiftState = int;
+class ECORE_API CUI_Camera
+{
 	ECameraStyle	m_Style;
     bool			m_bMoving;
     TShiftState	 	m_Shift;

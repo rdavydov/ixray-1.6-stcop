@@ -9,6 +9,7 @@
 #include "ui_main.h"
 #include "EditObject.h"
 #include "../Layers/xrRender/ResourceManager.h"
+#define STB_IMAGE_IMPLEMENTATION
 #include <StbImage/stb_image.h>
 #include "../utils/ETools/ETools.h"
 CImageManager ImageLib;

@@ -101,7 +101,10 @@ char*			xr_strdup		(const char* string)
 }
 wchar_t* xr_strdup(const wchar_t* string)
 {
-	VERIFY(string);
+	if (string == nullptr)
+		return nullptr;
+
+	//VERIFY(string);
 	size_t len = u32(wcslen(string)) + 1;
 	wchar_t* memory = new wchar_t[len];
 	CopyMemory(memory, string, len);

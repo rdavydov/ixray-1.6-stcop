@@ -4,14 +4,15 @@
 #pragma once
 // DirectX headers
 #include <d3d9.h>
-// "directx\d3dx9.h"
+#include <d3dx9.h>
+#include "../xrEUI/stdafx.h"
 #include "..\..\Layers\xrRenderDX9\xrD3DDefs.h"
 
+#define DIRECTINPUT_VERSION 0x0800
 #include <dinput.h>
 //#include <dsound.h>
-#include "../xrEUI/stdafx.h"
-#include "..\xrEngine\stdafx.h"
-#include "..\xrEngine\device.h"
+#include "..\..\xrEngine\stdafx.h"
+#include "..\..\xrEngine\device.h"
 #include "..\xrEProps\stdafx.h"
 #include "..\..\xrCDB\xrCDB.h"
 #include "..\..\xrSound\Sound.h"

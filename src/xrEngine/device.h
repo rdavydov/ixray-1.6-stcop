@@ -161,6 +161,7 @@ public:
 	void									_Destroy	(BOOL	bKeepTextures);
 	void									_SetupStates();
 
+	bool InitRenderDeviceEditor();
 	bool InitRenderDevice(APILevel API) override;
 	void DestroyRenderDevice() override;
 

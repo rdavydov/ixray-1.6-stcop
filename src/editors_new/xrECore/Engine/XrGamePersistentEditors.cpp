@@ -1,14 +1,14 @@
 #include "stdafx.h"
 
-#include "IGame_Persistent.h"
-#include "..\XrAPI\xrGameManager.h"
+#include "../xrEngine/IGame_Persistent.h"
+//#include "..\XrAPI\xrGameManager.h"
 #include "XrGamePersistentEditors.h"
 
-XrGamePersistentEditors::XrGamePersistentEditors():IGame_Persistent (true)
+XrGamePersistentEditors::XrGamePersistentEditors():IGame_Persistent ()
 {
 	g_dedicated_server = false;
 	m_pMainMenu						= NULL;
-	pEnvironment = nullptr;
+	//pEnvironment = nullptr;
 	/*switch (xrGameManager::GetGame())
 	{
 	case EGame::SHOC:

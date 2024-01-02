@@ -1,7 +1,8 @@
 //---------------------------------------------------------------------------
 #include "stdafx.h"
 #pragma hdrstop
-
+#if 0
+#define USE_NORMAL_TYPES 
 #include "GameMtlLib.h"
 
 void DestroySounds(SoundVec& lst)
@@ -10,9 +11,9 @@ void DestroySounds(SoundVec& lst)
 		it->destroy();
 }
 
-void DestroyMarks(ShaderVec& lst)
+void DestroyMarks(xr_vector<ref_shader>& lst)
 {
-	for (ShaderIt it=lst.begin(); lst.end() != it; ++it)
+	for (auto it=lst.begin(); lst.end() != it; ++it)
 		it->destroy();
 }
 
@@ -31,7 +32,7 @@ void CreateSounds(SoundVec& lst, LPCSTR buf)
 		lst[k].create	(_GetItem(buf,k,tmp),st_Effect,sg_SourceType);
 }
 
-void CreateMarks(ShaderVec& lst, LPCSTR buf)
+void CreateMarks(xr_vector<ref_shader>& lst, LPCSTR buf)
 {
 	string256	tmp;
 	int cnt		=_GetItemCount(buf);	R_ASSERT(cnt<=GAMEMTL_SUBITEM_COUNT);
@@ -83,3 +84,4 @@ void SGameMtlPair::Load(IReader& fs)
     fs.r_stringZ			(buf);		CreatePSs			(CollideParticles,*buf);
     fs.r_stringZ			(buf);		CreateMarks			(CollideMarks,*buf);
 }
+#endif

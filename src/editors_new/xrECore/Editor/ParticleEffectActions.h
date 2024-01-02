@@ -40,7 +40,7 @@ struct PVector{
     void 		set(const Fvector& v){val.set(v);}
     void 		set(float x, float y, float z){val.set(x,y,z);}
 };
-struct PDomain
+struct ECORE_API PDomain
 {
 public:
 	PAPI::PDomainEnum	type;

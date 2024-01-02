@@ -267,6 +267,22 @@ static void InitImGui()
 	io.Fonts->Build();
 }
 
+bool CRenderDevice::InitRenderDeviceEditor()
+{
+	fill_vid_mode_list();
+
+	if (!CreateD3D9())
+	{
+		return false;
+	}
+
+	Device.TargetWidth = psCurrentVidMode[0];
+	Device.TargetHeight = psCurrentVidMode[1];
+	CurrentAPILevel = APILevel::DX9;
+
+	return true;
+}
+
 bool CRenderDevice::InitRenderDevice(APILevel API)
 {
 	fill_vid_mode_list();

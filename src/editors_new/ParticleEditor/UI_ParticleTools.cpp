@@ -51,8 +51,8 @@ bool CParticleTool::OnCreate()
     SetAction		(etaSelect);
 
 
-    m_EditPE 		= (PS::CParticleEffect*)::Render->Models->CreatePE(0);
-    m_EditPG		= (PS::CParticleGroup*)::Render->Models->CreatePG(0);
+    m_EditPE 		= (PS::CParticleEffect*)((CRender*)::Render)->Models->CreatePE(0);
+    m_EditPG		= (PS::CParticleGroup*)((CRender*)::Render)->Models->CreatePG(0);
     m_ItemProps = xr_new<UIPropertiesForm>();
     m_ItemProps->SetModifiedEvent(TOnModifiedEvent(this, &CParticleTool::OnItemModified));
 
@@ -60,11 +60,11 @@ bool CParticleTool::OnCreate()
     m_PList = xr_new<UIItemListForm>();
     m_PList->m_Flags.set(UIItemListForm::fMenuEdit, true);
     m_PList->SetOnItemFocusedEvent	(TOnILItemFocused(this,&CParticleTool::OnParticleItemFocused));
-    m_PList->SetOnItemCloneEvent(TOnItemClone(this, &CParticleTool::OnParticleCloneItem));
-    m_PList->SetOnItemCreaetEvent(TOnItemCreate(this, &CParticleTool::OnParticleCreateItem));
-	m_PList->SetOnItemRenameEvent	(TOnItemRename(this,&CParticleTool::OnParticleItemRename));
-    m_PList->SetOnItemRemoveEvent	(TOnItemRemove(this,&CParticleTool::OnParticleItemRemove));
-
+    //m_PList->SetOnItemCloneEvent(TOnItemClone(this, &CParticleTool::OnParticleCloneItem));
+    //m_PList->SetOnItemCreaetEvent(TOnItemCreate(this, &CParticleTool::OnParticleCreateItem));
+	//m_PList->SetOnItemRenameEvent	(TOnItemRename(this,&CParticleTool::OnParticleItemRename));
+    //m_PList->SetOnItemRemoveEvent	(TOnItemRemove(this,&CParticleTool::OnParticleItemRemove));
+    //
     m_ParentAnimator= xr_new<CObjectAnimator>();
 
     m_ObjectProps = xr_new<UIPropertiesForm>();
@@ -157,8 +157,8 @@ void CParticleTool::Render()
     default: THROW;
     }
 	// Draw the particles.
-    ::Render->Models->RenderSingle(m_EditPG,Fidentity,1.f);
-    ::Render->Models->RenderSingle(m_EditPE,Fidentity,1.f);
+    ((CRender*)::Render)->Models->RenderSingle(m_EditPG,Fidentity,1.f);
+    ((CRender*)::Render)->Models->RenderSingle(m_EditPE,Fidentity,1.f);
 
     if (m_Flags.is(flAnimatedPath))
     	m_ParentAnimator->DrawPath();
@@ -174,11 +174,11 @@ void CParticleTool::OnFrame()
     	m_EditObject->OnFrame();
 
     if (m_Flags.is(flAnimatedParent)){
-    	m_ParentAnimator->Update(EDevice.fTimeDelta);
+    	m_ParentAnimator->Update(EDevice->fTimeDelta);
         if (m_ParentAnimator->IsPlaying()){
         	Fvector new_vel;
             new_vel.sub (m_ParentAnimator->XFORM().c,m_Transform.c);
-            new_vel.div (EDevice.fTimeDelta);
+            new_vel.div (EDevice->fTimeDelta);
             m_Vel.lerp	(m_Vel,new_vel,0.9);
             m_Transform	= m_ParentAnimator->XFORM();
             m_Flags.set	(flApplyParent,TRUE);
@@ -192,8 +192,8 @@ void CParticleTool::OnFrame()
 	if (m_Flags.is(flCompileEffect))
     	RealCompileEffect();
 
-    m_EditPE->OnFrame(EDevice.dwTimeDelta);
-    m_EditPG->OnFrame(EDevice.dwTimeDelta);
+    m_EditPE->OnFrame(EDevice->dwTimeDelta);
+    m_EditPG->OnFrame(EDevice->dwTimeDelta);
 
 	if (m_Flags.is(flRefreshProps))
     	RealUpdateProperties();
@@ -211,7 +211,10 @@ void CParticleTool::OnFrame()
         if (m_EditPE->IsPlaying())
         {
 
-            xr_string nn; nn.sprintf(" PE Playing...[%d]", m_EditPE->ParticlesCount()).c_str();
+            xr_string nn;
+            nn.resize(64);
+            sprintf(nn.data(), " PE Playing...[%d]", m_EditPE->ParticlesCount());
+
             UI->SetStatus(nn.c_str(), false);
         }
         
@@ -219,8 +222,13 @@ void CParticleTool::OnFrame()
         	UI->SetStatus(" Stopped.",false);
     break;
     case emGroup:
-    	if (m_EditPG->IsPlaying())
-        	UI->SetStatus(xr_string().sprintf(" PE Playing...[%d]",m_EditPG->ParticlesCount()).c_str(),false);
+        if (m_EditPG->IsPlaying())
+        {
+            xr_string nn;
+            nn.resize(64);
+            sprintf(nn.data(), " PE Playing...[%d]", m_EditPG->ParticlesCount());
+        	UI->SetStatus(nn.c_str(),false);
+        }
         else
         	UI->SetStatus(" Stopped.",false);
     break;
@@ -232,7 +240,7 @@ void CParticleTool::ZoomObject(BOOL bSelOnly)
 {
 	VERIFY(m_bReady);
     if (!bSelOnly&&m_EditObject){
-        EDevice.m_Camera.ZoomExtents(m_EditObject->GetBox());
+        EDevice->m_Camera.ZoomExtents(m_EditObject->GetBox());
 	}else{
     	Fbox box; box.invalidate();
         switch(m_EditMode){
@@ -241,7 +249,7 @@ void CParticleTool::ZoomObject(BOOL bSelOnly)
         case emGroup:	box.set(m_EditPG->vis.box);	break;
 	    default: THROW;
         }
-        if (box.is_valid()){ box.grow(1.f); EDevice.m_Camera.ZoomExtents(box); }
+        if (box.is_valid()){ box.grow(1.f); EDevice->m_Camera.ZoomExtents(box); }
     }
 }
 
@@ -253,28 +261,28 @@ void CParticleTool::PrepareLighting()
     L.type = D3DLIGHT_DIRECTIONAL;
     L.diffuse.set(1,1,1,1);
     L.direction.set(1,-1,1); L.direction.normalize();
-	EDevice.SetLight(0,L);
-	EDevice.LightEnable(0,true);
+	EDevice->SetLight(0,L);
+	EDevice->LightEnable(0,true);
 
     L.diffuse.set(0.3,0.3,0.3,1);
     L.direction.set(-1,-1,-1); L.direction.normalize();
-	EDevice.SetLight(1,L);
-	EDevice.LightEnable(1,true);
+	EDevice->SetLight(1,L);
+	EDevice->LightEnable(1,true);
 
     L.diffuse.set(0.3,0.3,0.3,1);
     L.direction.set(1,-1,-1); L.direction.normalize();
-	EDevice.SetLight(2,L);
-	EDevice.LightEnable(2,true);
+	EDevice->SetLight(2,L);
+	EDevice->LightEnable(2,true);
 
     L.diffuse.set(0.3,0.3,0.3,1);
     L.direction.set(-1,-1,1); L.direction.normalize();
-	EDevice.SetLight(3,L);
-	EDevice.LightEnable(3,true);
+	EDevice->SetLight(3,L);
+	EDevice->LightEnable(3,true);
 
 	L.diffuse.set(1.0,0.8,0.7,1);
     L.direction.set(0,1,0); L.direction.normalize();
-	EDevice.SetLight(4,L);
-	EDevice.LightEnable(4,true);
+	EDevice->SetLight(4,L);
+	EDevice->LightEnable(4,true);
 }
 
 void CParticleTool::OnDeviceCreate()
@@ -673,6 +681,7 @@ void CParticleTool::OnShowHint(AStringVec& SS)
 {
 }
 
+float m_MoveSnap = 1;
 bool CParticleTool::MouseStart(TShiftState Shift)
 {
 	inherited::MouseStart(Shift);

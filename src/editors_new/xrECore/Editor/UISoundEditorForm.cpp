@@ -158,10 +158,10 @@ void UISoundEditorForm::OnSyncCurrentClick(ButtonValue* V, bool& bModif, bool& b
 
         string_path             src_name, game_name;
         FS.update_path(src_name, _sounds_, pTHM->SrcName());
-        strconcat(sizeof(src_name), src_name, src_name, ".wav");
+        xr_strconcat(src_name, src_name, ".wav");
 
         FS.update_path(game_name, _game_sounds_, pTHM->SrcName());
-        strconcat(sizeof(game_name), game_name, game_name, ".ogg");
+        xr_strconcat(game_name, game_name, ".ogg");
 
         Msg("synchronizing [%s]", game_name);
         SndLib->MakeGameSound(pTHM, src_name, game_name);

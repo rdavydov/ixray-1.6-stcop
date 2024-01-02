@@ -12,13 +12,13 @@
 #include "UISoundEditorForm.h"
 #include "d3dutils.h"
 
-#include "PSLibrary.h"
 #include "Library.h"
-#include "LightAnimLibrary.h"
+#include "../Layers/xrRender/PSLibrary.h"
+#include "../xrEngine/LightAnimLibrary.h"
 
 #include "ImageManager.h"
 #include "SoundManager.h"
-#include "ResourceManager.h"
+#include "../Layers/xrRender/ResourceManager.h"
 #include "engine\XrGamePersistentEditors.h"
 
 
@@ -199,7 +199,7 @@ void	TUI::ClearCommands ()
 //------------------------------------------------------------------------------
 CCommandVar	TUI::CommandRenderFocus(CCommandVar p1, CCommandVar p2)
 {
-    SetFocus(EDevice->m_hWnd);
+   // SetFocus(EDevice->m_hWnd);
     return 1;
 }
 CCommandVar	TUI::CommandBreakLastOperation(CCommandVar p1, CCommandVar p2)
@@ -236,13 +236,12 @@ CCommandVar 	TUI::CommandRenderResize(CCommandVar p1, CCommandVar p2)
 //------------------------------------------------------------------------------
 CCommandVar CommandInitialize(CCommandVar p1, CCommandVar p2)
 {
-
     EDevice = xr_new< CEditorRenderDevice>();
-    Device = EDevice;
+    g_pDevice = EDevice;
 	CCommandVar res		= TRUE;
     {
         string_path              fn;
-        strconcat(sizeof(fn), fn, UI->EditorName(), ".log");
+        xr_strconcat(fn, UI->EditorName(), ".log");
         FS.update_path(fn, _local_root_, fn);
         string_path 			si_name;
         FS.update_path(si_name, "$game_config$", "system.ltx");
@@ -263,7 +262,7 @@ CCommandVar CommandInitialize(CCommandVar p1, CCommandVar p2)
         Lib.OnCreate	();
         BOOL bWeather = psDeviceFlags.is(rsEnvironment);
         psDeviceFlags.set(rsEnvironment, FALSE);
-        g_pGamePersistent= xr_new<XrGamePersistentEditors>();
+        //g_pGamePersistent= xr_new<XrGamePersistentEditors>();
         if (Tools)
         {
             if (Tools->OnCreate())
@@ -306,7 +305,7 @@ CCommandVar 	CommandDestroy(CCommandVar p1, CCommandVar p2)
     Tools->OnDestroy	();
     SndLib->OnDestroy	();
     xr_delete			(SndLib);
-    DU_impl.DestroyObjects();
+   // DU_impl.DestroyObjects();
     Lib.OnDestroy		();
     UI->OnDestroy		();
     {
@@ -322,7 +321,7 @@ CCommandVar 	CommandDestroy(CCommandVar p1, CCommandVar p2)
     }
     ECommands.clear();
     xr_delete(EDevice);
-    Device = nullptr;
+    g_pDevice = nullptr;
     return				TRUE;
 }             
 CCommandVar 	CommandQuit(CCommandVar p1, CCommandVar p2)
@@ -655,7 +654,7 @@ CCommandVar 	CommandAssignMacro(CCommandVar p1, CCommandVar p2)
 	    ECommands[COMMAND_RUN_MACRO]->sub_commands[p1]->p0 = fn;
 	    return 			TRUE;
     }else{
-    	if (EFS.GetOpenName(EDevice->m_hWnd, _import_,fn,false,NULL,2))
+    	if (EFS.GetOpenName(_import_,fn,false,NULL,2))
         	return 		ExecCommand	(COMMAND_ASSIGN_MACRO,p1,fn);
     }
     return FALSE;

@@ -86,6 +86,7 @@ void EImageThumbnail::CreatePixels(u32* p, u32 w, u32 h)
 	m_Pixels.resize(THUMB_SIZE);
 	imf_Process(m_Pixels.data(),THUMB_WIDTH,THUMB_HEIGHT,p,w,h,imf_box);
 }
+
 void EImageThumbnail::Update(ImTextureID& Texture)
 {
     if (m_Pixels.size() == 0)
@@ -118,7 +119,6 @@ void EImageThumbnail::Update(ImTextureID& Texture)
     }
     
 }
-
 
 EImageThumbnail* CreateThumbnail(LPCSTR src_name, ECustomThumbnail::THMType type, bool bLoad)
 {

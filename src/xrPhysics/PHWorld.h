@@ -123,7 +123,7 @@ ContactCallbackFun				*default_character_contact_shotmark()						{ return m_defa
 	void						NetRelcase						(CPhysicsShell* s)			;
 	CObjectSpace				&ObjectSpace					()							{ VERIFY( m_object_space ); return *m_object_space; }
 	CObjectList					&LevelObjects					()							{ VERIFY( m_level_objects ); return *m_level_objects; }
-	CRenderDeviceBase			&Device							()							{ VERIFY( m_device ); return *m_device;	}
+	CRenderDeviceBase			&GetDevice						()							{ VERIFY( m_device ); return *m_device;	}
 	
 //	void						AddCall							(CPHCondition*c,CPHAction*a);
 #ifdef DEBUG

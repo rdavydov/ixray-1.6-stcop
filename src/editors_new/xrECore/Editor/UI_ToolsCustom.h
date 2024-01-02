@@ -15,7 +15,17 @@ class CBlend;
 enum ETAction{
     etaSelect=0,
     etaAdd,
+    etaMove,
+    etaRotate,
+    etaScale,
     etaMaxActions
+};
+
+enum ETAxis{
+    etAxisX =0,
+    etAxisY,
+    etAxisZ,
+    etAxisZX,
 };
 
 

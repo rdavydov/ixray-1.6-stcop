@@ -9,6 +9,12 @@
 
 #include "bone.h"
 
+#ifdef XR_EDITOR_NEW
+#define EDITOR_API ECORE_API
+#else
+#define EDITOR_API ENGINE_API
+#endif
+
 // refs
 class CEnvelope;
 class IWriter;
@@ -43,7 +49,7 @@ using BoneMotionVec = xr_vector<st_BoneMotion>;
 using BoneMotionIt = BoneMotionVec::iterator;
 
 //--------------------------------------------------------------------------
-class ENGINE_API CCustomMotion
+class EDITOR_API CCustomMotion
 {
 protected:
 	enum EMotionType
@@ -83,7 +89,7 @@ public:
 };
 
 //--------------------------------------------------------------------------
-class ENGINE_API COMotion: public CCustomMotion
+class EDITOR_API COMotion: public CCustomMotion
 {
 	CEnvelope*		envs			[ctMaxChannel];
 public:
@@ -109,7 +115,7 @@ public:
 	void			DeleteKey		(float t);
     void			NormalizeKeys	();
     int				KeyCount		();
-	CEnvelope*		Envelope		(EChannelType et=ctPositionX){return envs[et];}
+	IC CEnvelope*		Envelope		(EChannelType et=ctPositionX){return envs[et];}
     BOOL			ScaleKeys		(float from_time, float to_time, float scale_factor);
     BOOL			NormalizeKeys	(float from_time, float to_time, float speed);
     float			GetLength		(float* mn=0, float* mx=0);
@@ -132,7 +138,8 @@ enum ESMFlags{
 #if defined(_EDITOR) || defined(_MAX_EXPORT) || defined(_MAYA_EXPORT)
 	#include "SkeletonMotions.h"
 
-class ENGINE_API CSMotion: public CCustomMotion{
+class EDITOR_API CSMotion: public CCustomMotion
+{
 	BoneMotionVec	bone_mots;
 public:
     u16			           	        m_BoneOrPart;
@@ -155,8 +162,8 @@ public:
     void			CopyMotion		(CSMotion* src);
 
     st_BoneMotion*	FindBoneMotion	(shared_str name);
-    BoneMotionVec&	BoneMotions		()				{return bone_mots;}
-	Flags8			GetMotionFlags	(int bone_idx)	{return bone_mots[bone_idx].m_Flags;}
+    IC BoneMotionVec& BoneMotions	()				{return bone_mots;}
+	IC Flags8		GetMotionFlags	(int bone_idx)	{return bone_mots[bone_idx].m_Flags;}
 	void			add_empty_motion(shared_str const &bone_id);
 
 	virtual void	Save			(IWriter& F);

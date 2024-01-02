@@ -15,11 +15,13 @@
 #	include <rpc.h>
 #endif
 
+#pragma comment(lib, "Rpcrt4.lib")
+
 ECORE_API xrGUID generate_guid()
 {
 	xrGUID			result;
 #ifdef WINVER
-	STATIC_CHECK	(sizeof(xrGUID) == sizeof(GUID),Different_GUID_types);
+	//STATIC_CHECK	(sizeof(xrGUID) == sizeof(GUID),Different_GUID_types);
 	GUID			_result;
 	RPC_STATUS		gen_result = UuidCreate(&_result);
 	Memory.mem_copy	(&result,&_result,sizeof(_result));
@@ -30,9 +32,14 @@ ECORE_API xrGUID generate_guid()
 		default						: break;
 	}
 #endif
-	STATIC_CHECK	(sizeof(result) >= sizeof(u64),GUID_must_have_size_greater_or_equal_to_the_long_long);
+	//STATIC_CHECK	(sizeof(result) >= sizeof(u64),GUID_must_have_size_greater_or_equal_to_the_long_long);
 	ZeroMemory		(&result,sizeof(result));
 	u64				temp = CPU::GetCLK();
 	Memory.mem_copy	(&result,&temp,sizeof(temp));
 	return			(result);
+}
+
+u32 GetGpuNum()
+{
+	return 1;
 }

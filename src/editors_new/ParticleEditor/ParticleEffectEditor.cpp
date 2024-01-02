@@ -4,8 +4,8 @@
 
 #ifdef _PARTICLE_EDITOR
 
-#include "..\..\xrRender\Private\ParticleEffect.h"
-#include "..\XrEcore\Editor\ParticleEffectActions.h"
+#include "..\..\Layers\xrRender\ParticleEffect.h"
+#include "..\xrEcore\Editor\ParticleEffectActions.h"
 #include "../Public/PropertiesListHelper.h"
 #include "ui_particletools.h"
 #include "../xrEProps/FolderLib.h"
@@ -72,6 +72,9 @@ void PS::CPEDef::FillActionList(ChooseItemVec& items, void* param)
     for(int i=0; actions_token[i].name; i++)
         items.push_back(SChooseItem(actions_token[i].name,actions_token[i].info));
 }
+
+bool m_EditChoose = false;
+
 void  PS::CPEDef::OnDrawUI()
 {
     if (m_EditChoose)
@@ -99,7 +102,9 @@ void  PS::CPEDef::OnDrawUI()
                             }
                             else
                             {
-                                temp.sprintf("%s_%02d", pref.c_str(), i - 1);
+                                string64 Buffer;
+                                sprintf(Buffer, "%s_%02d", pref.c_str(), i - 1);
+                                temp = Buffer;
                             }
                             FindActionByName(temp.c_str(), result);
                             if (!result)
@@ -332,7 +337,9 @@ void PS::CPEDef::FillProp(LPCSTR pref, ::PropItemVec& items, ::ListItem* owner)
 	for (EPAVecIt s_it=m_EActionList.begin(); s_it!=m_EActionList.end(); s_it++)
     {
     	u32 clr				= (*s_it)->flags.is(EParticleAction::flEnabled)?0xFF000000:0xFFC0C0C0;
-    	shared_str a_pref		= PrepareKey(pref,"Actions",xr_string().sprintf("%s (%s)",*(*s_it)->actionType,*(*s_it)->actionName).c_str());
+        string128 buffer;
+        sprintf(buffer, "%s (%s)", *(*s_it)->actionType, *(*s_it)->actionName);
+    	shared_str a_pref		= PrepareKey(pref,"Actions", buffer);
 
         ButtonValue* B			= PHelper().CreateButton(items,a_pref,"Up,Down,Remove",ButtonValue::flFirstOnly); B->tag = (s_it-m_EActionList.begin());
         B->Owner()->prop_color	= clr;

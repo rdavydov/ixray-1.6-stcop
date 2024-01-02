@@ -1,8 +1,9 @@
-#include "stdafx.h"
 #ifndef IMGUI_DEFINE_MATH_OPERATORS
 #define IMGUI_DEFINE_MATH_OPERATORS
 #endif
+#include "stdafx.h"
 #include "imgui_internal.h"
+
 float ImGui::GetWindowBarHeight()
 {
     ImGuiWindow* window = GImGui->CurrentWindow;
@@ -25,29 +26,29 @@ bool ImGui::OpenPopupOnItemClick2(const char* str_id, ImGuiPopupFlags popup_flag
 
 bool ImGui::InputFloat(const char* label, float* v, float step, float step_fast, int dec, ImGuiInputTextFlags flags)
 {
-    string_path Format;
-    xr_sprintf(Format, "%%.%df", dec);
+    char Format[256];
+    sprintf(Format, "%%.%df", dec);
     return   InputFloat(label, v, step, step_fast, Format, flags);
 }
 
 bool ImGui::InputFloat2(const char* label, float v[2], int dec, ImGuiInputTextFlags flags)
 {
-    string_path Format;
-    xr_sprintf(Format, "%%.%df", dec);
+    char Format[256];
+    sprintf(Format, "%%.%df", dec);
     return InputFloat2(label, v, Format, flags);
 }
 
 bool ImGui::InputFloat3(const char* label, float v[3], int dec, ImGuiInputTextFlags flags)
 {
-    string_path Format;
-    xr_sprintf(Format, "%%.%df", dec);
+    char Format[256];
+    sprintf(Format, "%%.%df", dec);
     return  InputFloat3(label, v, Format, flags);
 }
 
 bool ImGui::InputFloat4(const char* label, float v[4], int dec, ImGuiInputTextFlags flags)
 {
-    string_path Format;
-    xr_sprintf(Format, "%%.%df", dec);
+    char Format[256];
+    sprintf(Format, "%%.%df", dec);
     return  InputFloat4(label, v, Format, flags);
 }
 bool ImGui::BeginPopupModal(const char* name, bool* p_open, ImGuiWindowFlags flags, bool open_always)

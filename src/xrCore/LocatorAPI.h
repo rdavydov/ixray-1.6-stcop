@@ -175,6 +175,7 @@ public:
     LPCSTR						update_path			(string_path& dest, LPCSTR initial, LPCSTR src);
 
 	int							file_list			(FS_FileSet& dest, LPCSTR path, u32 flags=FS_ListFiles, LPCSTR mask=0);
+	BOOL						file_find			(LPCSTR full_name, FS_File& f);
 
 	bool						load_all_unloaded_archives();
 	void						unload_archive		(archive& A);

@@ -57,7 +57,7 @@ const Fvector& CUI_Camera::GetPosition() const
 {
     if (UI->IsPlayInEditor())
     {
-        return Device->vCameraPosition;
+        return Device.vCameraPosition;
     }
     return m_Position;
 }
@@ -66,7 +66,7 @@ const Fvector& CUI_Camera::GetRight() const
 {
 	if (UI->IsPlayInEditor())
 	{
-		return Device->vCameraRight;
+		return Device.vCameraRight;
 	}
    return m_CamMat.i;
 }
@@ -75,7 +75,7 @@ const Fvector& CUI_Camera::GetNormal() const
 {
 	if (UI->IsPlayInEditor())
 	{
-		return Device->vCameraTop;
+		return Device.vCameraTop;
 	}
     return m_CamMat.j;
 }
@@ -84,7 +84,7 @@ const Fvector& CUI_Camera::GetDirection() const
 {
 	if (UI->IsPlayInEditor())
 	{
-		return Device->vCameraDirection;
+		return Device.vCameraDirection;
 	}
     return m_CamMat.k;
 }

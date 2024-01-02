@@ -4,10 +4,10 @@
 #include "Library.h"
 #include "GameMtlLib.h"
 #include "LightAnimLibrary.h"
-#include "SkeletonAnimated.h"
-#include "ResourceManager.h"
-#include "ParticleEffect.h"
-#include "ParticleGroup.h"
+#include "../../Layers/xrRender/SkeletonAnimated.h"
+#include "../../Layers/xrRender/ResourceManager.h"
+#include "../../Layers/xrRender/ParticleEffect.h"
+#include "../../Layers/xrRender/ParticleGroup.h"
 #include "defines.h"
 #include "EditObject.h"
 ref_sound* choose_snd;
@@ -194,7 +194,7 @@ namespace ChoseEvents
             }
             else
             {
-                R_CHK(HW.pDevice->CreateTexture(THUMB_WIDTH, THUMB_HEIGHT, 1, D3DUSAGE_DYNAMIC, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &pTexture, 0));
+                R_CHK(REDevice->CreateTexture(THUMB_WIDTH, THUMB_HEIGHT, 1, D3DUSAGE_DYNAMIC, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &pTexture, 0));
                 Texture = pTexture;
             }
             {
@@ -346,8 +346,8 @@ namespace ChoseEvents
     //---------------------------------------------------------------------------
     void   FillGameMaterial(ChooseItemVec& items, void* param)
     {
-        GameMtlIt _F = GameMaterialLibrary->FirstMaterial();
-        GameMtlIt _E = GameMaterialLibrary->LastMaterial();
+        GameMtlIt _F = PGMLib->FirstMaterial();
+        GameMtlIt _E = PGMLib->LastMaterial();
         for (; _F != _E; _F++)				items.push_back(SChooseItem(*(*_F)->m_Name, ""));
     }
     //---------------------------------------------------------------------------
@@ -406,12 +406,13 @@ void FillChooseEvents()
 {
     {
         ref_texture texture_null;
-        texture_null.create("ed\\ed_nodata");
+        texture_null.create("ed\\ed_not_existing_texture");
         texture_null->Load();
         VERIFY(texture_null->surface_get());
         texture_null->surface_get()->AddRef();
         UIChooseForm::SetNullTexture(texture_null->surface_get());
     }
+
     UIChooseForm::AppendEvents(smSoundSource, "Select Sound Source", ChoseEvents::FillSoundSource, ChoseEvents::SelectSoundSource, 0, ChoseEvents::CloseSoundSource, 0);
     UIChooseForm::AppendEvents(smSoundEnv, "Select Sound Environment", ChoseEvents::FillSoundEnv, 0, 0, 0, 0);
     UIChooseForm::AppendEvents(smObject, "Select Library Object", ChoseEvents::FillObject, ChoseEvents::SelectObject, ChoseEvents::UpdateObjectTHM, 0, 0);

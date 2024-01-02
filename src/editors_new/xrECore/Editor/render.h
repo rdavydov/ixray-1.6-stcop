@@ -38,6 +38,11 @@ public:
 	virtual ~CRenderTarget() {};
 	virtual u32			get_width			()				{ return EDevice->TargetWidth;	}
 	virtual u32			get_height			()				{ return EDevice->TargetHeight;	}
+
+	virtual u32						get_target_width()	{ return EDevice->TargetWidth;	}
+	virtual u32						get_target_height() { return EDevice->TargetHeight;	}
+	virtual u32						get_core_width()	{ return EDevice->TargetWidth;	}
+	virtual u32						get_core_height()	{ return EDevice->TargetHeight;	}
 };
 
 

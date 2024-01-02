@@ -10,7 +10,7 @@
 #define guid_generatorH
 #pragma once
 
-#include "xrLevel.h"
+#include "../xrEngine/xrLevel.h"
 
 ECORE_API extern xrGUID generate_guid();
 

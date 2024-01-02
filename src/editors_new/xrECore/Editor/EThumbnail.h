@@ -50,7 +50,7 @@ protected:
 public:
 					EImageThumbnail	(LPCSTR src_name, THMType type):ECustomThumbnail(src_name, type){};
 	virtual			~EImageThumbnail();
-	virtual void 	Update			(ImTextureID&Texture);
+	virtual void 	Update			(ImTextureID& Texture);
 //	virtual void 	Draw			(TMxPanel* panel){Irect r; r.set(1,1,1+panel->Width,1+panel->Height); Draw(panel->Canvas->Handle,r);}
     u32*			Pixels			(){return &*m_Pixels.begin();}
     virtual	int		MemoryUsage		(){return 0;};

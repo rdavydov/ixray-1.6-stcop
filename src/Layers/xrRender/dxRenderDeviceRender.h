@@ -68,7 +68,7 @@ private:
 #endif //ifndef _EDITOR
 
 #ifndef USE_DX11
-extern CHWCaps Caps;
+extern ECORE_API CHWCaps Caps;
 #endif
 
 #endif	//	RenderDeviceRender_included

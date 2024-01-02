@@ -39,7 +39,6 @@ dxRenderFactory RenderFactoryImpl;
 
 #ifndef _EDITOR
 	RENDER_FACTORY_IMPLEMENT(UISequenceVideoItem)
-	RENDER_FACTORY_IMPLEMENT(UIShader)
 	RENDER_FACTORY_IMPLEMENT(StatGraphRender)
 	RENDER_FACTORY_IMPLEMENT(RenderDeviceRender)
 #	ifdef DEBUG
@@ -60,4 +59,5 @@ dxRenderFactory RenderFactoryImpl;
     RENDER_FACTORY_IMPLEMENT(EnvDescriptorRender)
     RENDER_FACTORY_IMPLEMENT(FlareRender)
 #endif
+RENDER_FACTORY_IMPLEMENT(UIShader)
 RENDER_FACTORY_IMPLEMENT(FontRender)

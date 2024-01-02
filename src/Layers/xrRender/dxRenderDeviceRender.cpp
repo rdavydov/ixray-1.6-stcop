@@ -1,7 +1,9 @@
 #include "stdafx.h"
 #include "dxRenderDeviceRender.h"
 
-CHWCaps Caps;
+#ifndef USE_DX11
+ECORE_API CHWCaps Caps;
+#endif
 
 #ifndef _EDITOR
 #ifdef DEBUG_DRAW

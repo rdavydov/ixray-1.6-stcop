@@ -1,6 +1,6 @@
 //---------------------------------------------------------------------------
 #pragma once
-#include "../xrEngine/GameMtlLib.h"
+#include "../../xrEngine/GameMtlLib.h"
 
 class ECORE_API SGameMtlEditor:public SGameMtl
 {

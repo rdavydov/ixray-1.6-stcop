@@ -31,7 +31,7 @@
 #include "../xrCore/xr_resource.h"
 
 #ifdef _EDITOR    
-# 	include "ETools.h"
+//# 	include "ETools.h"
 #endif
 
 #endif
