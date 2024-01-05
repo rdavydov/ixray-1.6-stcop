@@ -647,6 +647,7 @@ std::string CWeaponMagazinedWGrenade::NeedAddSuffix(std::string M)
 				new_name = AddSuffixName(new_name, "_ammochange", "_g");
 
 			new_name = AddSuffixName(new_name, "_g");
+
 		}
 		else
 		{
@@ -692,6 +693,9 @@ std::string CWeaponMagazinedWGrenade::NeedAddSuffix(std::string M)
 
 			new_name = AddSuffixName(new_name, "_w_gl");
 		}
+
+		if (!IsScopeAttached())
+			new_name = AddSuffixName(new_name, "_noscope");
 	}
 	else
 		return inherited::NeedAddSuffix(M);
