@@ -1,5 +1,24 @@
 #pragma	once
 
+#include <wx/wx.h>
+#include <wx/cmdline.h>
+
+/*
+class LOG : public wxFrame
+{
+public:
+	LOG(const wxString& title);
+};
+*/
+
+class Main : public wxApp
+{
+public:
+	virtual bool OnInit();
+};
+
+IMPLEMENT_APP(Main)
+
 extern class i_lc_log
 {
 public:
@@ -14,5 +33,5 @@ void clMsg(const char* format, ...);
 void Status(const char* format, ...);
 void Progress(const float F);
 void Phase(const char* phase_name);
-void logThread	    (void *dummy);
-void logCallback	(LPCSTR c);
+void logThread(void *dummy);
+void logCallback(LPCSTR c);

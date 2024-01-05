@@ -22,7 +22,7 @@ void	CThreadManager::start(CThread* T)
 
 void CThreadManager::wait(u32 sleep_time)
 {
-	// Wait for completition
+	// Wait for completion
 	char perf[1024];
 	if (threads.empty())
 		return;

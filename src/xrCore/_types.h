@@ -22,6 +22,8 @@ typedef const char*			pcstr;
 
 // windoze stuff
 #ifndef _WINDOWS_
+	typedef LPSTR			char*;
+	typedef LPCSTR			const char*;
 	typedef	int				BOOL;
 	typedef pstr			LPSTR;
 	typedef pcstr			LPCSTR;

@@ -30,7 +30,7 @@ add_executable(xrForms WIN32 ${UTILS_FORMS_SRC_FILES})
 target_include_directories(xrForms PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")
 target_link_directories(xrForms PUBLIC "${IXRAY_SDK_LIB}/")
 set_target_properties(xrForms PROPERTIES DISABLE_PRECOMPILE_HEADERS ON)
-target_include_directories(xrForms PRIVATE "../../xrServerEntities/")
+target_include_directories(xrForms PRIVATE "../../xrServerEntities/" "../packages/wxWidgets.3.2.2.1/include/")
 
 # Project defines
 target_compile_definitions(xrForms PRIVATE UTILS_FORMS_EXPORTS)
@@ -59,6 +59,7 @@ add_custom_command(TARGET ${PROJECT_NAME}
 
 # NuGet
 set(FREEIMAGE ${CMAKE_BINARY_DIR}/packages/ImeSense.Packages.FreeImage.WinMerge.3.18.0.20230819)
+set(WXWIDGETS ${CMAKE_BINARY_DIR}/packages/wxWidgets.3.2.2.1)
 
 add_custom_command(TARGET ${PROJECT_NAME}
     PRE_BUILD
@@ -70,9 +71,17 @@ if(NOT "${CMAKE_VS_PLATFORM_NAME}" MATCHES "(x64)")
         POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_if_different ${FREEIMAGE}/native/bin/x86/Release/FreeImage.dll ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>/
     )
+    add_custom_command(TARGET ${PROJECT_NAME}
+        POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different ${WXWIDGETS}/native/bin/x86/Release/wxmsw32u_vc.dll ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>/
+    )
 else()
     add_custom_command(TARGET ${PROJECT_NAME}
         POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_if_different ${FREEIMAGE}/native/bin/x64/Release/FreeImage.dll ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>/
+    )
+    add_custom_command(TARGET ${PROJECT_NAME}
+        POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different ${WXWIDGETS}/native/bin/x86/Release/wxmsw32u_vc.dll ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>/
     )
 endif()
