@@ -41,10 +41,7 @@ void ErrorLog(LPCSTR caMessage)
 		}
 #	endif // #ifndef USE_LUA_STUDIO
 
-		bool lua_studio_connected = !!g_pScriptEngine->debugger();
-		if (!lua_studio_connected)
 #endif //#ifdef DEBUG
-	R_ASSERT2(0, caMessage);
 }
 
 void FlushLogs()
