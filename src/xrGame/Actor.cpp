@@ -199,6 +199,8 @@ CActor::CActor() : CEntityAlive(),current_ik_cam_shift(0)
 
 	// Alex ADD: for smooth crouch
 	CurrentHeight = -1.f;
+
+	bTrySprint = true;
 }
 
 
@@ -993,6 +995,11 @@ void CActor::UpdateCL	()
 	}
 	if(pWeapon )
 	{
+		if (pWeapon->NoRunStates())
+			bTrySprint = false;
+		else
+			bTrySprint = true;
+
 		if(pWeapon->IsZoomed())
 		{
 			float full_fire_disp = pWeapon->GetFireDispersion(true);
@@ -1047,6 +1054,7 @@ void CActor::UpdateCL	()
 	{
 		if(Level().CurrentEntity() && this->ID()==Level().CurrentEntity()->ID() )
 		{
+			bTrySprint = true;
 			HUD().SetCrosshairDisp(0.f);
 			HUD().ShowCrosshair(false);
 
