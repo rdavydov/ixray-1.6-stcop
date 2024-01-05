@@ -283,23 +283,9 @@ void CWeaponMagazined::FireEnd()
 	if (psActorFlags.test(AF_AUTORELOAD))
 	{
 		CActor	*actor = smart_cast<CActor*>(H_Parent());
-		if(m_pInventory && !iAmmoElapsed && actor && GetState()!=eReload)
-			Reload();
+		if(m_pInventory && !iAmmoElapsed && actor && GetState() != eReload)
+			TryReload();
 	}
-}
-
-void CWeaponMagazined::Reload() 
-{
-	auto i1 = g_player_hud->attached_item(1);
-	if (i1 && HudItemData())
-	{
-		auto det = smart_cast<CCustomDetector*>(i1->m_parent_hud_item);
-		if (det && det->GetState() != CCustomDetector::eIdle)
-			return;
-	}
-
-	inherited::Reload();
-	TryReload();
 }
 
 bool CWeaponMagazined::TryReload() 
@@ -832,7 +818,7 @@ void CWeaponMagazined::OnAnimationEnd(u32 state)
 		} break;
 		case eUnjam:
 			bMisfire = false;
-			bReloadKeyPressed = false;
+			bUnjamKeyPressed = false;
 			SwitchState(eIdle);
 		break;
 		case eHiding:
@@ -1015,6 +1001,10 @@ void CWeaponMagazined::switch2_Showing()
 
 	SetPending			(TRUE);
 	PlayAnimShow		();
+
+	bReloadKeyPressed = false;
+	bAmmotypeKeyPressed = false;
+	bUnjamKeyPressed = false;
 }
 
 void CWeaponMagazined::switch2_FireMode()
@@ -1031,30 +1021,50 @@ bool CWeaponMagazined::Action(u16 cmd, u32 flags)
 	if(inherited::Action(cmd, flags)) return true;
 	
 	//если оружие чем-то занято, то ничего не делать
-	if(IsPending()) return false;
+	if(IsPending())
+		return false;
 	
+	if (GetState() != eIdle)
+		return false;
+
 	switch(cmd) 
 	{
 	case kWPN_RELOAD:
 		{
-			if(flags&CMD_START)
+			if (!(flags&CMD_START))
+				return false;
+
+			if (IsZoomed())
+				return false;
+
+			if (!bUnjamKeyPressed && !bReloadKeyPressed && !bAmmotypeKeyPressed)
 			{
-				if (IsZoomed())
-					return false;
-
-				if (iAmmoElapsed < iMagazineSize || IsMisfire())
-				{
-					if (!bReloadKeyPressed || !bAmmotypeKeyPressed)
-						bReloadKeyPressed = true;
-
-					if (IsMisfire() && !IsGrenadeMode())
-						SwitchState(eUnjam);
-					else
-						Reload();
-				}
+				if (IsMisfire())
+					bUnjamKeyPressed = true;
+				else
+					bReloadKeyPressed = true;
 			}
-		} 
-		return true;
+			else
+				return false;
+
+			auto i1 = g_player_hud->attached_item(1);
+			if (i1 && HudItemData())
+			{
+				auto det = smart_cast<CCustomDetector*>(i1->m_parent_hud_item);
+				if (det && det->GetState() != CCustomDetector::eIdle)
+					return false;
+			}
+
+			if (IsMisfire() && !IsGrenadeMode())
+			{
+				SwitchState(eUnjam);
+				return true;
+			}
+
+			if (iAmmoElapsed < iMagazineSize)
+				return TryReload();
+
+		}break;
 	case kWPN_FIREMODE_PREV:
 		{
 			if(flags&CMD_START) 
@@ -1549,12 +1559,6 @@ void CWeaponMagazined::OnNextFireMode()
 	if (!m_bHasDifferentFireModes)
 		return;
 
-	if (GetState() != eIdle)
-		return;
-
-	if (IsPending())
-		return;
-
 	bool isGuns = EngineExternal()[EEngineExternalGunslinger::EnableGunslingerMode];
 	if (isGuns)
 	{
@@ -1575,12 +1579,6 @@ void CWeaponMagazined::OnNextFireMode()
 void CWeaponMagazined::OnPrevFireMode()
 {
 	if (!m_bHasDifferentFireModes)
-		return;
-
-	if (GetState() != eIdle)
-		return;
-
-	if (IsPending())
 		return;
 
 	bool isGuns = EngineExternal()[EEngineExternalGunslinger::EnableGunslingerMode];
