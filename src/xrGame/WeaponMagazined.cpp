@@ -117,6 +117,9 @@ void CWeaponMagazined::Load	(LPCSTR section)
 	if (WeaponSoundExist(section, "snd_breechblock"))
 		m_sounds.LoadSound(section, "snd_breechblock", "sndPump", true, m_eSoundReload);
 
+	if (WeaponSoundExist(section, "snd_jammed_click"))
+		m_sounds.LoadSound(section, "snd_jammed_click", "sndJammedClick", true, m_eSoundEmptyClick);
+
 	if (WeaponSoundExist(section, "snd_aim"))
 		m_sounds.LoadSound(section, "snd_aim", "sndAim", true, m_eSoundAim);
 
@@ -250,14 +253,24 @@ void CWeaponMagazined::FireStart()
 	}
 	else
 	{
-		//misfire
+		if (GetState() != eIdle)
+			return;
 
+		//misfire
 		CGameObject* object = smart_cast<CGameObject*>(H_Parent());
 		if (object)
 			object->callback(GameObject::eOnWeaponJammed)(object->lua_game_object(), this->lua_game_object());
 
 		if(smart_cast<CActor*>(this->H_Parent()) && (Level().CurrentViewEntity()==H_Parent()) )
 			CurrentGameUI()->AddCustomStatic("gun_jammed",true);
+
+		bool isGuns = EngineExternal()[EEngineExternalGunslinger::EnableGunslingerMode];
+
+		if (isGuns)
+		{
+			SwitchState(eCheckMisfire);
+			return;
+		}
 
 		OnEmptyClick();
 	}
@@ -520,6 +533,9 @@ void CWeaponMagazined::OnStateSwitch	(u32 S)
 	case eEmptyClick:
 		switch2_Empty();
 		break;
+	case eCheckMisfire:
+		switch2_CheckMisfire();
+		break;
 	}
 }
 
@@ -592,6 +608,7 @@ void CWeaponMagazined::UpdateCL			()
 		case eSwitchMode:
 		case eEmptyClick:
 		case eUnjam:
+		case eCheckMisfire:
 		case eIdle:
 			{
 				fShotTimeCounter	-=	dt;
@@ -827,6 +844,7 @@ void CWeaponMagazined::OnAnimationEnd(u32 state)
 		case eSwitchMode:
 		case eEmptyClick:
 		case eShowing:
+		case eCheckMisfire:
 		case eFire:
 			SwitchState(eIdle);
 		break;
@@ -915,6 +933,14 @@ void CWeaponMagazined::switch2_Empty()
 		OnEmptyClick();
 		PlayAnimFakeshoot();
 	}
+}
+
+void CWeaponMagazined::switch2_CheckMisfire()
+{
+	PlayAnimFakeshoot();
+
+	if (m_sounds.FindSoundItem("sndJammedClick", false))
+		PlaySound("sndJammedClick", get_LastFP());
 }
 
 void CWeaponMagazined::PlayAnimFakeshoot()
