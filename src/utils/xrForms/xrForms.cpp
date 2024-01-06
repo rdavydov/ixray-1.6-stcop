@@ -1,9 +1,11 @@
 #include "../../xrCore/xrCore.h"
 #include "cl_log.h"
 
+#include "xrForms.h"
+
 #pragma warning(disable:4995)
-#include <timeapi.h>
-#include <commctrl.h>
+//#include <timeapi.h>
+//#include <commctrl.h>
 
 #include <chrono>
 
@@ -15,7 +17,7 @@
 
 #pragma warning(default:4995)
 
-extern HWND logWindow;
+//extern HWND logWindow;
 
 void StartupAI(LPSTR lpCmdLine);
 void StartupLC(LPSTR lpCmdLine);
@@ -24,11 +26,11 @@ void StartupDO(LPSTR lpCmdLine);
 void InitialFactory();
 void DestroyFactory();
 
-
 void Help(const char* h_str)
 {
 	//MessageBoxA(0, h_str, "Command line options", MB_OK | MB_ICONINFORMATION);
 	wxMessageDialog* help = new wxMessageDialog(NULL, wxT("Command line options", h_str, wxOK | wxICON_INFORMATION));
+
 	help->ShowModal();
 }
 
@@ -54,7 +56,6 @@ void Startup(LPSTR lpCmdLine)
 	double dwStartupTime = elapsed.count();
 
 	//u32 dwTimeLC = 0;
-	//auto dwTimeLC = clock.now;
 	double dwTimeLC = .0;
 	if (gCompilerMode.LC)
 	{
@@ -109,8 +110,8 @@ void Startup(LPSTR lpCmdLine)
 
 	// Show statistics
 	string256 stats;
-	extern std::string make_time(u32 sec);
-	u32 dwEndTime = timeGetTime();
+	extern std::string make_time(double sec);
+	//u32 dwEndTime = timeGetTime();
 
 	xr_sprintf
 	(
@@ -127,7 +128,6 @@ void Startup(LPSTR lpCmdLine)
 	{
 		//MessageBoxA(logWindow, stats, "Congratulations!", MB_OK | MB_ICONINFORMATION);
 
-		// congratulations?
 		wxMessageDialog* logWindow = new wxMessageDialog(NULL, wxT("Congratulations!", stats, wxOK | wxICON_INFORMATION));
 		logWindow->ShowModal();
 	}
@@ -163,12 +163,15 @@ bool Main::OnInit()
 	gCompilerMode.Silent = strstr(lpCmdLine, "-silent");
 
 	// Give a LOG-thread a chance to startup
-	InitCommonControls();
+	//InitCommonControls();
+
 	Sleep(150);
 	thread_spawn(logThread, "log-update", 1024 * 1024, 0);
 
+	/*
 	while (!logWindow)
 		Sleep(100);
+		*/
 
 	Startup(lpCmdLine);
 

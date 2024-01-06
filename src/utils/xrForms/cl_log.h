@@ -1,23 +1,12 @@
 #pragma	once
 
 #include <wx/wx.h>
-#include <wx/cmdline.h>
 
-/*
-class LOG : public wxFrame
+class logWindow : public wxFrame
 {
 public:
-	LOG(const wxString& title);
+	logWindow(const wxString& title);
 };
-*/
-
-class Main : public wxApp
-{
-public:
-	virtual bool OnInit();
-};
-
-IMPLEMENT_APP(Main)
 
 extern class i_lc_log
 {

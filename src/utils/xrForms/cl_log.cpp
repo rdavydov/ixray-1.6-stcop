@@ -55,6 +55,7 @@ static INT_PTR CALLBACK logDlgProc( HWND hw, UINT msg, WPARAM wp, LPARAM lp )
 	}
 	return TRUE;
 }
+
 static void _process_messages(void)
 {
 	MSG msg;
@@ -65,11 +66,11 @@ static void _process_messages(void)
 	}
 }
 
-std::string make_time	(u32 sec)
+std::string make_time(double sec)
 {
-	char		buf[64];
-	xr_sprintf		(buf,"%2.0d:%2.0d:%2.0d",sec/3600,(sec%3600)/60,sec%60);
-	int len		= int(xr_strlen(buf));
+	char buf[64];
+	xr_sprintf(buf,"%2.0d:%2.0d:%2.0d", sec / 3600, (sec / 3600) / 60, sec / 60);
+	int len	= int(xr_strlen(buf));
 	for (int i=0; i<len; i++) if (buf[i]==' ') buf[i]='0';
 	return std::string(buf);
 }
@@ -77,15 +78,13 @@ std::string make_time	(u32 sec)
 void __cdecl Status(const char* format, ...)
 {
 	csLog.Enter();
-	va_list				mark;
+	va_list	mark;
 	va_start(mark, format);
 	vsprintf(status, format, mark);
 	bStatusChange = TRUE;
 	Msg("    | %s", status);
 	csLog.Leave();
 }
-
-
 
 void Progress(const float F)
 {
@@ -119,11 +118,12 @@ void Phase(const char* phase_name)
 	csLog.Leave();
 }
 
-HWND logWindow=0;
+//HWND logWindow=0;
 void logThread(void* dummy)
 {
 	SetProcessPriorityBoost(GetCurrentProcess(), TRUE);
 
+	/*
 	logWindow = CreateDialog(
 		HINSTANCE(GetModuleHandle(0)),
 		MAKEINTRESOURCE(IDD_LOG),
@@ -142,6 +142,7 @@ void logThread(void* dummy)
 
 	SendMessageA(hwProgress, PBM_SETRANGE, 0, MAKELPARAM(0, 1000));
 	SendMessageA(hwProgress, PBM_SETPOS, 0, 0);
+	*/
 
 	Msg("\"LevelBuilder v4.1\" beta build\nCompilation date: %s\n", __DATE__);
 	{
@@ -149,12 +150,14 @@ void logThread(void* dummy)
 		Msg("Startup time: %s", _strtime(tmpbuf));
 	}
 
-	BOOL		bHighPriority = FALSE;
-	string256	u_name;
-	unsigned long		u_size = sizeof(u_name) - 1;
+	/*
+	BOOL bHighPriority = FALSE;
+	string256 u_name;
+	unsigned long u_size = sizeof(u_name) - 1;
 	GetUserNameA(u_name, &u_size);
 	_strlwr(u_name);
 	if ((0 == xr_strcmp(u_name, "oles")) || (0 == xr_strcmp(u_name, "alexmx")))	bHighPriority = TRUE;
+	*/
 
 	// Main cycle
 	u32		LogSize = 0;
@@ -246,6 +249,7 @@ void clLog(LPCSTR msg)
 {
 	csLog.Enter();
 	Log(msg);
+
 	csLog.Leave();
 }
 
@@ -256,13 +260,11 @@ void __cdecl clMsg(const char* format, ...)
 	va_start(mark, format);
 	vsprintf(buf, format, mark);
 
-
 	string1024		_out_;
 	xr_strconcat(_out_, "    |    | ", buf);
 	clLog(_out_);
 
 }
-
 
 class client_log_impl : public i_lc_log
 {
@@ -274,3 +276,7 @@ class client_log_impl : public i_lc_log
 public:
 	client_log_impl() { lc_log = this; }
 } client_log_impl;
+
+logWindow::logWindow(const wxString& title)
+{
+}
