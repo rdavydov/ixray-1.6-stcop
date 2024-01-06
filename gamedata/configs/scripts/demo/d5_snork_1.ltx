@@ -1,0 +1,38 @@
+[logic]
+active = mob_home@wait
+on_death = death
+
+[death]
+on_info = %-demo_d5_snork_attack%
+
+[mob_home@wait]
+path_home = pri_b301_home_1
+home_min_radius = 2
+home_max_radius = 5
+on_info = {+demo_d5} mob_home@select
+out_restr = pri_b301_monster_out_restr
+braindead = true
+combat_ignore_cond = true 
+combat_ignore_keep_when_attacked = true 
+npc_friendly = true
+aggressive = false
+
+[mob_home@select]
+path_home = pri_b301_home_1
+home_min_radius = 7
+home_max_radius = 10
+on_info = {-demo_d5_snork_attack ~20} mob_home@attack %+demo_d5_snork_attack%
+out_restr = pri_b301_monster_out_restr
+braindead = true
+combat_ignore_cond = true 
+combat_ignore_keep_when_attacked = true 
+npc_friendly = true
+aggressive = false
+
+[mob_home@attack]
+path_home = pri_b301_home_2
+home_min_radius = 10
+home_max_radius = 12
+aggressive = true
+on_game_timer = 50 | mob_home@select %-demo_d5_snork_attack%
+out_restr = pri_b301_monster_out_restr

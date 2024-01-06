@@ -106,3 +106,19 @@ pri_b305_camera_5 = {
 					finish = {
 							}
 					}
+					
+demo_cameff_set = {
+					start = {
+							},
+					idle = {
+								{anim = "scenario_cam\\demo\\amd_cam_1", looped = "false", global_cameffect = true, enabled = "true"},
+								{anim = "scenario_cam\\demo\\amd_cam_2", looped = "false", global_cameffect = true, enabled = "true %+demo_d2%"},
+								{anim = "scenario_cam\\demo\\amd_cam_3", looped = "false", global_cameffect = true, enabled = "true %+demo_d5%"},
+								{anim = "scenario_cam\\demo\\amd_cam_4", looped = "false", global_cameffect = true, enabled = "true %+demo_d6%"},
+								{anim = "scenario_cam\\demo\\amd_cam_5", looped = "false", global_cameffect = true, enabled = "true %+demo_d7%"},
+								{anim = "scenario_cam\\demo\\amd_cam_6", looped = "false", global_cameffect = true, enabled = "true %=exit_game%"},
+							},
+					finish = {
+							}
+						}
+					

@@ -1,0 +1,28 @@
+[logic]
+active = camper@wait_for_actor
+
+[camper@wait_for_actor]
+path_walk = pri_b301_zulus_walk_1
+path_look = pri_b301_zulus_look_1
+out_restr = pri_b301_zulus_def_restr
+combat_ignore_cond = true
+combat_ignore_keep_when_attacked = true
+invulnerable = true
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+meet = no_meet
+on_info = {+demo_d5} camper@defend
+
+[camper@defend]
+path_walk = pri_b301_zulus_walk_1
+path_look = pri_b301_zulus_look_1
+out_restr = pri_b301_zulus_def_restr
+invulnerable = true
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+meet = no_meet
+radius = 30
+def_state_campering_fire = threat_fire
+def_state_campering = threat_fire

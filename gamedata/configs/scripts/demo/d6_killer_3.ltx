@@ -1,0 +1,24 @@
+[logic]
+active = smartcover@wait
+
+[smartcover@wait]
+cover_name = d6_sc_1
+use_in_combat = true
+combat_ignore_cond = true 
+combat_ignore_keep_when_attacked = true
+invulnerable = true 
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+meet = no_meet
+on_info = {+demo_d6} smartcover@attack
+
+[smartcover@attack]
+cover_name = d6_sc_1
+use_in_combat = true
+invulnerable = true 
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+meet = no_meet
+

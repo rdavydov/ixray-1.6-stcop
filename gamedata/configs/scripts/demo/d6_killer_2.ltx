@@ -1,0 +1,27 @@
+[logic]
+active = walker@wait
+
+[walker@wait]
+path_walk = d6_killer_2_start
+path_look = d6_killer_2_look
+def_state_standing = threat_na
+def_state_moving = assault
+combat_ignore_cond = true 
+combat_ignore_keep_when_attacked = true
+invulnerable = true 
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+meet = no_meet
+on_info = {+demo_d6} walker@attack
+
+[walker@attack]
+path_walk = d6_killer_2_attack
+path_look = d6_killer_2_look
+def_state_standing = threat_na
+def_state_moving = assault
+invulnerable = true 
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+meet = no_meet

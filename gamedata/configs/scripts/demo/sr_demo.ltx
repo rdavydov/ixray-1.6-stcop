@@ -1,0 +1,19 @@
+[logic]
+active = sr_cutscene@demo %=disable_ui%
+
+[sr_idle@alife]
+on_info = sr_idle@start %=widen_alife%
+
+[sr_idle@start]
+on_info = sr_cutscene@demo
+
+[sr_cutscene@demo]
+point = pri_a16_pri_b305_kirillov_closer_walk
+look = pri_a16_pri_b305_tarasov_walk
+cam_effector = demo_cameff_set
+on_signal = cameff_end | sr_idle@end
+outdoor = true
+enable_ui_on_end = false
+
+[sr_idle@end]
+on_info = %=exit_game%
